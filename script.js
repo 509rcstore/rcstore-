@@ -2176,9 +2176,8 @@ function init() {
 
   renderCart();
 
-  setupButtons();
-
-}
-
-
-init();    
+  setupButtons()
+     renderProducts();
+renderCart();
+setupDeliveryFields();
+setupPaymentFields();
