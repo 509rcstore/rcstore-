@@ -1,4 +1,4 @@
-Wi 👍🏽 Men li ankò pou w ka rekopye l dirèkteman. Se menm vèsyon an, ak Arcahaie + zòn yo + panier + NatCash + prèv peman + commandes + pending/paid + reçu.
+
 
 const products = [
   {
