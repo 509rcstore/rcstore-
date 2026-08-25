@@ -1,4 +1,11 @@
+     // =====================================
+// RC STORE — SCRIPT COMPLET
+// =====================================
 
+
+// =====================================
+// PRODUITS
+// =====================================
 
 const products = [
   {
@@ -78,7 +85,8 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_ZKacsfCd6dI-srcCWJeh0g_PpYB6G-M";
 
-const NATCASH_NUMBER = "41551464";
+const NATCASH_NUMBER =
+  "41551464";
 
 const PAYMENT_BUCKET =
   "preuves-de-paiement";
@@ -94,7 +102,7 @@ const communes = [
 
 
 // =====================================
-// ZONES - ARCAHAIE
+// ZONES
 // =====================================
 
 const zones = [
@@ -124,12 +132,25 @@ const zones = [
 ];
 
 
+// =====================================
+// VARIABLES
+// =====================================
+
 let cart =
   JSON.parse(
     localStorage.getItem("rc_cart") || "[]"
   );
 
-let currentCategory = "Tous";
+let currentCategory =
+  "Tous";
+
+let paymentCheckTimer =
+  null;
+
+
+// =====================================
+// HELPER
+// =====================================
 
 const $ = id =>
   document.getElementById(id);
@@ -142,7 +163,8 @@ const $ = id =>
 function money(number) {
 
   return new Intl.NumberFormat("fr-FR")
-    .format(number) + " HTG";
+    .format(Number(number) || 0) +
+    " HTG";
 
 }
 
@@ -163,77 +185,122 @@ function saveCart() {
 }
 
 
+function getCartTotal() {
+
+  return cart.reduce(
+    (sum, item) =>
+      sum +
+      Number(item.price) *
+      Number(item.qty),
+    0
+  );
+
+}
+
+
+function getCartQuantity() {
+
+  return cart.reduce(
+    (sum, item) =>
+      sum + Number(item.qty),
+    0
+  );
+
+}
+
+
 // =====================================
 // PRODUITS
 // =====================================
 
 function renderProducts() {
 
+  const searchInput =
+    $("searchInput");
+
   const search =
-    $("searchInput").value
-      .toLowerCase()
-      .trim();
+    searchInput
+      ? searchInput.value
+          .toLowerCase()
+          .trim()
+      : "";
 
 
   const list =
-    products.filter(product =>
-      (
+    products.filter(product => {
+
+      const categoryOK =
         currentCategory === "Tous" ||
-        product.category === currentCategory
-      ) &&
-      (
+        product.category ===
+          currentCategory;
+
+      const searchOK =
         !search ||
         product.name
           .toLowerCase()
           .includes(search) ||
         product.category
           .toLowerCase()
-          .includes(search)
-      )
-    );
+          .includes(search);
+
+      return categoryOK &&
+        searchOK;
+
+    });
 
 
-  $("resultCount").textContent =
-    list.length + " produit(s)";
+  if ($("resultCount")) {
+
+    $("resultCount")
+      .textContent =
+      list.length +
+      " produit(s)";
+
+  }
 
 
-  $("productGrid").innerHTML =
-    list.map(product => `
+  if ($("productGrid")) {
 
-      <article
-        class="product"
-        onclick="openProduct(${product.id})"
-      >
+    $("productGrid")
+      .innerHTML =
+      list.map(product => `
 
-        <div class="product-img">
-          ${product.emoji}
-        </div>
+        <article
+          class="product"
+          onclick="openProduct(${product.id})"
+        >
 
-        <div class="product-info">
-
-          <div class="category">
-            ${product.category}
+          <div class="product-img">
+            ${product.emoji}
           </div>
 
-          <h3>
-            ${product.name}
-          </h3>
+          <div class="product-info">
 
-          <div class="price">
-            ${money(product.price)}
+            <div class="category">
+              ${product.category}
+            </div>
+
+            <h3>
+              ${product.name}
+            </h3>
+
+            <div class="price">
+              ${money(product.price)}
+            </div>
+
           </div>
 
-        </div>
+        </article>
 
-      </article>
+      `).join("");
 
-    `).join("");
+  }
 
 }
 
 
 // =====================================
-// AJOUTER AU PANIER
+// AJOUT PANIER
 // =====================================
 
 function addToCart(id) {
@@ -244,7 +311,15 @@ function addToCart(id) {
     );
 
 
-  if (!product) return;
+  if (!product) {
+
+    toast(
+      "Produit introuvable"
+    );
+
+    return;
+
+  }
 
 
   const existing =
@@ -280,7 +355,10 @@ function addToCart(id) {
 // QUANTITÉ
 // =====================================
 
-function changeQty(id, difference) {
+function changeQty(
+  id,
+  difference
+) {
 
   const item =
     cart.find(
@@ -298,7 +376,8 @@ function changeQty(id, difference) {
 
     cart =
       cart.filter(
-        product => product.id !== id
+        product =>
+          product.id !== id
       );
 
   }
@@ -317,9 +396,9 @@ function removeItem(id) {
 
   cart =
     cart.filter(
-      product => product.id !== id
+      product =>
+        product.id !== id
     );
-
 
   saveCart();
 
@@ -332,32 +411,44 @@ function removeItem(id) {
 
 function renderCart() {
 
+  if (!$("cartCount"))
+    return;
+
+
   const quantity =
-    cart.reduce(
-      (total, item) =>
-        total + item.qty,
-      0
-    );
+    getCartQuantity();
 
 
-  $("cartCount").textContent =
+  $("cartCount")
+    .textContent =
     quantity;
+
+
+  if (!$("cartItems"))
+    return;
 
 
   if (!cart.length) {
 
-    $("cartItems").innerHTML =
+    $("cartItems")
+      .innerHTML =
       "<p>Votre panier est vide.</p>";
 
-    $("cartTotal").textContent =
-      "0 HTG";
+    if ($("cartTotal")) {
+
+      $("cartTotal")
+        .textContent =
+        "0 HTG";
+
+    }
 
     return;
 
   }
 
 
-  $("cartItems").innerHTML =
+  $("cartItems")
+    .innerHTML =
     cart.map(item => `
 
       <div class="cart-row">
@@ -409,16 +500,15 @@ function renderCart() {
     `).join("");
 
 
-  const total =
-    cart.reduce(
-      (sum, item) =>
-        sum + item.price * item.qty,
-      0
-    );
+  if ($("cartTotal")) {
 
+    $("cartTotal")
+      .textContent =
+      money(
+        getCartTotal()
+      );
 
-  $("cartTotal").textContent =
-    money(total);
+  }
 
 }
 
@@ -438,52 +528,56 @@ function openProduct(id) {
   if (!product) return;
 
 
-  $("productDetail").innerHTML = `
+  $("productDetail")
+    .innerHTML = `
 
-    <div class="detail">
+      <div class="detail">
 
-      <div class="detail-img">
-        ${product.emoji}
-      </div>
-
-      <div>
-
-        <div class="category">
-          ${product.category}
+        <div class="detail-img">
+          ${product.emoji}
         </div>
 
-        <h2>
-          ${product.name}
-        </h2>
+        <div>
 
-        <div class="big-price">
-          ${money(product.price)}
+          <div class="category">
+            ${product.category}
+          </div>
+
+          <h2>
+            ${product.name}
+          </h2>
+
+          <div class="big-price">
+            ${money(product.price)}
+          </div>
+
+          <p>
+            ${product.desc}
+          </p>
+
+          <p>
+            <strong>
+              🚚 Livraison :
+            </strong>
+            environ 1 à 2 jours
+            selon la zone.
+          </p>
+
+          <button
+            class="primary"
+            onclick="
+              addToCart(${product.id});
+              closeModals()
+            "
+          >
+            Ajouter au panier
+          </button>
+
         </div>
-
-        <p>
-          ${product.desc}
-        </p>
-
-        <p>
-          <strong>🚚 Livraison :</strong>
-          environ 1 à 2 jours selon la zone.
-        </p>
-
-        <button
-          class="primary"
-          onclick="
-            addToCart(${product.id});
-            closeModals()
-          "
-        >
-          Ajouter au panier
-        </button>
 
       </div>
 
-    </div>
-
-  `;
+    `;
 
 
   $("productModal")
@@ -505,7 +599,6 @@ function openCart() {
   $("cartDrawer")
     .classList.add("open");
 
-
   $("overlay")
     .classList.remove("hidden");
 
@@ -525,12 +618,20 @@ function closeModals() {
     );
 
 
-  $("cartDrawer")
-    .classList.remove("open");
+  if ($("cartDrawer")) {
+
+    $("cartDrawer")
+      .classList.remove("open");
+
+  }
 
 
-  $("overlay")
-    .classList.add("hidden");
+  if ($("overlay")) {
+
+    $("overlay")
+      .classList.add("hidden");
+
+  }
 
 }
 
@@ -541,7 +642,17 @@ function closeModals() {
 
 function toast(message) {
 
-  $("toast").textContent =
+  if (!$("toast")) {
+
+    alert(message);
+
+    return;
+
+  }
+
+
+  $("toast")
+    .textContent =
     message;
 
 
@@ -554,13 +665,13 @@ function toast(message) {
     $("toast")
       .classList.remove("show");
 
-  }, 1800);
+  }, 2200);
 
 }
 
 
 // =====================================
-// COMMUNE + ZONE
+// LIVRAISON
 // =====================================
 
 function setupDeliveryFields() {
@@ -575,25 +686,26 @@ function setupDeliveryFields() {
       '<option value="">Choisir une commune</option>';
 
 
-    communes.forEach(commune => {
+    communes.forEach(
+      commune => {
 
-      const option =
-        document.createElement("option");
+        const option =
+          document.createElement(
+            "option"
+          );
 
+        option.value =
+          commune;
 
-      option.value =
-        commune;
+        option.textContent =
+          commune;
 
+        communeSelect.appendChild(
+          option
+        );
 
-      option.textContent =
-        commune;
-
-
-      communeSelect.appendChild(
-        option
-      );
-
-    });
+      }
+    );
 
   }
 
@@ -604,19 +716,23 @@ function setupDeliveryFields() {
     );
 
 
-  if (areaInput) {
+  if (
+    areaInput &&
+    !document.querySelector(
+      'select[name="area"]'
+    )
+  ) {
 
     const zoneSelect =
-      document.createElement("select");
-
+      document.createElement(
+        "select"
+      );
 
     zoneSelect.name =
       "area";
 
-
     zoneSelect.required =
       true;
-
 
     zoneSelect.id =
       "zoneSelect";
@@ -626,25 +742,26 @@ function setupDeliveryFields() {
       '<option value="">Choisir une zone</option>';
 
 
-    zones.forEach(zone => {
+    zones.forEach(
+      zone => {
 
-      const option =
-        document.createElement("option");
+        const option =
+          document.createElement(
+            "option"
+          );
 
+        option.value =
+          zone;
 
-      option.value =
-        zone;
+        option.textContent =
+          zone;
 
+        zoneSelect.appendChild(
+          option
+        );
 
-      option.textContent =
-        zone;
-
-
-      zoneSelect.appendChild(
-        option
-      );
-
-    });
+      }
+    );
 
 
     areaInput.replaceWith(
@@ -668,115 +785,171 @@ function setupPaymentFields() {
     );
 
 
-  if (!paymentSelect) return;
+  if (!paymentSelect)
+    return;
 
 
-  let paymentInfo =
+  const paymentInfo =
     $("natcashPaymentInfo");
 
 
-  if (!paymentInfo) {
-
-    paymentInfo =
-      document.createElement("div");
+  if (!paymentInfo)
+    return;
 
 
-    paymentInfo.id =
-      "natcashPaymentInfo";
+  function updatePaymentInfo() {
+
+    if (
+      paymentSelect.value ===
+      "NatCash"
+    ) {
+
+      paymentInfo.style.display =
+        "block";
 
 
-    paymentInfo.style.marginTop =
-      "12px";
+      const total =
+        getCartTotal();
 
 
-    paymentInfo.style.padding =
-      "14px";
+      paymentInfo.innerHTML = `
 
+        <div>
 
-    paymentInfo.style.border =
-      "1px solid #ddd";
+          <strong>
+            💰 Paiement par NatCash
+          </strong>
 
+        </div>
 
-    paymentInfo.style.borderRadius =
-      "10px";
+        <p>
+          Envoyez le montant exact
+          de votre commande au :
+        </p>
 
+        <h3>
+          📱 ${NATCASH_NUMBER}
+        </h3>
 
-    paymentInfo.style.display =
-      "none";
+        <p>
+          Montant à payer :
+          <strong>
+            ${money(total)}
+          </strong>
+        </p>
 
+        <p>
+          Après le paiement, ajoutez
+          une capture d'écran du reçu.
+        </p>
 
-    paymentSelect.parentNode.appendChild(
-      paymentInfo
-    );
+        <label>
+
+          📸 Preuve de paiement
+
+          <input
+            type="file"
+            id="paymentProof"
+            accept="image/jpeg,image/png,image/webp"
+          >
+
+        </label>
+
+      `;
+
+    } else {
+
+      paymentInfo.style.display =
+        "none";
+
+      paymentInfo.innerHTML =
+        "";
+
+    }
 
   }
 
 
   paymentSelect.addEventListener(
     "change",
-    function() {
-
-      if (
-        this.value
-          .toLowerCase()
-          .includes("natcash")
-      ) {
-
-        paymentInfo.style.display =
-          "block";
-
-
-        paymentInfo.innerHTML = `
-
-          <div>
-            <strong>
-              💰 Paiement NatCash
-            </strong>
-          </div>
-
-          <p>
-            Envoyez le montant de votre
-            commande au numéro :
-          </p>
-
-          <h3>
-            ${NATCASH_NUMBER}
-          </h3>
-
-          <p>
-            Après le paiement, ajoutez
-            une capture d'écran ou une
-            photo comme preuve.
-          </p>
-
-          <input
-            type="file"
-            id="paymentProof"
-            accept="image/jpeg,image/png,image/webp"
-            required
-          />
-
-        `;
-
-      } else {
-
-        paymentInfo.style.display =
-          "none";
-
-
-        paymentInfo.innerHTML =
-          "";
-
-      }
-
-    }
+    updatePaymentInfo
   );
+
+
+  updatePaymentInfo();
 
 }
 
 
 // =====================================
-// UPLOAD PREUVE
+// SUPABASE — CREER COMMANDE
+// =====================================
+
+async function createOrder(
+  orderData
+) {
+
+  const response =
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/commandes`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`,
+
+          "Prefer":
+            "return=representation"
+        },
+
+        body:
+          JSON.stringify(
+            orderData
+          )
+      }
+    );
+
+
+  if (!response.ok) {
+
+    const text =
+      await response.text();
+
+    throw new Error(
+      text ||
+      "Impossible d'enregistrer la commande."
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+
+  if (!data.length) {
+
+    throw new Error(
+      "La commande n'a pas été retournée par Supabase."
+    );
+
+  }
+
+
+  return data[0];
+
+}
+
+
+// =====================================
+// SUPABASE — UPLOAD PREUVE
 // =====================================
 
 async function uploadPaymentProof(
@@ -787,7 +960,7 @@ async function uploadPaymentProof(
   if (!file) {
 
     throw new Error(
-      "Veuillez ajouter la preuve de paiement."
+      "Ajoutez la preuve de paiement."
     );
 
   }
@@ -807,7 +980,7 @@ async function uploadPaymentProof(
   ) {
 
     throw new Error(
-      "Format accepté : JPG, PNG ou WEBP."
+      "Utilisez une image JPG, PNG ou WEBP."
     );
 
   }
@@ -815,11 +988,11 @@ async function uploadPaymentProof(
 
   if (
     file.size >
-    50 * 1024 * 1024
+    10 * 1024 * 1024
   ) {
 
     throw new Error(
-      "La photo ne doit pas dépasser 50 MB."
+      "La preuve ne doit pas dépasser 10 MB."
     );
 
   }
@@ -833,22 +1006,16 @@ async function uploadPaymentProof(
 
 
   const filePath =
-    orderId +
-    "/" +
-    Date.now() +
-    "-preuve." +
-    extension;
+    `${orderId}/${Date.now()}-preuve.${extension}`;
 
 
   const response =
     await fetch(
       `${SUPABASE_URL}/storage/v1/object/${PAYMENT_BUCKET}/${filePath}`,
       {
-
         method: "POST",
 
         headers: {
-
           "Authorization":
             `Bearer ${SUPABASE_KEY}`,
 
@@ -860,24 +1027,21 @@ async function uploadPaymentProof(
 
           "x-upsert":
             "false"
-
         },
 
         body: file
-
       }
     );
 
 
   if (!response.ok) {
 
-    const errorText =
+    const text =
       await response.text();
 
-
     throw new Error(
-      "Impossible d'envoyer la preuve : " +
-      errorText
+      "Erreur upload preuve : " +
+      text
     );
 
   }
@@ -889,22 +1053,21 @@ async function uploadPaymentProof(
 
 
 // =====================================
-// CRÉER COMMANDE
+// METTRE A JOUR LA COMMANDE
 // =====================================
 
-async function createOrder(
-  orderData
+async function updateOrder(
+  orderId,
+  updateData
 ) {
 
   const response =
     await fetch(
-      `${SUPABASE_URL}/rest/v1/commandes`,
+      `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}`,
       {
-
-        method: "POST",
+        method: "PATCH",
 
         headers: {
-
           "Content-Type":
             "application/json",
 
@@ -916,25 +1079,24 @@ async function createOrder(
 
           "Prefer":
             "return=representation"
-
         },
 
         body:
-          JSON.stringify(orderData)
-
+          JSON.stringify(
+            updateData
+          )
       }
     );
 
 
   if (!response.ok) {
 
-    const errorText =
+    const text =
       await response.text();
 
-
     throw new Error(
-      "Erreur lors de l'enregistrement de la commande : " +
-      errorText
+      text ||
+      "Impossible de mettre à jour la commande."
     );
 
   }
@@ -944,18 +1106,14 @@ async function createOrder(
     await response.json();
 
 
-  return data[0];
+  return data[0] || null;
 
 }
 
 
 // =====================================
-// VÉRIFIER STATUT
+// VÉRIFIER LE STATUT
 // =====================================
-
-let paymentCheckTimer =
-  null;
-
 
 function startPaymentStatusCheck(
   orderId
@@ -978,19 +1136,15 @@ function startPaymentStatusCheck(
 
           const response =
             await fetch(
-              `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}&select=id,status,created_at,name,phone,commune,zone,items,total,payment_method`,
+              `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}&select=*`,
               {
-
                 headers: {
-
                   "apikey":
                     SUPABASE_KEY,
 
                   "Authorization":
                     `Bearer ${SUPABASE_KEY}`
-
                 }
-
               }
             );
 
@@ -1031,7 +1185,6 @@ function startPaymentStatusCheck(
         } catch (error) {
 
           console.error(
-            "Vérification paiement :",
             error
           );
 
@@ -1052,94 +1205,103 @@ function showPaidReceipt(
   order
 ) {
 
-  const existing =
-    document.getElementById(
-      "rcReceiptBox"
-    );
+  const old =
+    $("rcReceiptBox");
 
 
-  if (existing)
-    existing.remove();
+  if (old)
+    old.remove();
 
 
-  const items =
-    Array.isArray(order.items)
-      ? order.items
-      : [];
+  let items = [];
+
+
+  try {
+
+    items =
+      typeof order.items ===
+      "string"
+        ? JSON.parse(
+            order.items
+          )
+        : (
+            Array.isArray(
+              order.items
+            )
+              ? order.items
+              : []
+          );
+
+  } catch {
+
+    items = [];
+
+  }
 
 
   const itemsHtml =
-    items.map(item => `
+    items.map(
+      item => `
 
-      <div style="
-        display:flex;
-        justify-content:space-between;
-        gap:10px;
-        margin:6px 0;
-      ">
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:10px;
+          margin:7px 0;
+        ">
 
-        <span>
-          ${item.name} × ${item.qty}
-        </span>
+          <span>
+            ${item.name || "Produit"}
+            ×
+            ${item.qty || 1}
+          </span>
 
-        <strong>
-          ${money(
-            item.price * item.qty
-          )}
-        </strong>
+          <strong>
+            ${money(
+              Number(item.price || 0) *
+              Number(item.qty || 1)
+            )}
+          </strong>
 
-      </div>
+        </div>
 
-    `).join("");
+      `
+    ).join("");
 
 
   const date =
     order.created_at
       ? new Date(
           order.created_at
-        ).toLocaleString("fr-FR")
+        ).toLocaleString(
+          "fr-FR"
+        )
       : new Date()
-          .toLocaleString("fr-FR");
+          .toLocaleString(
+            "fr-FR"
+          );
 
 
   const receipt =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
 
   receipt.id =
     "rcReceiptBox";
 
 
-  receipt.style.position =
-    "fixed";
-
-
-  receipt.style.inset =
-    "0";
-
-
-  receipt.style.background =
-    "rgba(0,0,0,.55)";
-
-
-  receipt.style.zIndex =
-    "99999";
-
-
-  receipt.style.display =
-    "flex";
-
-
-  receipt.style.alignItems =
-    "center";
-
-
-  receipt.style.justifyContent =
-    "center";
-
-
-  receipt.style.padding =
-    "18px";
+  receipt.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  `;
 
 
   receipt.innerHTML = `
@@ -1147,9 +1309,9 @@ function showPaidReceipt(
     <div
       id="rcReceiptContent"
       style="
-        background:#fff;
-        max-width:520px;
+        background:white;
         width:100%;
+        max-width:520px;
         max-height:90vh;
         overflow:auto;
         border-radius:16px;
@@ -1174,94 +1336,75 @@ function showPaidReceipt(
 
       </div>
 
-
       <hr>
-
 
       <p>
         <strong>
           N° commande :
         </strong>
-
-        ${order.id}
+        ${order.id || ""}
       </p>
-
 
       <p>
         <strong>
           Client :
         </strong>
-
         ${order.name || ""}
       </p>
-
 
       <p>
         <strong>
           Téléphone :
         </strong>
-
         ${order.phone || ""}
       </p>
-
 
       <p>
         <strong>
           Commune :
         </strong>
-
         ${order.commune || ""}
       </p>
-
 
       <p>
         <strong>
           Zone :
         </strong>
-
-        ${order.zone || ""}
+        ${order.zone || order.area || ""}
       </p>
-
 
       <p>
         <strong>
           Date :
         </strong>
-
         ${date}
       </p>
-
 
       <p>
         <strong>
           Paiement :
         </strong>
-
         ${order.payment_method || "NatCash"}
       </p>
 
-
       <hr>
-
 
       <h4>
         Commande
       </h4>
 
-
       ${itemsHtml}
 
-
       <hr>
-
 
       <h3 style="text-align:right">
 
         Total :
-        ${money(order.total || 0)}
+        ${money(
+          order.total || 0
+        )}
 
       </h3>
-
 
       <p style="text-align:center">
 
@@ -1270,12 +1413,11 @@ function showPaidReceipt(
 
       </p>
 
-
       <div style="
         display:flex;
         gap:10px;
-        flex-wrap:wrap;
         justify-content:center;
+        flex-wrap:wrap;
         margin-top:18px;
       ">
 
@@ -1290,7 +1432,6 @@ function showPaidReceipt(
         >
           📥 Télécharger le reçu
         </button>
-
 
         <button
           id="closeReceiptBtn"
@@ -1316,12 +1457,18 @@ function showPaidReceipt(
   );
 
 
-  $("downloadReceiptBtn").onclick =
-    () => downloadReceipt(order);
+  $("downloadReceiptBtn")
+    .onclick =
+    () =>
+      downloadReceipt(
+        order
+      );
 
 
-  $("closeReceiptBtn").onclick =
-    () => receipt.remove();
+  $("closeReceiptBtn")
+    .onclick =
+    () =>
+      receipt.remove();
 
 }
 
@@ -1335,9 +1482,7 @@ function downloadReceipt(
 ) {
 
   const content =
-    document.getElementById(
-      "rcReceiptContent"
-    );
+    $("rcReceiptContent");
 
 
   if (!content)
@@ -1359,11 +1504,15 @@ function downloadReceipt(
 
 
   const url =
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
 
 
   const link =
-    document.createElement("a");
+    document.createElement(
+      "a"
+    );
 
 
   link.href =
@@ -1371,7 +1520,7 @@ function downloadReceipt(
 
 
   link.download =
-    `recu-RC-STORE-${order.id}.txt`;
+    `recu-RC-STORE-${order.id || "commande"}.txt`;
 
 
   document.body.appendChild(
@@ -1385,7 +1534,520 @@ function downloadReceipt(
   link.remove();
 
 
-  URL.revokeObjectURL(url);
+  URL.revokeObjectURL(
+    url
+  );
+
+}
+
+
+// =====================================
+// CHECKOUT
+// =====================================
+
+function openCheckout() {
+
+  if (!cart.length) {
+
+    toast(
+      "Votre panier est vide."
+    );
+
+    return;
+
+  }
+
+
+  if ($("cartDrawer")) {
+
+    $("cartDrawer")
+      .classList.remove(
+        "open"
+      );
+
+  }
+
+
+  const total =
+    getCartTotal();
+
+
+  const quantity =
+    getCartQuantity();
+
+
+  if ($("checkoutSummary")) {
+
+    $("checkoutSummary")
+      .innerHTML = `
+
+        <div class="delivery-box">
+
+          <strong>
+            ${quantity}
+            article(s) —
+            ${money(total)}
+          </strong>
+
+          <span>
+            🚚 Livraison estimée :
+            1 à 2 jours selon la zone.
+          </span>
+
+        </div>
+
+      `;
+
+  }
+
+
+  if ($("checkoutModal")) {
+
+    $("checkoutModal")
+      .classList.remove(
+        "hidden"
+      );
+
+  }
+
+
+  if ($("overlay")) {
+
+    $("overlay")
+      .classList.remove(
+        "hidden"
+      );
+
+  }
+
+
+  setupDeliveryFields();
+  setupPaymentFields();
+
+}
+
+
+// =====================================
+// SOUMISSION COMMANDE
+// =====================================
+
+async function submitOrder(
+  event
+) {
+
+  event.preventDefault();
+
+
+  if (!cart.length) {
+
+    toast(
+      "Votre panier est vide."
+    );
+
+    return;
+
+  }
+
+
+  const form =
+    event.currentTarget;
+
+
+  const formData =
+    new FormData(form);
+
+
+  const name =
+    String(
+      formData.get("name") || ""
+    ).trim();
+
+
+  const phone =
+    String(
+      formData.get("phone") || ""
+    ).trim();
+
+
+  const commune =
+    String(
+      formData.get("commune") || ""
+    ).trim();
+
+
+  const area =
+    String(
+      formData.get("area") || ""
+    ).trim();
+
+
+  const landmark =
+    String(
+      formData.get("landmark") || ""
+    ).trim();
+
+
+  const payment =
+    String(
+      formData.get("payment") || ""
+    ).trim();
+
+
+  if (
+    !name ||
+    !phone ||
+    !commune ||
+    !area ||
+    !landmark ||
+    !payment
+  ) {
+
+    toast(
+      "Veuillez remplir tous les champs."
+    );
+
+    return;
+
+  }
+
+
+  const proofInput =
+    $("paymentProof");
+
+
+  const proofFile =
+    proofInput &&
+    proofInput.files
+      ? proofInput.files[0]
+      : null;
+
+
+  if (
+    payment === "NatCash" &&
+    !proofFile
+  ) {
+
+    toast(
+      "Ajoutez la preuve du paiement NatCash."
+    );
+
+    return;
+
+  }
+
+
+  const total =
+    getCartTotal();
+
+
+  const quantity =
+    getCartQuantity();
+
+
+  const items =
+    cart.map(
+      item => ({
+        id: item.id,
+        name: item.name,
+        price: Number(item.price),
+        qty: Number(item.qty),
+        category: item.category
+      })
+    );
+
+
+  const button =
+    form.querySelector(
+      'button[type="submit"]'
+    );
+
+
+  if (button) {
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "Enregistrement...";
+
+  }
+
+
+  try {
+
+    // ---------------------------------
+    // CRÉER COMMANDE
+    // ---------------------------------
+
+    const orderData = {
+
+      name,
+
+      phone,
+
+      commune,
+
+      zone: area,
+
+      landmark,
+
+      payment_method:
+        payment,
+
+      total,
+
+      quantity,
+
+      items,
+
+      status:
+        payment === "NatCash"
+          ? "pending"
+          : "pending",
+
+      created_at:
+        new Date().toISOString()
+
+    };
+
+
+    const order =
+      await createOrder(
+        orderData
+      );
+
+
+    if (!order ||
+        !order.id) {
+
+      throw new Error(
+        "La commande n'a pas reçu de numéro."
+      );
+
+    }
+
+
+    // ---------------------------------
+    // UPLOAD PREUVE NATCASH
+    // ---------------------------------
+
+    let proofPath =
+      null;
+
+
+    if (
+      payment === "NatCash"
+    ) {
+
+      proofPath =
+        await uploadPaymentProof(
+          proofFile,
+          order.id
+        );
+
+
+      await updateOrder(
+        order.id,
+        {
+          payment_proof:
+            proofPath
+        }
+      );
+
+    }
+
+
+    // ---------------------------------
+    // SUCCÈS
+    // ---------------------------------
+
+    toast(
+      "Commande enregistrée !"
+    );
+
+
+    cart = [];
+
+
+    saveCart();
+
+
+    form.reset();
+
+
+    if ($("natcashPaymentInfo")) {
+
+      $("natcashPaymentInfo")
+        .style.display =
+        "none";
+
+      $("natcashPaymentInfo")
+        .innerHTML =
+        "";
+
+    }
+
+
+    closeModals();
+
+
+    setTimeout(() => {
+
+      showPendingMessage(
+        order
+      );
+
+    }, 500);
+
+
+    // Vérifier si admin valide
+    // le paiement
+
+    if (
+      payment === "NatCash"
+    ) {
+
+      startPaymentStatusCheck(
+        order.id
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Commande:",
+      error
+    );
+
+
+    toast(
+      error.message ||
+      "Une erreur est survenue."
+    );
+
+  } finally {
+
+    if (button) {
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "Confirmer la commande";
+
+    }
+
+  }
+
+}
+
+
+// =====================================
+// MESSAGE EN ATTENTE
+// =====================================
+
+function showPendingMessage(
+  order
+) {
+
+  const old =
+    $("rcPendingBox");
+
+
+  if (old)
+    old.remove();
+
+
+  const box =
+    document.createElement(
+      "div"
+    );
+
+
+  box.id =
+    "rcPendingBox";
+
+
+  box.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:99998;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  `;
+
+
+  box.innerHTML = `
+
+    <div style="
+      background:#fff;
+      width:100%;
+      max-width:480px;
+      border-radius:16px;
+      padding:25px;
+      text-align:center;
+      font-family:Arial,sans-serif;
+    ">
+
+      <div style="
+        font-size:45px;
+      ">
+        ⏳
+      </div>
+
+      <h2>
+        Commande reçue
+      </h2>
+
+      <p>
+        Votre commande
+        <strong>
+          #${order.id}
+        </strong>
+        a bien été enregistrée.
+      </p>
+
+      <p>
+        Votre paiement NatCash est
+        <strong>
+          en attente de vérification.
+        </strong>
+      </p>
+
+      <p>
+        Après validation du paiement,
+        votre reçu sera disponible.
+      </p>
+
+      <button
+        id="closePendingBtn"
+        class="primary"
+        style="
+          margin-top:15px;
+          padding:12px 20px;
+        "
+      >
+        Compris
+      </button>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    box
+  );
+
+
+  $("closePendingBtn")
+    .onclick =
+    () =>
+      box.remove();
 
 }
 
@@ -1394,487 +2056,129 @@ function downloadReceipt(
 // BOUTONS
 // =====================================
 
-$("cartBtn").onclick =
-  openCart;
+function setupButtons() {
 
+  if ($("cartBtn")) {
 
-$("overlay").onclick =
-  closeModals;
-
-
-document
-  .querySelectorAll("[data-close]")
-  .forEach(button => {
-
-    button.onclick =
-      closeModals;
-
-  });
-
-
-// =====================================
-// RECHERCHE
-// =====================================
-
-$("searchInput").oninput =
-  renderProducts;
-
-
-$("searchBtn").onclick =
-  renderProducts;
-
-
-// =====================================
-// CATÉGORIES
-// =====================================
-
-document
-  .querySelectorAll(".nav-link")
-  .forEach(button => {
-
-    button.onclick = () => {
-
-      document
-        .querySelectorAll(".nav-link")
-        .forEach(item =>
-          item.classList.remove(
-            "active"
-          )
-        );
-
-
-      button.classList.add(
-        "active"
-      );
-
-
-      currentCategory =
-        button.dataset.category;
-
-
-      renderProducts();
-
-    };
-
-  });
-
-
-// =====================================
-// CHECKOUT
-// =====================================
-
-$("checkoutBtn").onclick = () => {
-
-  if (!cart.length) {
-
-    toast(
-      "Votre panier est vide"
-    );
-
-    return;
+    $("cartBtn")
+      .onclick =
+      openCart;
 
   }
 
 
-  $("cartDrawer")
-    .classList.remove(
-      "open"
-    );
+  if ($("overlay")) {
 
+    $("overlay")
+      .onclick =
+      closeModals;
 
-  const total =
-    cart.reduce(
-      (sum, item) =>
-        sum +
-        item.price *
-        item.qty,
-      0
-    );
+  }
 
 
-  const quantity =
-    cart.reduce(
-      (sum, item) =>
-        sum + item.qty,
-      0
-    );
+  document
+    .querySelectorAll(
+      "[data-close]"
+    )
+    .forEach(button => {
 
+      button.onclick =
+        closeModals;
 
-  $("checkoutSummary").innerHTML = `
+    });
 
-    <div class="delivery-box">
 
-      <strong>
+  if ($("checkoutBtn")) {
 
-        ${quantity} article(s)
-        —
-        ${money(total)}
+    $("checkoutBtn")
+      .onclick =
+      openCheckout;
 
-      </strong>
+  }
 
 
-      <span>
+  if ($("orderForm")) {
 
-        🚚 Livraison estimée :
-        1 à 2 jours selon la zone.
+    $("orderForm")
+      .addEventListener(
+        "submit",
+        submitOrder
+      );
 
-      </span>
+  }
 
-    </div>
 
-  `;
+  if ($("searchInput")) {
 
+    $("searchInput")
+      .addEventListener(
+        "input",
+        renderProducts
+      );
 
-  $("checkoutModal")
-    .classList.remove(
-      "hidden"
-    );
+  }
 
 
-  $("overlay")
-    .classList.remove(
-      "hidden"
-    );
+  if ($("searchBtn")) {
 
+    $("searchBtn")
+      .onclick =
+      renderProducts;
 
-  setupDeliveryFields();
+  }
 
-  setupPaymentFields();
 
-};
+  document
+    .querySelectorAll(
+      ".nav-link"
+    )
+    .forEach(button => {
 
+      button.onclick =
+        () => {
 
-// =====================================
-// CONFIRMATION COMMANDE
-// =====================================
-
-$("orderForm")
-  .addEventListener(
-    "submit",
-    async function(event) {
-
-      event.preventDefault();
-
-
-      const formData =
-        new FormData(this);
-
-
-      const name =
-        formData.get("name");
-
-
-      const phone =
-        formData.get("phone");
-
-
-      const commune =
-        formData.get("commune");
-
-
-      const area =
-        formData.get("area");
-
-
-      const landmark =
-        formData.get("landmark");
-
-
-      const payment =
-        formData.get("payment");
-
-
-      if (
-        !name ||
-        !phone ||
-        !commune ||
-        !area ||
-        !landmark ||
-        !payment
-      ) {
-
-        toast(
-          "Veuillez remplir tous les champs."
-        );
-
-        return;
-
-      }
-
-
-      const total =
-        cart.reduce(
-          (sum, item) =>
-            sum +
-            item.price *
-            item.qty,
-          0
-        );
-
-
-      const items =
-        cart.map(item => ({
-
-          id:
-            item.id,
-
-          name:
-            item.name,
-
-          price:
-            item.price,
-
-          qty:
-            item.qty,
-
-          category:
-            item.category
-
-        }));
-
-
-      const isNatCash =
-        payment
-          .toLowerCase()
-          .includes(
-            "natcash"
-          );
-
-
-      if (isNatCash) {
-
-        const proofInput =
-          document.getElementById(
-            "paymentProof"
-          );
-
-
-        if (
-          !proofInput ||
-          !proofInput.files ||
-          !proofInput.files[0]
-        ) {
-
-          toast(
-            "Veuillez ajouter la preuve de paiement NatCash."
-          );
-
-          return;
-
-        }
-
-      }
-
-
-      const submitButton =
-        this.querySelector(
-          'button[type="submit"]'
-        );
-
-
-      if (submitButton) {
-
-        submitButton.disabled =
-          true;
-
-        submitButton.textContent =
-          "Enregistrement...";
-
-      }
-
-
-      try {
-
-        const order =
-          await createOrder({
-
-            name:
-              name,
-
-            phone:
-              phone,
-
-            commune:
-              commune,
-
-            zone:
-              area,
-
-            items:
-              items,
-
-            total:
-              total,
-
-            payment_method:
-              payment,
-
-            payment_proof:
-              null,
-
-            status:
-              "pending"
-
-          });
-
-
-        if (isNatCash) {
-
-          const proofInput =
-            document.getElementById(
-              "paymentProof"
+          document
+            .querySelectorAll(
+              ".nav-link"
+            )
+            .forEach(item =>
+              item.classList
+                .remove(
+                  "active"
+                )
             );
 
 
-          const proofFile =
-            proofInput.files[0];
+          button.classList
+            .add("active");
 
 
-          const proofPath =
-            await uploadPaymentProof(
-              proofFile,
-              order.id
-            );
+          currentCategory =
+            button.dataset.category;
 
 
-          const updateResponse =
-            await fetch(
-              `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(order.id)}`,
-              {
+          renderProducts();
 
-                method:
-                  "PATCH",
+        };
 
-                headers: {
+    });
 
-                  "Content-Type":
-                    "application/json",
-
-                  "apikey":
-                    SUPABASE_KEY,
-
-                  "Authorization":
-                    `Bearer ${SUPABASE_KEY}`,
-
-                  "Prefer":
-                    "return=minimal"
-
-                },
-
-                body:
-                  JSON.stringify({
-
-                    payment_proof:
-                      proofPath
-
-                  })
-
-              }
-            );
-
-
-          if (!updateResponse.ok) {
-
-            throw new Error(
-              "La preuve a été envoyée, mais son enregistrement a échoué."
-            );
-
-          }
-
-        }
-
-
-        $("checkoutModal")
-          .classList.add(
-            "hidden"
-          );
-
-
-        $("overlay")
-          .classList.add(
-            "hidden"
-          );
-
-
-        alert(
-
-          "Merci " +
-          name +
-          " ! Votre commande #" +
-          order.id +
-          " a été enregistrée.\n\n" +
-
-          "Paiement : " +
-          (
-            isNatCash
-              ? "preuve NatCash reçue"
-              : payment
-          ) +
-
-          "\n\n" +
-
-          "Votre paiement est maintenant en attente de vérification par RC STORE. " +
-
-          "Vous recevrez le reçu dès que le paiement sera accepté."
-
-        );
-
-
-        startPaymentStatusCheck(
-          order.id
-        );
-
-
-        cart = [];
-
-
-        saveCart();
-
-
-        this.reset();
-
-
-        setupDeliveryFields();
-
-
-      } catch (error) {
-
-        console.error(
-          error
-        );
-
-
-        alert(
-
-          "Une erreur est survenue :\n\n" +
-          error.message
-
-        );
-
-      } finally {
-
-        if (submitButton) {
-
-          submitButton.disabled =
-            false;
-
-          submitButton.textContent =
-            "Confirmer la commande";
-
-        }
-
-      }
-
-    }
-  );
+}
 
 
 // =====================================
 // DÉMARRAGE
 // =====================================
 
-renderProducts();
+function init() {
 
-renderCart();
+  renderProducts();
 
-setupDeliveryFields();
+  renderCart();
+
+  setupButtons();
+
+}
+
+
+init();    
