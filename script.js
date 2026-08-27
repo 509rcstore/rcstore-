@@ -1,5 +1,11 @@
 // =====================================
-// RC STORE — SCRIPT
+// RC STORE — SCRIPT.JS
+// VERSION CORRIGÉE
+// =====================================
+
+
+// =====================================
+// PRODUITS
 // =====================================
 
 const products = [
@@ -69,142 +75,299 @@ const products = [
   }
 ];
 
+
 // =====================================
 // VARIABLES
 // =====================================
 
-let cart = JSON.parse(localStorage.getItem("rc_cart") || "[]");
+let cart = [];
+
+try {
+  cart = JSON.parse(
+    localStorage.getItem("rc_cart") || "[]"
+  );
+
+  if (!Array.isArray(cart)) {
+    cart = [];
+  }
+} catch (error) {
+  cart = [];
+}
+
 let currentCategory = "Tous";
+
 
 // =====================================
 // PRIX
 // =====================================
 
 function money(number) {
-  return new Intl.NumberFormat("fr-FR").format(Number(number) || 0) + " HTG";
+
+  return (
+    new Intl.NumberFormat("fr-FR")
+      .format(Number(number) || 0)
+    + " HTG"
+  );
+
 }
 
+
 // =====================================
-// PANIER
+// PANIER — TOTAL
 // =====================================
 
 function getCartTotal() {
+
   return cart.reduce(function(total, item) {
-    return total + Number(item.price) * Number(item.qty);
+
+    return total +
+      Number(item.price || 0) *
+      Number(item.qty || 0);
+
   }, 0);
+
 }
+
+
+// =====================================
+// PANIER — QUANTITÉ
+// =====================================
 
 function getCartQuantity() {
+
   return cart.reduce(function(total, item) {
-    return total + Number(item.qty);
+
+    return total + Number(item.qty || 0);
+
   }, 0);
+
 }
+
+
+// =====================================
+// SAUVEGARDER PANIER
+// =====================================
 
 function saveCart() {
-  localStorage.setItem("rc_cart", JSON.stringify(cart));
+
+  localStorage.setItem(
+    "rc_cart",
+    JSON.stringify(cart)
+  );
+
   renderCart();
+
 }
+
+
+// =====================================
+// AJOUTER AU PANIER
+// =====================================
 
 function addToCart(id) {
+
   const product = products.find(function(item) {
-    return item.id === id;
+
+    return item.id === Number(id);
+
   });
 
-  if (!product) return;
-
-  const existing = cart.find(function(item) {
-    return item.id === id;
-  });
-
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      emoji: product.emoji,
-      qty: 1
-    });
-  }
-
-  saveCart();
-  toast("Produit ajouté au panier 🛒");
-}
-
-function changeQty(id, amount) {
-  const item = cart.find(function(product) {
-    return product.id === id;
-  });
-
-  if (!item) return;
-
-  item.qty += amount;
-
-  if (item.qty <= 0) {
-    cart = cart.filter(function(product) {
-      return product.id !== id;
-    });
-  }
-
-  saveCart();
-}
-
-function removeItem(id) {
-  cart = cart.filter(function(item) {
-    return item.id !== id;
-  });
-
-  saveCart();
-}
-
-function renderCart() {
-  const cartItems = document.getElementById("cartItems");
-  const cartCount = document.getElementById("cartCount");
-  const cartTotal = document.getElementById("cartTotal");
-
-  if (cartCount) {
-    cartCount.textContent = getCartQuantity();
-  }
-
-  if (cartTotal) {
-    cartTotal.textContent = money(getCartTotal());
-  }
-
-  if (!cartItems) return;
-
-  if (cart.length === 0) {
-    cartItems.innerHTML = `
-      <div class="empty-cart">
-        Votre panier est vide.
-      </div>
-    `;
+  if (!product) {
     return;
   }
 
+
+  const existing = cart.find(function(item) {
+
+    return item.id === product.id;
+
+  });
+
+
+  if (existing) {
+
+    existing.qty =
+      Number(existing.qty || 0) + 1;
+
+  } else {
+
+    cart.push({
+
+      id: product.id,
+
+      name: product.name,
+
+      price: product.price,
+
+      emoji: product.emoji,
+
+      qty: 1
+
+    });
+
+  }
+
+
+  saveCart();
+
+  toast(
+    product.name +
+    " ajouté au panier 🛒"
+  );
+
+}
+
+
+// =====================================
+// MODIFIER QUANTITÉ
+// =====================================
+
+function changeQty(id, amount) {
+
+  const item = cart.find(function(product) {
+
+    return product.id === Number(id);
+
+  });
+
+  if (!item) {
+    return;
+  }
+
+
+  item.qty =
+    Number(item.qty || 0) +
+    Number(amount || 0);
+
+
+  if (item.qty <= 0) {
+
+    cart = cart.filter(function(product) {
+
+      return product.id !== Number(id);
+
+    });
+
+  }
+
+
+  saveCart();
+
+}
+
+
+// =====================================
+// SUPPRIMER DU PANIER
+// =====================================
+
+function removeItem(id) {
+
+  cart = cart.filter(function(item) {
+
+    return item.id !== Number(id);
+
+  });
+
+  saveCart();
+
+  toast("Produit retiré du panier.");
+
+}
+
+
+// =====================================
+// AFFICHER PANIER
+// =====================================
+
+function renderCart() {
+
+  const cartItems =
+    document.getElementById("cartItems");
+
+  const cartCount =
+    document.getElementById("cartCount");
+
+  const cartTotal =
+    document.getElementById("cartTotal");
+
+
+  if (cartCount) {
+
+    cartCount.textContent =
+      getCartQuantity();
+
+  }
+
+
+  if (cartTotal) {
+
+    cartTotal.textContent =
+      money(getCartTotal());
+
+  }
+
+
+  if (!cartItems) {
+    return;
+  }
+
+
+  if (cart.length === 0) {
+
+    cartItems.innerHTML = `
+      <div class="empty-cart">
+
+        <div style="font-size:40px;">
+          🛒
+        </div>
+
+        <p>
+          Votre panier est vide.
+        </p>
+
+      </div>
+    `;
+
+    return;
+  }
+
+
   cartItems.innerHTML = cart.map(function(item) {
+
     return `
       <div class="cart-item">
 
         <div class="cart-item-icon">
-          ${item.emoji}
+          ${item.emoji || "📦"}
         </div>
 
         <div class="cart-item-info">
 
-          <strong>${item.name}</strong>
+          <strong>
+            ${item.name}
+          </strong>
 
-          <span>${money(item.price)}</span>
+          <span>
+            ${money(item.price)}
+          </span>
 
           <div class="qty-controls">
 
-            <button onclick="changeQty(${item.id}, -1)">
+            <button
+              type="button"
+              onclick="changeQty(${item.id}, -1)"
+            >
               −
             </button>
 
-            <strong>${item.qty}</strong>
+            <strong>
+              ${item.qty}
+            </strong>
 
-            <button onclick="changeQty(${item.id}, 1)">
+            <button
+              type="button"
+              onclick="changeQty(${item.id}, 1)"
+            >
               +
             </button>
 
@@ -213,137 +376,337 @@ function renderCart() {
         </div>
 
         <button
+          type="button"
           class="remove-item"
           onclick="removeItem(${item.id})"
+          aria-label="Supprimer"
         >
           ×
         </button>
 
       </div>
     `;
+
   }).join("");
+
 }
+
+
+// =====================================
+// OUVRIR PANIER
+// =====================================
+
+function openCart() {
+
+  const drawer =
+    document.getElementById("cartDrawer");
+
+  const overlay =
+    document.getElementById("overlay");
+
+
+  if (!drawer) {
+
+    console.error(
+      "Erreur : #cartDrawer introuvable."
+    );
+
+    return;
+
+  }
+
+
+  renderCart();
+
+
+  drawer.classList.add("open");
+
+  drawer.classList.remove("hidden");
+
+
+  if (overlay) {
+
+    overlay.classList.remove("hidden");
+
+  }
+
+
+  document.body.classList.add(
+    "cart-open"
+  );
+
+}
+
+
+// =====================================
+// FERMER PANIER / MODALS
+// =====================================
+
+function closeModals() {
+
+  document.querySelectorAll(
+    ".modal"
+  ).forEach(function(modal) {
+
+    modal.classList.add("hidden");
+
+  });
+
+
+  const drawer =
+    document.getElementById("cartDrawer");
+
+  if (drawer) {
+
+    drawer.classList.remove("open");
+
+  }
+
+
+  const overlay =
+    document.getElementById("overlay");
+
+  if (overlay) {
+
+    overlay.classList.add("hidden");
+
+  }
+
+
+  document.body.classList.remove(
+    "cart-open"
+  );
+
+}
+
 
 // =====================================
 // PRODUITS
 // =====================================
 
 function renderProducts() {
-  const grid = document.getElementById("productGrid");
-  const resultCount = document.getElementById("resultCount");
-  const searchInput = document.getElementById("searchInput");
 
-  if (!grid) return;
+  const grid =
+    document.getElementById(
+      "productGrid"
+    );
 
-  const search = searchInput
-    ? searchInput.value.toLowerCase().trim()
-    : "";
+  const resultCount =
+    document.getElementById(
+      "resultCount"
+    );
 
-  const filteredProducts = products.filter(function(product) {
+  const searchInput =
+    document.getElementById(
+      "searchInput"
+    );
 
-    const categoryOK =
-      currentCategory === "Tous" ||
-      product.category === currentCategory;
 
-    const searchOK =
-      search === "" ||
-      product.name.toLowerCase().includes(search) ||
-      product.category.toLowerCase().includes(search) ||
-      product.desc.toLowerCase().includes(search);
+  if (!grid) {
+    return;
+  }
 
-    return categoryOK && searchOK;
-  });
+
+  const search =
+    searchInput
+      ? searchInput.value
+          .toLowerCase()
+          .trim()
+      : "";
+
+
+  const filteredProducts =
+    products.filter(function(product) {
+
+      const categoryOK =
+        currentCategory === "Tous" ||
+        product.category ===
+        currentCategory;
+
+
+      const searchOK =
+        search === "" ||
+
+        product.name
+          .toLowerCase()
+          .includes(search) ||
+
+        product.category
+          .toLowerCase()
+          .includes(search) ||
+
+        product.desc
+          .toLowerCase()
+          .includes(search);
+
+
+      return categoryOK && searchOK;
+
+    });
+
 
   if (resultCount) {
+
     resultCount.textContent =
       filteredProducts.length +
       " produit" +
-      (filteredProducts.length > 1 ? "s" : "");
+      (
+        filteredProducts.length > 1
+          ? "s"
+          : ""
+      );
+
   }
 
+
   if (filteredProducts.length === 0) {
+
     grid.innerHTML = `
       <div class="empty-products">
         Aucun produit trouvé.
       </div>
     `;
+
     return;
+
   }
 
-  grid.innerHTML = filteredProducts.map(function(product) {
-    return `
-      <article class="product-card">
 
-        <button
-          class="product-image"
-          onclick="openProduct(${product.id})"
-        >
-          <span>${product.emoji}</span>
-        </button>
+  grid.innerHTML =
+    filteredProducts.map(function(product) {
 
-        <div class="product-content">
+      return `
+        <article class="product-card">
 
-          <small>${product.category}</small>
+          <button
+            type="button"
+            class="product-image"
+            onclick="openProduct(${product.id})"
+            aria-label="${product.name}"
+          >
 
-          <h3>${product.name}</h3>
+            <span>
+              ${product.emoji}
+            </span>
 
-          <p>${product.desc}</p>
+          </button>
 
-          <div class="product-bottom">
 
-            <strong>
-              ${money(product.price)}
-            </strong>
+          <div class="product-content">
 
-            <button
-              class="primary"
-              onclick="addToCart(${product.id})"
-            >
-              Ajouter
-            </button>
+            <small>
+              ${product.category}
+            </small>
+
+            <h3>
+              ${product.name}
+            </h3>
+
+            <p>
+              ${product.desc}
+            </p>
+
+
+            <div class="product-bottom">
+
+              <strong>
+                ${money(product.price)}
+              </strong>
+
+
+              <button
+                type="button"
+                class="primary"
+                onclick="addToCart(${product.id})"
+              >
+                Ajouter au panier
+              </button>
+
+            </div>
 
           </div>
 
-        </div>
+        </article>
+      `;
 
-      </article>
-    `;
-  }).join("");
+    }).join("");
+
 }
 
+
 // =====================================
-// DETAIL PRODUIT
+// DÉTAIL PRODUIT
 // =====================================
 
 function openProduct(id) {
-  const product = products.find(function(item) {
-    return item.id === id;
-  });
 
-  const detail = document.getElementById("productDetail");
+  const product =
+    products.find(function(item) {
 
-  if (!product || !detail) return;
+      return item.id === Number(id);
+
+    });
+
+
+  const detail =
+    document.getElementById(
+      "productDetail"
+    );
+
+
+  const modal =
+    document.getElementById(
+      "productModal"
+    );
+
+
+  const overlay =
+    document.getElementById(
+      "overlay"
+    );
+
+
+  if (!product || !detail || !modal) {
+    return;
+  }
+
 
   detail.innerHTML = `
     <div class="product-detail">
 
       <div class="detail-image">
+
         ${product.emoji}
+
       </div>
+
 
       <div>
 
-        <small>${product.category}</small>
+        <small>
+          ${product.category}
+        </small>
 
-        <h2>${product.name}</h2>
+        <h2>
+          ${product.name}
+        </h2>
 
-        <h3>${money(product.price)}</h3>
+        <h3>
+          ${money(product.price)}
+        </h3>
 
-        <p>${product.desc}</p>
+        <p>
+          ${product.desc}
+        </p>
+
 
         <button
+          type="button"
           class="primary full"
-          onclick="addToCart(${product.id}); closeModals();"
+          onclick="
+            addToCart(${product.id});
+            closeModals();
+          "
         >
           Ajouter au panier
         </button>
@@ -353,47 +716,20 @@ function openProduct(id) {
     </div>
   `;
 
-  document.getElementById("productModal")
-    .classList.remove("hidden");
 
-  document.getElementById("overlay")
-    .classList.remove("hidden");
-}
+  modal.classList.remove("hidden");
 
-// =====================================
-// OUVRIR PANIER
-// =====================================
-
-function openCart() {
-  document.getElementById("cartDrawer")
-    .classList.add("open");
-
-  document.getElementById("overlay")
-    .classList.remove("hidden");
-}
-
-// =====================================
-// FERMER
-// =====================================
-
-function closeModals() {
-
-  document.querySelectorAll(".modal").forEach(function(modal) {
-    modal.classList.add("hidden");
-  });
-
-  const drawer = document.getElementById("cartDrawer");
-
-  if (drawer) {
-    drawer.classList.remove("open");
-  }
-
-  const overlay = document.getElementById("overlay");
 
   if (overlay) {
-    overlay.classList.add("hidden");
+
+    overlay.classList.remove(
+      "hidden"
+    );
+
   }
+
 }
+
 
 // =====================================
 // CHECKOUT
@@ -402,92 +738,166 @@ function closeModals() {
 function openCheckout() {
 
   if (cart.length === 0) {
-    toast("Votre panier est vide.");
+
+    toast(
+      "Votre panier est vide."
+    );
+
     return;
+
   }
 
+
   const summary =
-    document.getElementById("checkoutSummary");
+    document.getElementById(
+      "checkoutSummary"
+    );
+
 
   if (summary) {
 
     summary.innerHTML = `
-      <div class="checkout-summary">
 
-        ${cart.map(function(item) {
-          return `
-            <div class="summary-item">
+      ${cart.map(function(item) {
 
-              <span>
-                ${item.emoji}
-                ${item.name} × ${item.qty}
-              </span>
+        return `
+          <div class="summary-item">
 
-              <strong>
-                ${money(item.price * item.qty)}
-              </strong>
+            <span>
+              ${item.emoji || "📦"}
+              ${item.name}
+              × ${item.qty}
+            </span>
 
-            </div>
-          `;
-        }).join("")}
+            <strong>
+              ${money(
+                Number(item.price) *
+                Number(item.qty)
+              )}
+            </strong>
 
-        <div class="summary-total">
+          </div>
+        `;
 
-          <span>Total</span>
+      }).join("")}
 
-          <strong>
-            ${money(getCartTotal())}
-          </strong>
 
-        </div>
+      <div class="summary-total">
+
+        <span>
+          Total
+        </span>
+
+        <strong>
+          ${money(getCartTotal())}
+        </strong>
 
       </div>
+
     `;
+
   }
+
 
   closeModals();
 
-  document.getElementById("checkoutModal")
-    .classList.remove("hidden");
 
-  document.getElementById("overlay")
-    .classList.remove("hidden");
+  const checkoutModal =
+    document.getElementById(
+      "checkoutModal"
+    );
+
+
+  const overlay =
+    document.getElementById(
+      "overlay"
+    );
+
+
+  if (checkoutModal) {
+
+    checkoutModal.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  if (overlay) {
+
+    overlay.classList.remove(
+      "hidden"
+    );
+
+  }
+
 }
 
+
 // =====================================
-// NATCASH
+// PAIEMENT
 // =====================================
 
 function updatePaymentInfo() {
 
   const payment =
-    document.getElementById("paymentSelect");
+    document.getElementById(
+      "paymentSelect"
+    );
 
-  const paymentInfo =
-    document.getElementById("natcashPaymentInfo");
+
+  const natcashInfo =
+    document.getElementById(
+      "natcashPaymentInfo"
+    );
+
+
+  const moncashInfo =
+    document.getElementById(
+      "moncashPaymentInfo"
+    );
+
 
   const proof =
-    document.getElementById("paymentProof");
+    document.getElementById(
+      "paymentProof"
+    );
 
-  if (!payment || !paymentInfo) return;
 
-  if (payment.value === "NatCash") {
-
-    paymentInfo.style.display = "block";
-
-    if (proof) {
-      proof.required = true;
-    }
-
-  } else {
-
-    paymentInfo.style.display = "none";
-
-    if (proof) {
-      proof.required = false;
-    }
+  if (!payment) {
+    return;
   }
+
+
+  if (natcashInfo) {
+
+    natcashInfo.style.display =
+      payment.value === "NatCash"
+        ? "block"
+        : "none";
+
+  }
+
+
+  if (moncashInfo) {
+
+    moncashInfo.style.display =
+      payment.value === "MonCash"
+        ? "block"
+        : "none";
+
+  }
+
+
+  if (proof) {
+
+    proof.required =
+      payment.value === "NatCash";
+
+  }
+
 }
+
 
 // =====================================
 // COMMUNES
@@ -496,11 +906,18 @@ function updatePaymentInfo() {
 function setupDeliveryFields() {
 
   const communeSelect =
-    document.getElementById("communeSelect");
+    document.getElementById(
+      "communeSelect"
+    );
 
-  if (!communeSelect) return;
+
+  if (!communeSelect) {
+    return;
+  }
+
 
   const communes = [
+
     "Arcahaie",
     "Cabaret",
     "Port-au-Prince",
@@ -513,25 +930,38 @@ function setupDeliveryFields() {
     "Tabarre",
     "Cité Soleil",
     "Kenscoff"
+
   ];
 
+
   communeSelect.innerHTML = `
+
     <option value="">
       Choisir une commune
     </option>
+
   `;
+
 
   communes.forEach(function(commune) {
 
     const option =
-      document.createElement("option");
+      document.createElement(
+        "option"
+      );
 
     option.value = commune;
+
     option.textContent = commune;
 
-    communeSelect.appendChild(option);
+    communeSelect.appendChild(
+      option
+    );
+
   });
+
 }
+
 
 // =====================================
 // MESSAGE
@@ -540,20 +970,39 @@ function setupDeliveryFields() {
 function toast(message) {
 
   const element =
-    document.getElementById("toast");
+    document.getElementById(
+      "toast"
+    );
+
 
   if (!element) {
+
     alert(message);
+
     return;
+
   }
 
-  element.textContent = message;
-  element.classList.add("show");
+
+  element.textContent =
+    message;
+
+
+  element.classList.add(
+    "show"
+  );
+
 
   setTimeout(function() {
-    element.classList.remove("show");
+
+    element.classList.remove(
+      "show"
+    );
+
   }, 2500);
+
 }
+
 
 // =====================================
 // RECHERCHE
@@ -562,202 +1011,422 @@ function toast(message) {
 function setupSearch() {
 
   const input =
-    document.getElementById("searchInput");
+    document.getElementById(
+      "searchInput"
+    );
+
 
   const button =
-    document.getElementById("searchBtn");
+    document.getElementById(
+      "searchBtn"
+    );
+
 
   if (input) {
-    input.addEventListener("input", renderProducts);
+
+    input.addEventListener(
+      "input",
+      renderProducts
+    );
+
   }
+
 
   if (button) {
-    button.addEventListener("click", renderProducts);
+
+    button.addEventListener(
+      "click",
+      renderProducts
+    );
+
   }
+
 }
 
+
 // =====================================
-// CATEGORIES
+// CATÉGORIES
 // =====================================
 
 function setupCategories() {
 
-  document.querySelectorAll(".nav-link")
-    .forEach(function(button) {
+  document.querySelectorAll(
+    ".nav-link"
+  ).forEach(function(button) {
 
-      button.addEventListener("click", function() {
+    button.addEventListener(
+      "click",
+      function() {
 
-        document.querySelectorAll(".nav-link")
-          .forEach(function(btn) {
-            btn.classList.remove("active");
-          });
+        document.querySelectorAll(
+          ".nav-link"
+        ).forEach(function(btn) {
 
-        button.classList.add("active");
+          btn.classList.remove(
+            "active"
+          );
+
+        });
+
+
+        button.classList.add(
+          "active"
+        );
+
 
         currentCategory =
-          button.dataset.category || "Tous";
+          button.dataset.category ||
+          "Tous";
+
 
         renderProducts();
-      });
-    });
+
+      }
+    );
+
+  });
+
 }
 
+
 // =====================================
-// EVENEMENTS
+// ÉVÉNEMENTS
 // =====================================
 
 function setupEvents() {
 
   const cartBtn =
-    document.getElementById("cartBtn");
+    document.getElementById(
+      "cartBtn"
+    );
+
 
   if (cartBtn) {
-    cartBtn.addEventListener("click", openCart);
+
+    cartBtn.onclick =
+      function(event) {
+
+        event.preventDefault();
+
+        openCart();
+
+      };
+
   }
+
 
   const checkoutBtn =
-    document.getElementById("checkoutBtn");
+    document.getElementById(
+      "checkoutBtn"
+    );
+
 
   if (checkoutBtn) {
-    checkoutBtn.addEventListener("click", openCheckout);
+
+    checkoutBtn.onclick =
+      function(event) {
+
+        event.preventDefault();
+
+        openCheckout();
+
+      };
+
   }
+
 
   const overlay =
-    document.getElementById("overlay");
+    document.getElementById(
+      "overlay"
+    );
+
 
   if (overlay) {
-    overlay.addEventListener("click", closeModals);
+
+    overlay.onclick =
+      function() {
+
+        closeModals();
+
+      };
+
   }
 
+
   const payment =
-    document.getElementById("paymentSelect");
+    document.getElementById(
+      "paymentSelect"
+    );
+
 
   if (payment) {
+
     payment.addEventListener(
       "change",
       updatePaymentInfo
     );
+
   }
 
-  document.querySelectorAll("[data-close]")
-    .forEach(function(button) {
 
-      button.addEventListener(
-        "click",
-        closeModals
-      );
+  document.querySelectorAll(
+    "[data-close]"
+  ).forEach(function(button) {
 
-    });
+    button.addEventListener(
+      "click",
+      function() {
+
+        closeModals();
+
+      }
+    );
+
+  });
+
 }
 
+
 // =====================================
-// FORMULAIRE
+// FORMULAIRE COMMANDE
 // =====================================
 
 function setupOrderForm() {
 
   const form =
-    document.getElementById("orderForm");
-
-  if (!form) return;
-
-  form.addEventListener("submit", function(event) {
-
-    event.preventDefault();
-
-    if (cart.length === 0) {
-      toast("Votre panier est vide.");
-      return;
-    }
-
-    const formData =
-      new FormData(form);
-
-    const name =
-      formData.get("name");
-
-    const phone =
-      formData.get("phone");
-
-    const commune =
-      formData.get("commune");
-
-    const area =
-      formData.get("area");
-
-    const landmark =
-      formData.get("landmark");
-
-    const payment =
-      formData.get("payment");
-
-    if (
-      !name ||
-      !phone ||
-      !commune ||
-      !area ||
-      !landmark ||
-      !payment
-    ) {
-      toast("Veuillez remplir tous les champs.");
-      return;
-    }
-
-    if (
-      payment === "NatCash" &&
-      !formData.get("paymentProof")?.name
-    ) {
-      toast("Ajoutez votre preuve NatCash.");
-      return;
-    }
-
-    const orderNumber =
-      "RC-" +
-      Date.now().toString().slice(-8);
-
-    alert(
-      "Commande enregistrée !\n\n" +
-      "Numéro : " +
-      orderNumber +
-      "\n\n" +
-      "Total : " +
-      money(getCartTotal()) +
-      "\n\n" +
-      "RC STORE vous contactera pour confirmer la commande."
+    document.getElementById(
+      "orderForm"
     );
 
-    cart = [];
 
-    saveCart();
+  if (!form) {
+    return;
+  }
 
-    form.reset();
+
+  form.addEventListener(
+    "submit",
+    function(event) {
+
+      event.preventDefault();
+
+
+      if (cart.length === 0) {
+
+        toast(
+          "Votre panier est vide."
+        );
+
+        return;
+
+      }
+
+
+      const formData =
+        new FormData(form);
+
+
+      const name =
+        formData.get("name");
+
+
+      const countryCode =
+        formData.get(
+          "countryCode"
+        );
+
+
+      const phone =
+        formData.get("phone");
+
+
+      const commune =
+        formData.get("commune");
+
+
+      const area =
+        formData.get("area");
+
+
+      const landmark =
+        formData.get("landmark");
+
+
+      const payment =
+        formData.get("payment");
+
+
+      if (
+        !name ||
+        !countryCode ||
+        !phone ||
+        !commune ||
+        !area ||
+        !landmark ||
+        !payment
+      ) {
+
+        toast(
+          "Veuillez remplir tous les champs."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        payment === "NatCash"
+      ) {
+
+        const proofInput =
+          document.getElementById(
+            "paymentProof"
+          );
+
+
+        if (
+          !proofInput ||
+          !proofInput.files ||
+          proofInput.files.length === 0
+        ) {
+
+          toast(
+            "Ajoutez votre preuve NatCash."
+          );
+
+          return;
+
+        }
+
+      }
+
+
+      const orderNumber =
+        "RC-" +
+        Date.now()
+          .toString()
+          .slice(-8);
+
+
+      const customerPhone =
+        countryCode +
+        " " +
+        phone;
+
+
+      alert(
+
+        "Commande enregistrée !\n\n" +
+
+        "Numéro : " +
+        orderNumber +
+
+        "\n\n" +
+
+        "Client : " +
+        name +
+
+        "\n\n" +
+
+        "Téléphone : " +
+        customerPhone +
+
+        "\n\n" +
+
+        "Commune : " +
+        commune +
+
+        "\n\n" +
+
+        "Zone : " +
+        area +
+
+        "\n\n" +
+
+        "Paiement : " +
+        payment +
+
+        "\n\n" +
+
+        "Total : " +
+        money(
+          getCartTotal()
+        )
+
+      );
+
+
+      cart = [];
+
+
+      saveCart();
+
+
+      form.reset();
+
+
+      updatePaymentInfo();
+
+
+      closeModals();
+
+    }
+  );
+
+}
+
+
+// =====================================
+// EXPOSER LES FONCTIONS
+// POUR LES BOUTONS HTML
+// =====================================
+
+window.addToCart =
+  addToCart;
+
+window.changeQty =
+  changeQty;
+
+window.removeItem =
+  removeItem;
+
+window.openCart =
+  openCart;
+
+window.openProduct =
+  openProduct;
+
+window.openCheckout =
+  openCheckout;
+
+window.closeModals =
+  closeModals;
+
+
+// =====================================
+// DÉMARRAGE
+// =====================================
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function() {
+
+    renderProducts();
+
+    renderCart();
+
+    setupSearch();
+
+    setupCategories();
+
+    setupEvents();
+
+    setupDeliveryFields();
+
+    setupOrderForm();
 
     updatePaymentInfo();
 
-    closeModals();
-  });
-}
-
-// =====================================
-// DEMARRAGE
-// =====================================
-
-document.addEventListener("DOMContentLoaded", function() {
-
-  renderProducts();
-
-  renderCart();
-
-  setupSearch();
-
-  setupCategories();
-
-  setupEvents();
-
-  setupDeliveryFields();
-
-  setupOrderForm();
-
-  updatePaymentInfo();
-
-});
+  }
+);
