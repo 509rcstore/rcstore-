@@ -1,574 +1,297 @@
 <!doctype html>
 <html lang="fr">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
   <title>RC STORE — Boutique en ligne</title>
 
-  <meta
-    name="description"
-    content="RC STORE — Boutique en ligne. Découvrez nos produits, commandez facilement et choisissez votre livraison."
-  >
+  <meta name="description"
+    content="RC STORE — Boutique en ligne. Découvrez nos produits, commandez facilement et choisissez votre livraison.">
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- =====================================
-       HEADER
-  ====================================== -->
+<header class="topbar">
 
-  <header class="topbar">
+  <a class="brand" href="#" aria-label="RC STORE">
+    <span class="brand-mark">RC</span>
+    <span>STORE</span>
+  </a>
 
-    <a
-      class="brand"
-      href="#"
-      aria-label="RC STORE"
-    >
-      <span class="brand-mark">RC</span>
-      <span>STORE</span>
+  <div class="search-wrap">
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="Rechercher un produit..."
+      aria-label="Rechercher">
+    <button id="searchBtn">🔎</button>
+  </div>
+
+  <button class="icon-btn" id="cartBtn" aria-label="Panier">
+    🛒 <span id="cartCount">0</span>
+  </button>
+
+</header>
+
+<nav class="nav">
+
+  <button class="nav-link active" data-category="Tous">Tous</button>
+  <button class="nav-link" data-category="Mode">Mode</button>
+  <button class="nav-link" data-category="Beauté">Beauté</button>
+  <button class="nav-link" data-category="Électronique">Électronique</button>
+  <button class="nav-link" data-category="Maison">Maison</button>
+  <button class="nav-link" data-category="Accessoires">Accessoires</button>
+
+</nav>
+
+<main>
+
+<section class="hero">
+
+  <div>
+
+    <p class="eyebrow">BIENVENUE CHEZ RC STORE</p>
+
+    <h1>
+      Tout ce dont vous avez besoin,
+      <br>
+      <span>en un seul endroit.</span>
+    </h1>
+
+    <p>
+      Découvrez nos produits, consultez les prix,
+      ajoutez vos articles au panier et passez votre
+      commande en quelques étapes.
+    </p>
+
+    <a href="#products" class="hero-btn">
+      Voir les produits
     </a>
 
+  </div>
 
-    <div class="search-wrap">
+  <div class="hero-card">
 
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="Rechercher un produit..."
-        aria-label="Rechercher"
-      >
+    <div class="hero-logo">RC</div>
 
-      <button id="searchBtn">
-        🔎
-      </button>
+    <strong>STORE</strong>
+
+    <small>QUALITÉ • STYLE • SATISFACTION</small>
+
+  </div>
+
+</section>
+
+<section class="section" id="products">
+
+  <div class="section-head">
+
+    <div>
+
+      <p class="eyebrow">NOS PRODUITS</p>
+
+      <h2>Découvrez notre sélection</h2>
 
     </div>
 
+    <span id="resultCount"></span>
 
-    <button
-      class="icon-btn"
-      id="cartBtn"
-      aria-label="Panier"
-    >
-      🛒
-      <span id="cartCount">0</span>
-    </button>
+  </div>
 
-  </header>
+  <div id="productGrid" class="product-grid"></div>
 
+</section>
 
-  <!-- =====================================
-       NAVIGATION
-  ====================================== -->
+</main>
 
-  <nav class="nav">
+<div class="overlay hidden" id="overlay"></div>
 
-    <button
-      class="nav-link active"
-      data-category="Tous"
-    >
-      Tous
-    </button>
+<aside class="drawer" id="cartDrawer">
 
-    <button
-      class="nav-link"
-      data-category="Mode"
-    >
-      Mode
-    </button>
+  <div class="drawer-head">
 
-    <button
-      class="nav-link"
-      data-category="Beauté"
-    >
-      Beauté
-    </button>
+    <h2>Votre panier</h2>
 
-    <button
-      class="nav-link"
-      data-category="Électronique"
-    >
-      Électronique
-    </button>
+    <button class="close" data-close>×</button>
 
-    <button
-      class="nav-link"
-      data-category="Maison"
-    >
-      Maison
-    </button>
+  </div>
 
-    <button
-      class="nav-link"
-      data-category="Accessoires"
-    >
-      Accessoires
-    </button>
+  <div id="cartItems"></div>
 
-  </nav>
+  <div class="cart-total">
 
+    <span>Total</span>
 
-  <!-- =====================================
-       CONTENU
-  ====================================== -->
+    <strong id="cartTotal">0 HTG</strong>
 
-  <main>
+  </div>
 
-    <section class="hero">
+  <button class="primary full" id="checkoutBtn">
+    Passer la commande
+  </button>
 
-      <div>
+</aside>
 
-        <p class="eyebrow">
-          BIENVENUE CHEZ RC STORE
-        </p>
+<div class="modal hidden" id="productModal">
 
-        <h1>
-          Tout ce dont vous avez besoin,
-          <br>
-          <span>en un seul endroit.</span>
-        </h1>
+  <button class="close modal-close" data-close>×</button>
+
+  <div id="productDetail"></div>
+
+</div>
+
+<!-- CHECKOUT -->
+
+<div class="modal checkout-modal hidden" id="checkoutModal">
+
+  <button class="close modal-close" data-close>×</button>
+
+  <div class="checkout">
+
+    <p class="eyebrow">COMMANDE</p>
+
+    <h2>Finaliser votre commande</h2>
+
+    <div id="checkoutSummary"></div>
+
+    <form id="orderForm">
+
+      <label>
+        Nom complet
+        <input required name="name" placeholder="Votre nom">
+      </label>
+
+      <label>
+        Téléphone
+        <input required name="phone" placeholder="509...">
+      </label>
+
+      <label>
+        Commune
+        <select required name="commune" id="communeSelect">
+          <option value="">Choisir une commune</option>
+        </select>
+      </label>
+
+      <label>
+        Quartier / zone
+        <select required name="area" id="zoneSelect">
+          <option value="">Choisir une zone</option>
+        </select>
+      </label>
+
+      <label>
+        Point de repère
+        <input required name="landmark"
+          placeholder="Ex. près du marché...">
+      </label>
+
+      <label>
+        Mode de paiement
+
+        <select required name="payment" id="paymentSelect">
+
+          <option value="">Choisir</option>
+
+          <option value="MonCash">
+            MonCash
+          </option>
+
+          <option value="NatCash">
+            NatCash
+          </option>
+
+          <option value="Paiement à la livraison">
+            Paiement à la livraison
+          </option>
+
+        </select>
+
+      </label>
+
+      <!-- NATCASH -->
+
+      <div
+        id="natcashPaymentInfo"
+        class="delivery-box"
+        style="display:none;margin-top:12px;">
+
+        <strong>💰 Paiement par NatCash</strong>
 
         <p>
-          Découvrez nos produits, consultez les prix,
-          ajoutez vos articles au panier et passez votre
-          commande en quelques étapes.
+          Envoyez le montant exact de votre commande au numéro :
         </p>
 
-        <a
-          href="#products"
-          class="hero-btn"
-        >
-          Voir les produits
-        </a>
+        <h3 style="font-size:24px;margin:8px 0;">
+          📱 41551464
+        </h3>
 
-      </div>
+        <p>
+          Montant à payer :
+          <strong id="natcashAmount">0 HTG</strong>
+        </p>
 
+        <p>
+          Après le paiement, ajoutez la preuve de paiement.
+        </p>
 
-      <div class="hero-card">
+        <label style="display:block;margin-top:12px;">
 
-        <div class="hero-logo">
-          RC
-        </div>
+          📸 Preuve de paiement
 
-        <strong>
-          STORE
-        </strong>
+          <input
+            type="file"
+            id="paymentProof"
+            name="paymentProof"
+            accept="image/jpeg,image/png,image/webp">
+
+        </label>
 
         <small>
-          QUALITÉ • STYLE • SATISFACTION
+          Formats acceptés : JPG, PNG, WEBP.
+          Maximum 10 MB.
         </small>
 
       </div>
 
-    </section>
+      <div class="delivery-box">
 
+        <strong>🚚 Livraison estimée</strong>
 
-    <!-- =====================================
-         PRODUITS
-    ====================================== -->
-
-    <section
-      class="section"
-      id="products"
-    >
-
-      <div class="section-head">
-
-        <div>
-
-          <p class="eyebrow">
-            NOS PRODUITS
-          </p>
-
-          <h2>
-            Découvrez notre sélection
-          </h2>
-
-        </div>
-
-        <span id="resultCount"></span>
+        <span>
+          En général : 1 à 2 jours selon la zone.
+        </span>
 
       </div>
 
-
-      <div
-        id="productGrid"
-        class="product-grid"
-      ></div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =====================================
-       OVERLAY
-  ====================================== -->
-
-  <div
-    class="overlay hidden"
-    id="overlay"
-  ></div>
-
-
-  <!-- =====================================
-       PANIER
-  ====================================== -->
-
-  <aside
-    class="drawer"
-    id="cartDrawer"
-  >
-
-    <div class="drawer-head">
-
-      <h2>
-        Votre panier
-      </h2>
-
       <button
-        class="close"
-        data-close
-      >
-        ×
+        class="primary full"
+        type="submit">
+
+        Confirmer la commande
+
       </button>
 
-    </div>
+    </form>
 
+    <p class="tiny">
 
-    <div id="cartItems"></div>
+      Pour NatCash, le paiement sera vérifié avant
+      la validation définitive de la commande.
+      Après validation, le reçu RC STORE sera disponible.
 
-
-    <div class="cart-total">
-
-      <span>
-        Total
-      </span>
-
-      <strong id="cartTotal">
-        0 HTG
-      </strong>
-
-    </div>
-
-
-    <button
-      class="primary full"
-      id="checkoutBtn"
-    >
-      Passer la commande
-    </button>
-
-  </aside>
-
-
-  <!-- =====================================
-       MODAL PRODUIT
-  ====================================== -->
-
-  <div
-    class="modal hidden"
-    id="productModal"
-  >
-
-    <button
-      class="close modal-close"
-      data-close
-    >
-      ×
-    </button>
-
-    <div id="productDetail"></div>
+    </p>
 
   </div>
 
+</div>
 
-  <!-- =====================================
-       CHECKOUT
-  ====================================== -->
+<div class="toast" id="toast"></div>
 
-  <div
-    class="modal checkout-modal hidden"
-    id="checkoutModal"
-  >
-
-    <button
-      class="close modal-close"
-      data-close
-    >
-      ×
-    </button>
-
-
-    <div class="checkout">
-
-      <p class="eyebrow">
-        COMMANDE
-      </p>
-
-      <h2>
-        Finaliser votre commande
-      </h2>
-
-
-      <!-- Résumé commande -->
-
-      <div id="checkoutSummary"></div>
-
-
-      <form id="orderForm">
-
-
-        <!-- NOM -->
-
-        <label>
-
-          Nom complet
-
-          <input
-            required
-            name="name"
-            placeholder="Votre nom"
-          >
-
-        </label>
-
-
-        <!-- TELEPHONE -->
-
-        <label>
-
-          Téléphone
-
-          <input
-            required
-            name="phone"
-            placeholder="509..."
-          >
-
-        </label>
-
-
-        <!-- COMMUNE -->
-
-        <label>
-
-          Commune
-
-          <select
-            required
-            name="commune"
-            id="communeSelect"
-          >
-
-            <option value="">
-              Choisir une commune
-            </option>
-
-          </select>
-
-        </label>
-
-
-        <!-- ZONE -->
-
-        <label>
-
-          Quartier / zone
-
-          <input
-            required
-            name="area"
-            placeholder="Votre quartier"
-          >
-
-        </label>
-
-
-        <!-- POINT DE REPERE -->
-
-        <label>
-
-          Point de repère
-
-          <input
-            required
-            name="landmark"
-            placeholder="Ex. près du marché..."
-          >
-
-        </label>
-
-
-        <!-- =================================
-             MODE DE PAIEMENT
-        ================================== -->
-
-        <label>
-
-          Mode de paiement
-
-          <select
-            required
-            name="payment"
-            id="paymentSelect"
-          >
-
-            <option value="">
-              Choisir
-            </option>
-
-            <option value="MonCash">
-              MonCash
-            </option>
-
-            <option value="NatCash">
-              NatCash
-            </option>
-
-            <option value="Paiement à la livraison">
-              Paiement à la livraison
-            </option>
-
-          </select>
-
-        </label>
-
-
-        <!-- =================================
-             INFORMATIONS NATCASH
-        ================================== -->
-
-        <div
-          id="natcashPaymentInfo"
-          class="delivery-box"
-          style="display:none; margin-top:12px;"
-        >
-
-          <strong>
-            💰 Paiement par NatCash
-          </strong>
-
-          <p>
-            Envoyez le montant exact de votre
-            commande au numéro NatCash :
-          </p>
-
-          <h3
-            style="
-              font-size:24px;
-              margin:8px 0;
-            "
-          >
-            📱 41551464
-          </h3>
-
-          <p>
-            Après avoir effectué le paiement,
-            prenez une capture d'écran de votre
-            reçu NatCash et ajoutez-la ci-dessous.
-          </p>
-
-
-          <!-- PREUVE -->
-
-          <label
-            style="
-              display:block;
-              margin-top:12px;
-            "
-          >
-
-            📸 Preuve de paiement
-
-            <input
-              type="file"
-              id="paymentProof"
-              name="paymentProof"
-              accept="image/jpeg,image/png,image/webp"
-            >
-
-          </label>
-
-
-          <small
-            style="
-              display:block;
-              margin-top:8px;
-            "
-          >
-            Formats acceptés : JPG, PNG, WEBP.
-          </small>
-
-        </div>
-
-
-        <!-- =================================
-             LIVRAISON
-        ================================== -->
-
-        <div class="delivery-box">
-
-          <strong>
-            🚚 Livraison estimée
-          </strong>
-
-          <span>
-            En général : 1 à 2 jours selon la zone.
-          </span>
-
-        </div>
-
-
-        <!-- =================================
-             CONFIRMER
-        ================================== -->
-
-        <button
-          class="primary full"
-          type="submit"
-        >
-          Confirmer la commande
-        </button>
-
-
-      </form>
-
-
-      <p class="tiny">
-
-        Pour NatCash, votre paiement sera vérifié
-        avant la validation définitive de la commande.
-        Une fois le paiement accepté, votre reçu RC STORE
-        sera disponible.
-
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <!-- =====================================
-       MESSAGE
-  ====================================== -->
-
-  <div
-    class="toast"
-    id="toast"
-  ></div>
-
-
-  <!-- =====================================
-       SCRIPT
-  ====================================== -->
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
-
 </html>
