@@ -1,1308 +1,1181 @@
-// =====================================
-// RC STORE — SCRIPT COMPLET
-// IMAGES + PRIX TEST 10 HTG
-// =====================================
-
-
-// =====================================
-// PRODUITS
-// =====================================
-
-const products = [
-
-  {
-    id: 1,
-    name: "T-Shirt Premium",
-    price: 10,
-    category: "Mode",
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80",
-    desc: "T-shirt moderne et confortable."
-  },
-
-  {
-    id: 2,
-    name: "Sac Élégant",
-    price: 10,
-    category: "Accessoires",
-    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80",
-    desc: "Sac élégant pour toutes les occasions."
-  },
-
-  {
-    id: 3,
-    name: "Casque Audio",
-    price: 10,
-    category: "Électronique",
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
-    desc: "Casque audio moderne avec excellent confort."
-  },
-
-  {
-    id: 4,
-    name: "Produit Beauté",
-    price: 10,
-    category: "Beauté",
-    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
-    desc: "Produit beauté pour votre routine quotidienne."
-  },
-
-  {
-    id: 5,
-    name: "Décoration Maison",
-    price: 10,
-    category: "Maison",
-    image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
-    desc: "Un article élégant pour votre maison."
-  },
-
-  {
-    id: 6,
-    name: "Chaussures Sport",
-    price: 10,
-    category: "Mode",
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
-    desc: "Chaussures confortables pour le sport et la vie quotidienne."
-  },
-
-  {
-    id: 7,
-    name: "Montre Moderne",
-    price: 10,
-    category: "Électronique",
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
-    desc: "Montre élégante au design moderne."
-  },
-
-  {
-    id: 8,
-    name: "Lunettes",
-    price: 10,
-    category: "Accessoires",
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80",
-    desc: "Lunettes modernes et élégantes."
-  }
-
-];
-
-
-// =====================================
-// SUPABASE
-// =====================================
-
-const SUPABASE_URL =
-  "https://simlfhbsfsxthtzefufj.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_ZKacsfCd6dI-srcCWJeh0g_PpYB6G-M";
-
-const NATCASH_NUMBER =
-  "+50941551464";
-
-const NATCASH_NAME =
-  "Cherlot René";
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>RC STORE — Boutique en ligne</title>
+
+  <meta
+    name="description"
+    content="RC STORE — Boutique en ligne"
+  >
+
+  <link rel="stylesheet" href="style.css">
+</head>
 
-const PAYMENT_BUCKET =
-  "preuves-de-paiement";
+<body>
 
+<!-- =====================================
+     HEADER
+====================================== -->
 
-// =====================================
-// COMMUNE
-// =====================================
+<header class="topbar">
 
-const communes = [
-  "Arcahaie"
-];
+  <a class="brand" href="#">
+    <span class="brand-mark">RC</span>
+    <span>STORE</span>
+  </a>
+
+  <div class="search-wrap">
+
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="Rechercher un produit..."
+    >
+
+    <button id="searchBtn">
+      🔎
+    </button>
+
+  </div>
 
+  <button
+    class="icon-btn"
+    id="cartBtn"
+    aria-label="Panier"
+  >
+    🛒
+    <span id="cartCount">0</span>
+  </button>
 
-// =====================================
-// ZONES
-// =====================================
+</header>
 
-const zones = [
-  "Saint-Médard",
-  "Belle Fraîcheur",
-  "Cortade",
-  "Bourg",
-  "Bas Cortade",
-  "Boulard",
-  "Merotte",
-  "Corail",
-  "Pont-Callebasse",
-  "Carrefour Poy",
-  "Pierre Michel",
-  "Robert Vigner",
-  "Thoman",
-  "Poy la Ravine",
-  "Barrière Poy",
-  "Hostin",
-  "Ponce",
-  "Labarre",
-  "Pont-Mathéux",
-  "Saint-Ard",
-  "Brois Brûlé",
-  "Digue Mathéux",
-  "Digue Broby"
-];
 
+<!-- =====================================
+     NAVIGATION
+====================================== -->
 
-// =====================================
-// VARIABLES
-// =====================================
+<nav class="nav">
 
-let cart =
-  JSON.parse(
-    localStorage.getItem("rc_cart") || "[]"
-  );
+  <button
+    class="nav-link active"
+    data-category="Tous"
+  >
+    Tous
+  </button>
 
-let currentCategory = "Tous";
+  <button
+    class="nav-link"
+    data-category="Mode"
+  >
+    Mode
+  </button>
 
-let paymentCheckTimer = null;
+  <button
+    class="nav-link"
+    data-category="Beauté"
+  >
+    Beauté
+  </button>
 
+  <button
+    class="nav-link"
+    data-category="Électronique"
+  >
+    Électronique
+  </button>
 
-// =====================================
-// HELPER
-// =====================================
+  <button
+    class="nav-link"
+    data-category="Maison"
+  >
+    Maison
+  </button>
 
-const $ = id =>
-  document.getElementById(id);
+  <button
+    class="nav-link"
+    data-category="Accessoires"
+  >
+    Accessoires
+  </button>
 
+</nav>
 
-// =====================================
-// PRIX
-// =====================================
 
-function money(number) {
+<!-- =====================================
+     CONTENU
+====================================== -->
 
-  return new Intl.NumberFormat("fr-FR")
-    .format(Number(number) || 0) +
-    " HTG";
+<main>
 
-}
+<section class="hero">
 
+  <div>
 
-// =====================================
-// PANIER
-// =====================================
+    <p class="eyebrow">
+      BIENVENUE CHEZ RC STORE
+    </p>
 
-function saveCart() {
+    <h1>
+      Tout ce dont vous avez besoin,
+      <br>
+      <span>en un seul endroit.</span>
+    </h1>
 
-  localStorage.setItem(
-    "rc_cart",
-    JSON.stringify(cart)
-  );
+    <p>
+      Découvrez nos produits et commandez
+      facilement en ligne.
+    </p>
 
-  renderCart();
+    <a
+      href="#products"
+      class="hero-btn"
+    >
+      Voir les produits
+    </a>
 
-}
+  </div>
 
 
-function getCartTotal() {
+  <div class="hero-card">
 
-  return cart.reduce(
-    (sum, item) =>
-      sum +
-      Number(item.price) *
-      Number(item.qty),
-    0
-  );
+    <div class="hero-logo">
+      RC
+    </div>
 
-}
+    <strong>
+      STORE
+    </strong>
 
+    <small>
+      QUALITÉ • STYLE • SATISFACTION
+    </small>
 
-function getCartQuantity() {
+  </div>
 
-  return cart.reduce(
-    (sum, item) =>
-      sum +
-      Number(item.qty),
-    0
-  );
+</section>
 
-}
 
+<!-- =====================================
+     PRODUITS
+====================================== -->
 
-// =====================================
-// PRODUITS
-// =====================================
+<section
+  class="section"
+  id="products"
+>
 
-function renderProducts() {
+  <div class="section-head">
 
-  const searchInput =
-    $("searchInput");
+    <div>
 
-  const search =
-    searchInput
-      ? searchInput.value
-          .toLowerCase()
-          .trim()
-      : "";
+      <p class="eyebrow">
+        NOS PRODUITS
+      </p>
 
+      <h2>
+        Découvrez notre sélection
+      </h2>
 
-  const list =
-    products.filter(product => {
+    </div>
 
-      const categoryOK =
-        currentCategory === "Tous" ||
-        product.category === currentCategory;
+    <span id="resultCount"></span>
 
-      const searchOK =
-        !search ||
-        product.name
-          .toLowerCase()
-          .includes(search) ||
-        product.category
-          .toLowerCase()
-          .includes(search);
+  </div>
 
-      return categoryOK && searchOK;
 
-    });
+  <div
+    id="productGrid"
+    class="product-grid"
+  >
 
+    <!-- PRODUIT 1 -->
 
-  if ($("resultCount")) {
+    <article class="product">
 
-    $("resultCount").textContent =
-      list.length + " produit(s)";
+      <div class="product-img">
 
-  }
-
-
-  if ($("productGrid")) {
-
-    $("productGrid").innerHTML =
-      list.map(product => `
-
-        <article
-          class="product"
-          onclick="openProduct(${product.id})"
+        <img
+          src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80"
+          alt="T-Shirt"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
         >
 
-          <div class="product-img">
+      </div>
 
-            <img
-              src="${product.image}"
-              alt="${product.name}"
-              loading="lazy"
-              onerror="
-                this.style.display='none';
-                this.parentElement.innerHTML='🛍️';
-              "
-              style="
-                width:100%;
-                height:100%;
-                object-fit:cover;
-                display:block;
-              "
-            >
+      <div class="product-info">
 
-          </div>
+        <div class="category">
+          Mode
+        </div>
 
+        <h3>
+          T-Shirt Premium
+        </h3>
 
-          <div class="product-info">
+        <div class="price">
+          10 GDS
+        </div>
 
-            <div class="category">
-              ${product.category}
-            </div>
+      </div>
 
-            <h3>
-              ${product.name}
-            </h3>
+    </article>
 
-            <div class="price">
-              ${money(product.price)}
-            </div>
 
-          </div>
+    <!-- PRODUIT 2 -->
 
-        </article>
+    <article class="product">
 
-      `).join("");
+      <div class="product-img">
 
-  }
+        <img
+          src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80"
+          alt="Sac"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
 
-}
+      </div>
 
+      <div class="product-info">
 
-// =====================================
-// AJOUT PANIER
-// =====================================
+        <div class="category">
+          Accessoires
+        </div>
 
-function addToCart(id) {
+        <h3>
+          Sac Élégant
+        </h3>
 
-  const product =
-    products.find(
-      item => item.id === id
-    );
+        <div class="price">
+          10 GDS
+        </div>
 
+      </div>
 
-  if (!product) {
+    </article>
 
-    toast("Produit introuvable");
 
-    return;
+    <!-- PRODUIT 3 -->
 
-  }
+    <article class="product">
 
+      <div class="product-img">
 
-  const existing =
-    cart.find(
-      item => item.id === id
-    );
+        <img
+          src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
+          alt="Casque"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
 
+      </div>
 
-  if (existing) {
+      <div class="product-info">
 
-    existing.qty++;
+        <div class="category">
+          Électronique
+        </div>
 
-  } else {
+        <h3>
+          Casque Audio
+        </h3>
 
-    cart.push({
-      ...product,
-      qty: 1
-    });
+        <div class="price">
+          10 GDS
+        </div>
 
-  }
+      </div>
 
+    </article>
 
-  saveCart();
 
-  toast("Produit ajouté au panier");
+    <!-- PRODUIT 4 -->
 
-}
+    <article class="product">
 
+      <div class="product-img">
 
-// =====================================
-// QUANTITÉ
-// =====================================
+        <img
+          src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
+          alt="Beauté"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
 
-function changeQty(id, difference) {
+      </div>
 
-  const item =
-    cart.find(
-      product => product.id === id
-    );
+      <div class="product-info">
 
+        <div class="category">
+          Beauté
+        </div>
 
-  if (!item) return;
+        <h3>
+          Produit Beauté
+        </h3>
 
+        <div class="price">
+          10 GDS
+        </div>
 
-  item.qty += difference;
+      </div>
 
+    </article>
 
-  if (item.qty <= 0) {
 
-    cart =
-      cart.filter(
-        product =>
-          product.id !== id
-      );
+    <!-- PRODUIT 5 -->
 
-  }
+    <article class="product">
 
+      <div class="product-img">
 
-  saveCart();
+        <img
+          src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80"
+          alt="Maison"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
 
-}
+      </div>
 
+      <div class="product-info">
 
-// =====================================
-// SUPPRIMER
-// =====================================
+        <div class="category">
+          Maison
+        </div>
 
-function removeItem(id) {
+        <h3>
+          Décoration Maison
+        </h3>
 
-  cart =
-    cart.filter(
-      product =>
-        product.id !== id
-    );
+        <div class="price">
+          10 GDS
+        </div>
 
-  saveCart();
+      </div>
 
-}
+    </article>
 
 
-// =====================================
-// AFFICHER PANIER
-// =====================================
+    <!-- PRODUIT 6 -->
 
-function renderCart() {
+    <article class="product">
 
-  if (!$("cartCount"))
-    return;
+      <div class="product-img">
 
+        <img
+          src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+          alt="Chaussures"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
 
-  $("cartCount").textContent =
-    getCartQuantity();
+      </div>
 
+      <div class="product-info">
 
-  if (!$("cartItems"))
-    return;
+        <div class="category">
+          Mode
+        </div>
 
+        <h3>
+          Chaussures Sport
+        </h3>
 
-  if (!cart.length) {
+        <div class="price">
+          10 GDS
+        </div>
 
-    $("cartItems").innerHTML =
-      "<p>Votre panier est vide.</p>";
+      </div>
 
-    if ($("cartTotal")) {
+    </article>
 
-      $("cartTotal").textContent =
-        "0 HTG";
 
-    }
+    <!-- PRODUIT 7 -->
 
-    return;
+    <article class="product">
 
-  }
+      <div class="product-img">
 
+        <img
+          src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80"
+          alt="Montre"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
 
-  $("cartItems").innerHTML =
-    cart.map(item => `
+      </div>
 
-      <div class="cart-row">
+      <div class="product-info">
 
-        <div class="cart-thumb">
+        <div class="category">
+          Électronique
+        </div>
 
-          <img
-            src="${item.image}"
-            alt="${item.name}"
+        <h3>
+          Montre Moderne
+        </h3>
+
+        <div class="price">
+          10 GDS
+        </div>
+
+      </div>
+
+    </article>
+
+
+    <!-- PRODUIT 8 -->
+
+    <article class="product">
+
+      <div class="product-img">
+
+        <img
+          src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80"
+          alt="Lunettes"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
+
+      </div>
+
+      <div class="product-info">
+
+        <div class="category">
+          Accessoires
+        </div>
+
+        <h3>
+          Lunettes
+        </h3>
+
+        <div class="price">
+          10 GDS
+        </div>
+
+      </div>
+
+    </article>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<!-- =====================================
+     OVERLAY
+====================================== -->
+
+<div
+  class="overlay hidden"
+  id="overlay"
+></div>
+
+
+<!-- =====================================
+     PANIER
+====================================== -->
+
+<aside
+  class="drawer"
+  id="cartDrawer"
+>
+
+  <div class="drawer-head">
+
+    <h2>
+      Votre panier
+    </h2>
+
+    <button
+      class="close"
+      data-close
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <div id="cartItems">
+
+    <p>
+      Votre panier est vide.
+    </p>
+
+  </div>
+
+
+  <div class="cart-total">
+
+    <span>
+      Total
+    </span>
+
+    <strong id="cartTotal">
+      0 GDS
+    </strong>
+
+  </div>
+
+
+  <button
+    class="primary full"
+    id="checkoutBtn"
+  >
+    Passer la commande
+  </button>
+
+</aside>
+
+
+<!-- =====================================
+     MODAL PRODUIT
+====================================== -->
+
+<div
+  class="modal hidden"
+  id="productModal"
+>
+
+  <button
+    class="close modal-close"
+    data-close
+  >
+    ×
+  </button>
+
+  <div id="productDetail"></div>
+
+</div>
+
+
+<!-- =====================================
+     CHECKOUT
+====================================== -->
+
+<div
+  class="modal checkout-modal hidden"
+  id="checkoutModal"
+>
+
+  <button
+    class="close modal-close"
+    data-close
+  >
+    ×
+  </button>
+
+
+  <div class="checkout">
+
+    <p class="eyebrow">
+      COMMANDE
+    </p>
+
+    <h2>
+      Finaliser votre commande
+    </h2>
+
+
+    <div id="checkoutSummary"></div>
+
+
+    <form id="orderForm">
+
+
+      <!-- NOM -->
+
+      <label>
+
+        Nom complet
+
+        <input
+          required
+          name="name"
+          placeholder="Votre nom"
+        >
+
+      </label>
+
+
+      <!-- TELEPHONE -->
+
+      <label>
+
+        Téléphone
+
+        <div
+          style="
+            display:flex;
+            gap:8px;
+          "
+        >
+
+          <select
+            required
+            name="countryCode"
+            id="countryCode"
             style="
-              width:60px;
-              height:60px;
-              object-fit:cover;
-              border-radius:8px;
+              width:145px;
+              flex-shrink:0;
             "
+          >
+
+            <option value="+509">
+              🇭🇹 +509 Haïti
+            </option>
+
+            <option value="+1">
+              🇺🇸 +1 États-Unis
+            </option>
+
+            <option value="+1">
+              🇨🇦 +1 Canada
+            </option>
+
+            <option value="+33">
+              🇫🇷 +33 France
+            </option>
+
+            <option value="+34">
+              🇪🇸 +34 Espagne
+            </option>
+
+            <option value="+44">
+              🇬🇧 +44 Royaume-Uni
+            </option>
+
+            <option value="+49">
+              🇩🇪 +49 Allemagne
+            </option>
+
+            <option value="+52">
+              🇲🇽 +52 Mexique
+            </option>
+
+            <option value="+55">
+              🇧🇷 +55 Brésil
+            </option>
+
+            <option value="+57">
+              🇨🇴 +57 Colombie
+            </option>
+
+            <option value="+58">
+              🇻🇪 +58 Venezuela
+            </option>
+
+            <option value="+51">
+              🇵🇪 +51 Pérou
+            </option>
+
+            <option value="+54">
+              🇦🇷 +54 Argentine
+            </option>
+
+            <option value="+56">
+              🇨🇱 +56 Chili
+            </option>
+
+            <option value="+591">
+              🇧🇴 +591 Bolivie
+            </option>
+
+            <option value="+593">
+              🇪🇨 +593 Équateur
+            </option>
+
+            <option value="+598">
+              🇺🇾 +598 Uruguay
+            </option>
+
+            <option value="+502">
+              🇬🇹 +502 Guatemala
+            </option>
+
+            <option value="+503">
+              🇸🇻 +503 Salvador
+            </option>
+
+            <option value="+504">
+              🇭🇳 +504 Honduras
+            </option>
+
+            <option value="+505">
+              🇳🇮 +505 Nicaragua
+            </option>
+
+            <option value="+506">
+              🇨🇷 +506 Costa Rica
+            </option>
+
+            <option value="+507">
+              🇵🇦 +507 Panama
+            </option>
+
+            <option value="+32">
+              🇧🇪 +32 Belgique
+            </option>
+
+            <option value="+41">
+              🇨🇭 +41 Suisse
+            </option>
+
+            <option value="+31">
+              🇳🇱 +31 Pays-Bas
+            </option>
+
+            <option value="+351">
+              🇵🇹 +351 Portugal
+            </option>
+
+            <option value="+39">
+              🇮🇹 +39 Italie
+            </option>
+
+            <option value="+30">
+              🇬🇷 +30 Grèce
+            </option>
+
+            <option value="+43">
+              🇦🇹 +43 Autriche
+            </option>
+
+            <option value="+45">
+              🇩🇰 +45 Danemark
+            </option>
+
+            <option value="+46">
+              🇸🇪 +46 Suède
+            </option>
+
+            <option value="+47">
+              🇳🇴 +47 Norvège
+            </option>
+
+            <option value="+48">
+              🇵🇱 +48 Pologne
+            </option>
+
+            <option value="+7">
+              🇷🇺 +7 Russie
+            </option>
+
+            <option value="+90">
+              🇹🇷 +90 Turquie
+            </option>
+
+            <option value="+20">
+              🇪🇬 +20 Égypte
+            </option>
+
+            <option value="+27">
+              🇿🇦 +27 Afrique du Sud
+            </option>
+
+            <option value="+212">
+              🇲🇦 +212 Maroc
+            </option>
+
+            <option value="+213">
+              🇩🇿 +213 Algérie
+            </option>
+
+            <option value="+216">
+              🇹🇳 +216 Tunisie
+            </option>
+
+            <option value="+221">
+              🇸🇳 +221 Sénégal
+            </option>
+
+            <option value="+225">
+              🇨🇮 +225 Côte d'Ivoire
+            </option>
+
+            <option value="+226">
+              🇧🇫 +226 Burkina Faso
+            </option>
+
+            <option value="+227">
+              🇳🇪 +227 Niger
+            </option>
+
+            <option value="+228">
+              🇹🇬 +228 Togo
+            </option>
+
+            <option value="+229">
+              🇧🇯 +229 Bénin
+            </option>
+
+            <option value="+234">
+              🇳🇬 +234 Nigeria
+            </option>
+
+            <option value="+237">
+              🇨🇲 +237 Cameroun
+            </option>
+
+            <option value="+243">
+              🇨🇩 +243 RD Congo
+            </option>
+
+            <option value="+244">
+              🇦🇴 +244 Angola
+            </option>
+
+            <option value="+254">
+              🇰🇪 +254 Kenya
+            </option>
+
+            <option value="+255">
+              🇹🇿 +255 Tanzanie
+            </option>
+
+            <option value="+256">
+              🇺🇬 +256 Ouganda
+            </option>
+
+            <option value="+260">
+              🇿🇲 +260 Zambie
+            </option>
+
+            <option value="+263">
+              🇿🇼 +263 Zimbabwe
+            </option>
+
+            <option value="+81">
+              🇯🇵 +81 Japon
+            </option>
+
+            <option value="+82">
+              🇰🇷 +82 Corée du Sud
+            </option>
+
+            <option value="+86">
+              🇨🇳 +86 Chine
+            </option>
+
+            <option value="+91">
+              🇮🇳 +91 Inde
+            </option>
+
+            <option value="+92">
+              🇵🇰 +92 Pakistan
+            </option>
+
+            <option value="+971">
+              🇦🇪 +971 Émirats arabes unis
+            </option>
+
+            <option value="+966">
+              🇸🇦 +966 Arabie saoudite
+            </option>
+
+            <option value="+974">
+              🇶🇦 +974 Qatar
+            </option>
+
+            <option value="+61">
+              🇦🇺 +61 Australie
+            </option>
+
+            <option value="+64">
+              🇳🇿 +64 Nouvelle-Zélande
+            </option>
+
+          </select>
+
+
+          <input
+            required
+            name="phone"
+            id="phoneInput"
+            type="tel"
+            inputmode="numeric"
+            placeholder="Votre numéro"
+            style="flex:1;"
           >
 
         </div>
 
-
-        <div style="flex:1">
-
-          <h4>
-            ${item.name}
-          </h4>
-
-          <strong>
-            ${money(item.price)}
-          </strong>
+      </label>
 
 
-          <div class="qty">
+      <!-- COMMUNE -->
 
-            <button
-              onclick="changeQty(${item.id},-1)"
-            >
-              −
-            </button>
+      <label>
 
-            <span>
-              ${item.qty}
-            </span>
+        Commune
 
-            <button
-              onclick="changeQty(${item.id},1)"
-            >
-              +
-            </button>
-
-            <button
-              onclick="removeItem(${item.id})"
-            >
-              🗑️
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    `).join("");
-
-
-  if ($("cartTotal")) {
-
-    $("cartTotal").textContent =
-      money(getCartTotal());
-
-  }
-
-}
-
-
-// =====================================
-// DETAIL PRODUIT
-// =====================================
-
-function openProduct(id) {
-
-  const product =
-    products.find(
-      item => item.id === id
-    );
-
-
-  if (!product) return;
-
-
-  $("productDetail").innerHTML = `
-
-    <div class="detail">
-
-      <div class="detail-img">
-
-        <img
-          src="${product.image}"
-          alt="${product.name}"
-          style="
-            width:100%;
-            max-height:400px;
-            object-fit:cover;
-            border-radius:15px;
-          "
+        <select
+          required
+          name="commune"
+          id="communeSelect"
         >
 
-      </div>
+          <option value="">
+            Choisir une commune
+          </option>
+
+          <option value="Arcahaie">
+            Arcahaie
+          </option>
+
+        </select>
+
+      </label>
 
 
-      <div>
+      <!-- ZONE -->
 
-        <div class="category">
-          ${product.category}
-        </div>
+      <label>
 
-        <h2>
-          ${product.name}
-        </h2>
+        Quartier / zone
 
-        <div class="big-price">
-          ${money(product.price)}
-        </div>
-
-        <p>
-          ${product.desc}
-        </p>
-
-        <p>
-          <strong>
-            🚚 Livraison :
-          </strong>
-          environ 1 à 2 jours
-          selon la zone.
-        </p>
-
-
-        <button
-          class="primary"
-          onclick="
-            addToCart(${product.id});
-            closeModals();
-          "
+        <select
+          required
+          name="area"
+          id="zoneSelect"
         >
-          Ajouter au panier
-        </button>
 
-      </div>
+          <option value="">
+            Choisir une zone
+          </option>
 
-    </div>
+          <option>Saint-Médard</option>
+          <option>Belle Fraîcheur</option>
+          <option>Cortade</option>
+          <option>Bourg</option>
+          <option>Bas Cortade</option>
+          <option>Boulard</option>
+          <option>Merotte</option>
+          <option>Corail</option>
+          <option>Pont-Callebasse</option>
+          <option>Carrefour Poy</option>
+          <option>Pierre Michel</option>
+          <option>Robert Vigner</option>
+          <option>Thoman</option>
+          <option>Poy la Ravine</option>
+          <option>Barrière Poy</option>
+          <option>Hostin</option>
+          <option>Ponce</option>
+          <option>Labarre</option>
+          <option>Pont-Mathéux</option>
+          <option>Saint-Ard</option>
+          <option>Brois Brûlé</option>
+          <option>Digue Mathéux</option>
+          <option>Digue Broby</option>
 
-  `;
+        </select>
 
+      </label>
 
-  $("productModal")
-    .classList.remove("hidden");
 
+      <!-- POINT DE REPERE -->
 
-  $("overlay")
-    .classList.remove("hidden");
+      <label>
 
-}
+        Point de repère
 
+        <input
+          required
+          name="landmark"
+          placeholder="Ex. près du marché..."
+        >
 
-// =====================================
-// OUVRIR PANIER
-// =====================================
+      </label>
 
-function openCart() {
 
-  $("cartDrawer")
-    .classList.add("open");
+      <!-- PAIEMENT -->
 
-  $("overlay")
-    .classList.remove("hidden");
+      <label>
 
-}
+        Mode de paiement
 
+        <select
+          required
+          name="payment"
+          id="paymentSelect"
+        >
 
-// =====================================
-// FERMER
-// =====================================
+          <option value="">
+            Choisir
+          </option>
 
-function closeModals() {
+          <option value="MonCash">
+            MonCash
+          </option>
 
-  document
-    .querySelectorAll(".modal")
-    .forEach(modal =>
-      modal.classList.add("hidden")
-    );
+          <option value="NatCash">
+            NatCash
+          </option>
 
+          <option value="Paiement à la livraison">
+            Paiement à la livraison
+          </option>
 
-  if ($("cartDrawer")) {
+        </select>
 
-    $("cartDrawer")
-      .classList.remove("open");
+      </label>
 
-  }
 
+      <!-- NATCASH -->
 
-  if ($("overlay")) {
+      <div
+        id="natcashPaymentInfo"
+        class="delivery-box"
+        style="
+          display:none;
+          margin-top:15px;
+        "
+      >
 
-    $("overlay")
-      .classList.add("hidden");
+        <strong>
+          💰 Paiement par NatCash
+        </strong>
 
-  }
-
-}
-
-
-// =====================================
-// MESSAGE
-// =====================================
-
-function toast(message) {
-
-  if (!$("toast")) {
-
-    alert(message);
-
-    return;
-
-  }
-
-
-  $("toast").textContent =
-    message;
-
-
-  $("toast")
-    .classList.add("show");
-
-
-  setTimeout(() => {
-
-    $("toast")
-      .classList.remove("show");
-
-  }, 2200);
-
-}
-
-
-// =====================================
-// LIVRAISON
-// =====================================
-
-function setupDeliveryFields() {
-
-  const communeSelect =
-    $("communeSelect");
-
-
-  if (communeSelect) {
-
-    communeSelect.innerHTML =
-      '<option value="">Choisir une commune</option>';
-
-
-    communes.forEach(
-      commune => {
-
-        const option =
-          document.createElement("option");
-
-        option.value = commune;
-
-        option.textContent = commune;
-
-        communeSelect.appendChild(option);
-
-      }
-    );
-
-  }
-
-
-  const areaInput =
-    document.querySelector(
-      'input[name="area"]'
-    );
-
-
-  if (
-    areaInput &&
-    !document.querySelector(
-      'select[name="area"]'
-    )
-  ) {
-
-    const zoneSelect =
-      document.createElement("select");
-
-    zoneSelect.name = "area";
-
-    zoneSelect.required = true;
-
-    zoneSelect.id = "zoneSelect";
-
-
-    zoneSelect.innerHTML =
-      '<option value="">Choisir une zone</option>';
-
-
-    zones.forEach(
-      zone => {
-
-        const option =
-          document.createElement("option");
-
-        option.value = zone;
-
-        option.textContent = zone;
-
-        zoneSelect.appendChild(option);
-
-      }
-    );
-
-
-    areaInput.replaceWith(zoneSelect);
-
-  }
-
-}
-
-
-// =====================================
-// PAIEMENT
-// =====================================
-
-function setupPaymentFields() {
-
-  const paymentSelect =
-    document.querySelector(
-      'select[name="payment"]'
-    );
-
-
-  if (!paymentSelect)
-    return;
-
-
-  const paymentInfo =
-    $("natcashPaymentInfo");
-
-
-  const moncashInfo =
-    $("moncashPaymentInfo");
-
-
-  function updatePaymentInfo() {
-
-    if (paymentInfo) {
-
-      paymentInfo.style.display =
-        paymentSelect.value === "NatCash"
-          ? "block"
-          : "none";
-
-    }
-
-
-    if (moncashInfo) {
-
-      moncashInfo.style.display =
-        paymentSelect.value === "MonCash"
-          ? "block"
-          : "none";
-
-    }
-
-
-    if ($("natcashTotal")) {
-
-      $("natcashTotal").textContent =
-        money(getCartTotal());
-
-    }
-
-  }
-
-
-  paymentSelect.onchange =
-    updatePaymentInfo;
-
-
-  updatePaymentInfo();
-
-}
-
-
-// =====================================
-// SUPABASE — CREER COMMANDE
-// =====================================
-
-async function createOrder(orderData) {
-
-  const response =
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/commandes`,
-      {
-
-        method: "POST",
-
-        headers: {
-
-          "Content-Type":
-            "application/json",
-
-          "apikey":
-            SUPABASE_KEY,
-
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
-
-          "Prefer":
-            "return=representation"
-
-        },
-
-        body:
-          JSON.stringify(orderData)
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    const text =
-      await response.text();
-
-    throw new Error(
-      text ||
-      "Impossible d'enregistrer la commande."
-    );
-
-  }
-
-
-  const data =
-    await response.json();
-
-
-  if (!data.length) {
-
-    throw new Error(
-      "La commande n'a pas été retournée par Supabase."
-    );
-
-  }
-
-
-  return data[0];
-
-}
-
-
-// =====================================
-// UPLOAD PREUVE
-// =====================================
-
-async function uploadPaymentProof(file, orderId) {
-
-  if (!file) {
-
-    throw new Error(
-      "Ajoutez la preuve de paiement."
-    );
-
-  }
-
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp"
-  ];
-
-
-  if (
-    !allowedTypes.includes(file.type)
-  ) {
-
-    throw new Error(
-      "Utilisez une image JPG, PNG ou WEBP."
-    );
-
-  }
-
-
-  if (
-    file.size > 10 * 1024 * 1024
-  ) {
-
-    throw new Error(
-      "La preuve ne doit pas dépasser 10 MB."
-    );
-
-  }
-
-
-  const extension =
-    file.name
-      .split(".")
-      .pop()
-      .toLowerCase();
-
-
-  const filePath =
-    `${orderId}/${Date.now()}-preuve.${extension}`;
-
-
-  const response =
-    await fetch(
-      `${SUPABASE_URL}/storage/v1/object/${PAYMENT_BUCKET}/${filePath}`,
-      {
-
-        method: "POST",
-
-        headers: {
-
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
-
-          "apikey":
-            SUPABASE_KEY,
-
-          "Content-Type":
-            file.type,
-
-          "x-upsert":
-            "false"
-
-        },
-
-        body: file
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    const text =
-      await response.text();
-
-    throw new Error(
-      "Erreur upload preuve : " +
-      text
-    );
-
-  }
-
-
-  return filePath;
-
-}
-
-
-// =====================================
-// METTRE A JOUR COMMANDE
-// =====================================
-
-async function updateOrder(
-  orderId,
-  updateData
-) {
-
-  const response =
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}`,
-      {
-
-        method: "PATCH",
-
-        headers: {
-
-          "Content-Type":
-            "application/json",
-
-          "apikey":
-            SUPABASE_KEY,
-
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
-
-          "Prefer":
-            "return=representation"
-
-        },
-
-        body:
-          JSON.stringify(updateData)
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    const text =
-      await response.text();
-
-    throw new Error(
-      text ||
-      "Impossible de mettre à jour la commande."
-    );
-
-  }
-
-
-  const data =
-    await response.json();
-
-  return data[0] || null;
-
-}
-
-
-// =====================================
-// STATUT PAIEMENT
-// =====================================
-
-function startPaymentStatusCheck(orderId) {
-
-  if (paymentCheckTimer) {
-
-    clearInterval(
-      paymentCheckTimer
-    );
-
-  }
-
-
-  paymentCheckTimer =
-    setInterval(
-      async () => {
-
-        try {
-
-          const response =
-            await fetch(
-              `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}&select=*`,
-              {
-
-                headers: {
-
-                  "apikey":
-                    SUPABASE_KEY,
-
-                  "Authorization":
-                    `Bearer ${SUPABASE_KEY}`
-
-                }
-
-              }
-            );
-
-
-          if (!response.ok)
-            return;
-
-
-          const data =
-            await response.json();
-
-
-          if (!data.length)
-            return;
-
-
-          const order =
-            data[0];
-
-
-          if (
-            order.status === "paid" ||
-            order.status === "paye" ||
-            order.status === "accepted"
-          ) {
-
-            clearInterval(
-              paymentCheckTimer
-            );
-
-            showPaidReceipt(order);
-
-          }
-
-        } catch (error) {
-
-          console.error(error);
-
-        }
-
-      },
-      5000
-    );
-
-}
-
-
-// =====================================
-// RECU
-// =====================================
-
-function showPaidReceipt(order) {
-
-  const old =
-    $("rcReceiptBox");
-
-
-  if (old)
-    old.remove();
-
-
-  let items = [];
-
-
-  try {
-
-    items =
-      typeof order.items === "string"
-        ? JSON.parse(order.items)
-        : (
-            Array.isArray(order.items)
-              ? order.items
-              : []
-          );
-
-  } catch {
-
-    items = [];
-
-  }
-
-
-  const itemsHtml =
-    items.map(
-      item => `
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          gap:10px;
-          margin:7px 0;
-        ">
-
-          <span>
-            ${item.name || "Produit"}
-            ×
-            ${item.qty || 1}
-          </span>
-
-          <strong>
-            ${money(
-              Number(item.price || 0) *
-              Number(item.qty || 1)
-            )}
-          </strong>
-
-        </div>
-
-      `
-    ).join("");
-
-
-  const date =
-    order.created_at
-      ? new Date(
-          order.created_at
-        ).toLocaleString("fr-FR")
-      : new Date()
-          .toLocaleString("fr-FR");
-
-
-  const receipt =
-    document.createElement("div");
-
-
-  receipt.id =
-    "rcReceiptBox";
-
-
-  receipt.style.cssText = `
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:99999;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:18px;
-  `;
-
-
-  receipt.innerHTML = `
-
-    <div
-      id="rcReceiptContent"
-      style="
-        background:white;
-        width:100%;
-        max-width:520px;
-        max-height:90vh;
-        overflow:auto;
-        border-radius:16px;
-        padding:22px;
-        font-family:Arial,sans-serif;
-      "
-    >
-
-      <div style="text-align:center">
-
-        <h2>
-          RC STORE
-        </h2>
+        <p>
+          Envoyez le montant exact de votre
+          commande au :
+        </p>
 
         <h3>
-          REÇU DE PAIEMENT
+          📱 +50941551464
         </h3>
 
         <p>
-          ✅ Paiement accepté
+          👤
+          <strong>
+            Cherlot René
+          </strong>
+        </p>
+
+        <p>
+          Montant à payer :
+          <strong id="natcashTotal">
+            0 GDS
+          </strong>
+        </p>
+
+        <p>
+          Après le paiement, ajoutez votre
+          preuve de paiement.
+        </p>
+
+        <label>
+
+          📸 Preuve de paiement
+
+          <input
+            type="file"
+            id="paymentProof"
+            name="paymentProof"
+            accept="image/jpeg,image/png,image/webp"
+          >
+
+        </label>
+
+      </div>
+
+
+      <!-- MONCASH -->
+
+      <div
+        id="moncashPaymentInfo"
+        class="delivery-box"
+        style="
+          display:none;
+          margin-top:15px;
+        "
+      >
+
+        <strong>
+          💵 Paiement par MonCash
+        </strong>
+
+        <p>
+          Votre paiement MonCash sera traité
+          selon les informations de paiement
+          disponibles.
         </p>
 
       </div>
 
-      <hr>
 
-      <p>
-        <strong>N° commande :</strong>
-        ${order.id || ""}
-      </p>
+      <!-- LIVRAISON -->
 
-      <p>
-        <strong>Client :</strong>
-        ${order.name || ""}
-      </p>
+      <div class="delivery-box">
 
-      <p>
-        <strong>Téléphone :</strong>
-        ${order.phone || ""}
-      </p>
+        <strong>
+          🚚 Livraison estimée
+        </strong>
 
-      <p>
-        <strong>Commune 
+        <span>
+          En général : 1 à 2 jours selon la zone.
+        </span>
+
+      </div>
+
+
+      <!-- CONFIRMER -->
+
+      <button
+        class="primary full"
+        type="submit"
+      >
+        Confirmer la commande
+      </button>
+
+    </form>
+
+
+    <p class="tiny">
+
+      Pour NatCash, le paiement sera vérifié
+      avant la validation définitive de la commande.
+
+    </p>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================
+     TOAST
+===========================
