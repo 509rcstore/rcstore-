@@ -1,206 +1,728 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-
-  <title>RC STORE — Boutique en ligne</title>
+  <meta charset="UTF-8">
 
   <meta
-    name="description"
-    content="RC STORE — Boutique en ligne"
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
   >
 
-  <link rel="stylesheet" href="style.css">
+  <title>RC STORE</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #111;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ================================
+       HEADER
+    ================================= */
+
+    header {
+      background: #111;
+      color: white;
+      padding: 15px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .cart-button {
+      border: none;
+      background: white;
+      color: #111;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #cartCount {
+      background: #111;
+      color: white;
+      min-width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    /* ================================
+       NAVIGATION
+    ================================= */
+
+    nav {
+      max-width: 1200px;
+      margin: auto;
+      padding: 15px 20px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .nav-link {
+      border: 1px solid #ddd;
+      background: white;
+      padding: 9px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .nav-link.active {
+      background: #111;
+      color: white;
+    }
+
+    /* ================================
+       HERO
+    ================================= */
+
+    .hero {
+      max-width: 1200px;
+      margin: 15px auto;
+      padding: 45px 25px;
+      border-radius: 20px;
+      background: #111;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: #ddd;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    /* ================================
+       SEARCH
+    ================================= */
+
+    .search-area {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-area input {
+      flex: 1;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: white;
+      outline: none;
+    }
+
+    .search-area button {
+      padding: 13px 18px;
+      border: none;
+      background: #111;
+      color: white;
+      border-radius: 10px;
+    }
+
+    /* ================================
+       PRODUCTS
+    ================================= */
+
+    .products-section {
+      max-width: 1200px;
+      margin: auto;
+      padding: 0 20px 50px;
+    }
+
+    .section-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 25px 0 15px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+      );
+      gap: 18px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      border: 1px solid #eee;
+      box-shadow: 0 5px 18px rgba(0,0,0,.05);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 210px;
+      border: none;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+    }
+
+    .product-content {
+      padding: 16px;
+    }
+
+    .product-content small {
+      color: #777;
+    }
+
+    .product-content h3 {
+      margin: 7px 0;
+    }
+
+    .product-content p {
+      color: #666;
+      line-height: 1.5;
+      font-size: 14px;
+      min-height: 42px;
+    }
+
+    .product-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .primary {
+      border: none;
+      background: #111;
+      color: white;
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-weight: bold;
+    }
+
+    .primary:hover {
+      opacity: .85;
+    }
+
+    .full {
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    /* ================================
+       OVERLAY
+    ================================= */
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 200;
+    }
+
+    /* ================================
+       CART DRAWER
+    ================================= */
+
+    #cartDrawer {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: min(420px, 95%);
+      height: 100vh;
+      background: white;
+      z-index: 300;
+      transform: translateX(100%);
+      transition: .3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #cartDrawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 18px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .close-button {
+      border: none;
+      background: #eee;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+
+    #cartItems {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .cart-item-icon {
+      width: 55px;
+      height: 55px;
+      background: #f1f1f1;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-info strong {
+      display: block;
+    }
+
+    .cart-item-info span {
+      display: block;
+      color: #666;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 7px;
+    }
+
+    .qty-controls button {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 7px;
+    }
+
+    .remove-item {
+      border: none;
+      background: #eee;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 20px;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 50px 20px;
+      color: #777;
+    }
+
+    .drawer-footer {
+      padding: 18px;
+      border-top: 1px solid #eee;
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    /* ================================
+       MODALS
+    ================================= */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+    }
+
+    .modal-box {
+      background: white;
+      width: min(650px, 100%);
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 18px;
+      padding: 22px;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    /* ================================
+       PRODUCT DETAIL
+    ================================= */
+
+    .product-detail {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .detail-image {
+      min-height: 280px;
+      background: #f1f1f1;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 100px;
+    }
+
+    /* ================================
+       CHECKOUT
+    ================================= */
+
+    .checkout-summary {
+      background: #f7f7f7;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 13px;
+      font-size: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      outline: none;
+      background: white;
+    }
+
+    .phone-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px;
+    }
+
+    #natcashPaymentInfo,
+    #moncashPaymentInfo {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .payment-number {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    /* ================================
+       TOAST
+    ================================= */
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%)
+        translateY(100px);
+      background: #111;
+      color: white;
+      padding: 13px 18px;
+      border-radius: 10px;
+      z-index: 999;
+      transition: .3s ease;
+      opacity: 0;
+    }
+
+    #toast.show {
+      transform: translateX(-50%)
+        translateY(0);
+      opacity: 1;
+    }
+
+    /* ================================
+       FOOTER
+    ================================= */
+
+    footer {
+      background: #111;
+      color: white;
+      text-align: center;
+      padding: 25px;
+    }
+
+    /* ================================
+       MOBILE
+    ================================= */
+
+    @media (max-width: 650px) {
+
+      .hero {
+        margin: 10px;
+        padding: 30px 20px;
+      }
+
+      .hero h1 {
+        font-size: 30px;
+      }
+
+      .search-area {
+        padding: 0 10px;
+      }
+
+      .products-section {
+        padding: 0 10px 40px;
+      }
+
+      .product-detail {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-image {
+        min-height: 200px;
+      }
+
+      .phone-row {
+        grid-template-columns: 100px 1fr;
+      }
+
+    }
+
+  </style>
 </head>
 
 <body>
 
-<!-- =====================================================
-     HEADER
-====================================================== -->
+  <!-- ================================
+       HEADER
+  ================================= -->
 
-<header class="topbar">
+  <header>
 
-  <a
-    class="brand"
-    href="#"
-    aria-label="RC STORE"
-  >
-    <span class="brand-mark">RC</span>
-    <span>STORE</span>
-  </a>
+    <div class="header-inner">
 
-  <div class="search-wrap">
+      <div class="logo">
+        RC STORE
+      </div>
 
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="Rechercher un produit..."
-      aria-label="Rechercher un produit"
-    >
+      <button
+        type="button"
+        id="cartBtn"
+        class="cart-button"
+      >
+
+        🛒 Panier
+
+        <span id="cartCount">
+          0
+        </span>
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================================
+       NAVIGATION
+  ================================= -->
+
+  <nav>
 
     <button
-      id="searchBtn"
       type="button"
-      aria-label="Rechercher"
+      class="nav-link active"
+      data-category="Tous"
     >
-      🔎
+      Tous
     </button>
 
-  </div>
+    <button
+      type="button"
+      class="nav-link"
+      data-category="Mode"
+    >
+      Mode
+    </button>
 
-  <button
-    class="icon-btn"
-    id="cartBtn"
-    type="button"
-    aria-label="Panier"
-  >
-    🛒
-    <span id="cartCount">0</span>
-  </button>
+    <button
+      type="button"
+      class="nav-link"
+      data-category="Accessoires"
+    >
+      Accessoires
+    </button>
 
-</header>
+    <button
+      type="button"
+      class="nav-link"
+      data-category="Électronique"
+    >
+      Électronique
+    </button>
 
+    <button
+      type="button"
+      class="nav-link"
+      data-category="Beauté"
+    >
+      Beauté
+    </button>
 
-<!-- =====================================================
-     NAVIGATION
-====================================================== -->
-
-<nav class="nav">
-
-  <button
-    class="nav-link active"
-    data-category="Tous"
-    type="button"
-  >
-    Tous
-  </button>
-
-  <button
-    class="nav-link"
-    data-category="Mode"
-    type="button"
-  >
-    Mode
-  </button>
-
-  <button
-    class="nav-link"
-    data-category="Beauté"
-    type="button"
-  >
-    Beauté
-  </button>
-
-  <button
-    class="nav-link"
-    data-category="Électronique"
-    type="button"
-  >
-    Électronique
-  </button>
-
-  <button
-    class="nav-link"
-    data-category="Maison"
-    type="button"
-  >
-    Maison
-  </button>
-
-  <button
-    class="nav-link"
-    data-category="Accessoires"
-    type="button"
-  >
-    Accessoires
-  </button>
-
-</nav>
+  </nav>
 
 
-<!-- =====================================================
-     CONTENU
-====================================================== -->
-
-<main>
-
-  <!-- HERO -->
+  <!-- ================================
+       HERO
+  ================================= -->
 
   <section class="hero">
 
-    <div>
+    <h1>
+      Bienvenue chez RC STORE
+    </h1>
 
-      <p class="eyebrow">
-        BIENVENUE CHEZ RC STORE
-      </p>
-
-      <h1>
-        Tout ce dont vous avez besoin,
-        <br>
-        <span>en un seul endroit.</span>
-      </h1>
-
-      <p>
-        Découvrez nos produits, ajoutez-les au panier
-        et passez votre commande facilement.
-      </p>
-
-      <a
-        href="#products"
-        class="hero-btn"
-      >
-        Voir les produits
-      </a>
-
-    </div>
-
-    <div class="hero-card">
-
-      <div class="hero-logo">
-        RC
-      </div>
-
-      <strong>
-        STORE
-      </strong>
-
-      <small>
-        QUALITÉ • STYLE • SATISFACTION
-      </small>
-
-    </div>
+    <p>
+      Découvrez nos produits et ajoutez
+      facilement vos articles au panier.
+    </p>
 
   </section>
 
 
-  <!-- =================================================
-       PRODUITS
-  ================================================== -->
+  <!-- ================================
+       SEARCH
+  ================================= -->
 
-  <section
-    class="section"
-    id="products"
-  >
+  <div class="search-area">
 
-    <div class="section-head">
+    <input
+      type="search"
+      id="searchInput"
+      placeholder="Rechercher un produit..."
+    >
 
-      <div>
+    <button
+      type="button"
+      id="searchBtn"
+    >
+      Rechercher
+    </button>
 
-        <p class="eyebrow">
-          NOS PRODUITS
-        </p>
+  </div>
 
-        <h2>
-          Découvrez notre sélection
-        </h2>
 
-      </div>
+  <!-- ================================
+       PRODUCTS
+  ================================= -->
+
+  <main class="products-section">
+
+    <div class="section-top">
+
+      <h2>
+        Nos produits
+      </h2>
 
       <span id="resultCount">
-        0 produit(s)
+        0 produit
       </span>
 
     </div>
@@ -211,810 +733,429 @@
       class="product-grid"
     ></div>
 
-  </section>
-
-</main>
+  </main>
 
 
-<!-- =====================================================
-     OVERLAY
-====================================================== -->
-
-<div
-  id="overlay"
-  class="overlay hidden"
-></div>
-
-
-<!-- =====================================================
-     PANIER
-====================================================== -->
-
-<aside
-  id="cartDrawer"
-  class="drawer"
->
-
-  <div class="drawer-head">
-
-    <h2>
-      🛒 Votre panier
-    </h2>
-
-    <button
-      class="close"
-      type="button"
-      data-close
-      aria-label="Fermer le panier"
-    >
-      ×
-    </button>
-
-  </div>
-
+  <!-- ================================
+       OVERLAY
+  ================================= -->
 
   <div
-    id="cartItems"
-    class="cart-items"
+    id="overlay"
+    class="hidden"
+  ></div>
+
+
+  <!-- ================================
+       CART
+  ================================= -->
+
+  <aside id="cartDrawer">
+
+    <div class="drawer-header">
+
+      <h2>
+        Mon panier
+      </h2>
+
+      <button
+        type="button"
+        class="close-button"
+        data-close
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div id="cartItems"></div>
+
+
+    <div class="drawer-footer">
+
+      <div class="cart-total">
+
+        <span>
+          Total
+        </span>
+
+        <strong id="cartTotal">
+          0 HTG
+        </strong>
+
+      </div>
+
+
+      <button
+        type="button"
+        id="checkoutBtn"
+        class="primary full"
+      >
+        Passer la commande
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ================================
+       PRODUCT MODAL
+  ================================= -->
+
+  <div
+    id="productModal"
+    class="modal hidden"
   >
 
-    <p>
-      Votre panier est vide.
-    </p>
+    <div class="modal-box">
+
+      <div class="modal-header">
+
+        <h2>
+          Produit
+        </h2>
+
+        <button
+          type="button"
+          class="close-button"
+          data-close
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div id="productDetail"></div>
+
+    </div>
 
   </div>
 
 
-  <div class="cart-total">
+  <!-- ================================
+       CHECKOUT MODAL
+  ================================= -->
 
-    <span>
-      Total
-    </span>
-
-    <strong id="cartTotal">
-      0 GDS
-    </strong>
-
-  </div>
-
-
-  <button
-    id="checkoutBtn"
-    class="primary full"
-    type="button"
+  <div
+    id="checkoutModal"
+    class="modal hidden"
   >
-    🛍️ Passer la commande
-  </button>
 
-</aside>
+    <div class="modal-box">
 
+      <div class="modal-header">
 
-<!-- =====================================================
-     MODAL PRODUIT
-====================================================== -->
+        <h2>
+          Passer la commande
+        </h2>
 
-<div
-  id="productModal"
-  class="modal hidden"
->
-
-  <button
-    class="close modal-close"
-    type="button"
-    data-close
-  >
-    ×
-  </button>
-
-  <div id="productDetail"></div>
-
-</div>
-
-
-<!-- =====================================================
-     CHECKOUT
-====================================================== -->
-
-<div
-  id="checkoutModal"
-  class="modal checkout-modal hidden"
->
-
-  <button
-    class="close modal-close"
-    type="button"
-    data-close
-  >
-    ×
-  </button>
-
-
-  <div class="checkout">
-
-    <p class="eyebrow">
-      COMMANDE
-    </p>
-
-    <h2>
-      Finaliser votre commande
-    </h2>
-
-
-    <!-- RÉSUMÉ -->
-
-    <div
-      id="checkoutSummary"
-      class="checkout-summary"
-    ></div>
-
-
-    <form id="orderForm">
-
-
-      <!-- =================================================
-           NOM
-      ================================================== -->
-
-      <label>
-
-        Nom complet
-
-        <input
-          type="text"
-          name="name"
-          required
-          autocomplete="name"
-          placeholder="Votre nom complet"
+        <button
+          type="button"
+          class="close-button"
+          data-close
         >
+          ×
+        </button>
 
-      </label>
+      </div>
 
 
-      <!-- =================================================
-           TÉLÉPHONE
-      ================================================== -->
+      <!-- RÉSUMÉ -->
 
-      <label>
+      <div id="checkoutSummary"></div>
 
-        Téléphone
 
-        <div
-          style="
-            display:flex;
-            gap:8px;
-            width:100%;
-          "
-        >
+      <!-- FORMULAIRE -->
 
-          <select
-            name="countryCode"
-            id="countryCode"
+      <form id="orderForm">
+
+        <div class="form-group">
+
+          <label for="name">
+            Nom complet
+          </label>
+
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Votre nom"
             required
-            aria-label="Indicatif du pays"
-            style="
-              width:150px;
-              min-width:150px;
-            "
           >
 
-            <option value="+509">
-              🇭🇹 +509 Haïti
-            </option>
-
-            <option value="+1">
-              🇺🇸 +1 États-Unis
-            </option>
-
-            <option value="+1">
-              🇨🇦 +1 Canada
-            </option>
-
-            <option value="+52">
-              🇲🇽 +52 Mexique
-            </option>
-
-            <option value="+33">
-              🇫🇷 +33 France
-            </option>
-
-            <option value="+34">
-              🇪🇸 +34 Espagne
-            </option>
-
-            <option value="+39">
-              🇮🇹 +39 Italie
-            </option>
-
-            <option value="+44">
-              🇬🇧 +44 Royaume-Uni
-            </option>
-
-            <option value="+49">
-              🇩🇪 +49 Allemagne
-            </option>
-
-            <option value="+30">
-              🇬🇷 +30 Grèce
-            </option>
-
-            <option value="+31">
-              🇳🇱 +31 Pays-Bas
-            </option>
-
-            <option value="+32">
-              🇧🇪 +32 Belgique
-            </option>
-
-            <option value="+41">
-              🇨🇭 +41 Suisse
-            </option>
-
-            <option value="+43">
-              🇦🇹 +43 Autriche
-            </option>
-
-            <option value="+45">
-              🇩🇰 +45 Danemark
-            </option>
-
-            <option value="+46">
-              🇸🇪 +46 Suède
-            </option>
-
-            <option value="+47">
-              🇳🇴 +47 Norvège
-            </option>
-
-            <option value="+48">
-              🇵🇱 +48 Pologne
-            </option>
-
-            <option value="+351">
-              🇵🇹 +351 Portugal
-            </option>
-
-            <option value="+353">
-              🇮🇪 +353 Irlande
-            </option>
-
-            <option value="+354">
-              🇮🇸 +354 Islande
-            </option>
-
-            <option value="+358">
-              🇫🇮 +358 Finlande
-            </option>
-
-            <option value="+359">
-              🇧🇬 +359 Bulgarie
-            </option>
-
-            <option value="+370">
-              🇱🇹 +370 Lituanie
-            </option>
-
-            <option value="+371">
-              🇱🇻 +371 Lettonie
-            </option>
-
-            <option value="+372">
-              🇪🇪 +372 Estonie
-            </option>
-
-            <option value="+380">
-              🇺🇦 +380 Ukraine
-            </option>
-
-            <option value="+381">
-              🇷🇸 +381 Serbie
-            </option>
-
-            <option value="+385">
-              🇭🇷 +385 Croatie
-            </option>
-
-            <option value="+386">
-              🇸🇮 +386 Slovénie
-            </option>
-
-            <option value="+420">
-              🇨🇿 +420 Tchéquie
-            </option>
-
-            <option value="+421">
-              🇸🇰 +421 Slovaquie
-            </option>
-
-            <option value="+40">
-              🇷🇴 +40 Roumanie
-            </option>
-
-            <option value="+7">
-              🇷🇺 +7 Russie
-            </option>
-
-            <option value="+90">
-              🇹🇷 +90 Turquie
-            </option>
-
-            <option value="+20">
-              🇪🇬 +20 Égypte
-            </option>
-
-            <option value="+27">
-              🇿🇦 +27 Afrique du Sud
-            </option>
-
-            <option value="+211">
-              🇸🇸 +211 Soudan du Sud
-            </option>
-
-            <option value="+212">
-              🇲🇦 +212 Maroc
-            </option>
-
-            <option value="+213">
-              🇩🇿 +213 Algérie
-            </option>
-
-            <option value="+216">
-              🇹🇳 +216 Tunisie
-            </option>
-
-            <option value="+218">
-              🇱🇾 +218 Libye
-            </option>
-
-            <option value="+220">
-              🇬🇲 +220 Gambie
-            </option>
-
-            <option value="+221">
-              🇸🇳 +221 Sénégal
-            </option>
-
-            <option value="+222">
-              🇲🇷 +222 Mauritanie
-            </option>
-
-            <option value="+223">
-              🇲🇱 +223 Mali
-            </option>
-
-            <option value="+224">
-              🇬🇳 +224 Guinée
-            </option>
-
-            <option value="+225">
-              🇨🇮 +225 Côte d'Ivoire
-            </option>
-
-            <option value="+226">
-              🇧🇫 +226 Burkina Faso
-            </option>
-
-            <option value="+227">
-              🇳🇪 +227 Niger
-            </option>
-
-            <option value="+228">
-              🇹🇬 +228 Togo
-            </option>
-
-            <option value="+229">
-              🇧🇯 +229 Bénin
-            </option>
-
-            <option value="+230">
-              🇲🇺 +230 Maurice
-            </option>
-
-            <option value="+231">
-              🇱🇷 +231 Liberia
-            </option>
-
-            <option value="+232">
-              🇸🇱 +232 Sierra Leone
-            </option>
-
-            <option value="+233">
-              🇬🇭 +233 Ghana
-            </option>
-
-            <option value="+234">
-              🇳🇬 +234 Nigeria
-            </option>
-
-            <option value="+235">
-              🇹🇩 +235 Tchad
-            </option>
-
-            <option value="+236">
-              🇨🇫 +236 Centrafrique
-            </option>
-
-            <option value="+237">
-              🇨🇲 +237 Cameroun
-            </option>
-
-            <option value="+238">
-              🇨🇻 +238 Cap-Vert
-            </option>
-
-            <option value="+239">
-              🇸🇹 +239 Sao Tomé-et-Principe
-            </option>
-
-            <option value="+240">
-              🇬🇶 +240 Guinée équatoriale
-            </option>
-
-            <option value="+241">
-              🇬🇦 +241 Gabon
-            </option>
-
-            <option value="+242">
-              🇨🇬 +242 Congo
-            </option>
-
-            <option value="+243">
-              🇨🇩 +243 RD Congo
-            </option>
-
-            <option value="+244">
-              🇦🇴 +244 Angola
-            </option>
-
-            <option value="+245">
-              🇬🇼 +245 Guinée-Bissau
-            </option>
-
-            <option value="+248">
-              🇸🇨 +248 Seychelles
-            </option>
-
-            <option value="+249">
-              🇸🇩 +249 Soudan
-            </option>
-
-            <option value="+250">
-              🇷🇼 +250 Rwanda
-            </option>
-
-            <option value="+251">
-              🇪🇹 +251 Éthiopie
-            </option>
-
-            <option value="+252">
-              🇸🇴 +252 Somalie
-            </option>
-
-            <option value="+253">
-              🇩🇯 +253 Djibouti
-            </option>
+        </div>
 
-            <option value="+254">
-              🇰🇪 +254 Kenya
-            </option>
 
-            <option value="+255">
-              🇹🇿 +255 Tanzanie
-            </option>
+        <!-- TÉLÉPHONE -->
 
-            <option value="+256">
-              🇺🇬 +256 Ouganda
-            </option>
+        <div class="form-group">
 
-            <option value="+257">
-              🇧🇮 +257 Burundi
-            </option>
+          <label>
+            Numéro de téléphone
+          </label>
 
-            <option value="+258">
-              🇲🇿 +258 Mozambique
-            </option>
+          <div class="phone-row">
 
-            <option value="+260">
-              🇿🇲 +260 Zambie
-            </option>
+            <select
+              id="countryCode"
+              name="countryCode"
+              required
+            >
 
-            <option value="+261">
-              🇲🇬 +261 Madagascar
-            </option>
+              <option value="+509">
+                🇭🇹 +509
+              </option>
 
-            <option value="+262">
-              🇷🇪 +262 Réunion
-            </option>
+              <option value="+1">
+                🇺🇸 +1
+              </option>
 
-            <option value="+263">
-              🇿🇼 +263 Zimbabwe
-            </option>
+              <option value="+33">
+                🇫🇷 +33
+              </option>
 
-            <option value="+264">
-              🇳🇦 +264 Namibie
-            </option>
+              <option value="+1">
+                🇨🇦 +1
+              </option>
 
-            <option value="+265">
-              🇲🇼 +265 Malawi
-            </option>
+              <option value="+52">
+                🇲🇽 +52
+              </option>
 
-            <option value="+266">
-              🇱🇸 +266 Lesotho
-            </option>
+              <option value="+34">
+                🇪🇸 +34
+              </option>
 
-            <option value="+267">
-              🇧🇼 +267 Botswana
-            </option>
+              <option value="+44">
+                🇬🇧 +44
+              </option>
 
-            <option value="+268">
-              🇸🇿 +268 Eswatini
-            </option>
+              <option value="+49">
+                🇩🇪 +49
+              </option>
 
-            <option value="+269">
-              🇰🇲 +269 Comores
-            </option>
+              <option value="+41">
+                🇨🇭 +41
+              </option>
 
-            <option value="+290">
-              🇸🇭 +290 Sainte-Hélène
-            </option>
+              <option value="+39">
+                🇮🇹 +39
+              </option>
 
-            <option value="+291">
-              🇪🇷 +291 Érythrée
-            </option>
+              <option value="+32">
+                🇧🇪 +32
+              </option>
 
-            <option value="+297">
-              🇦🇼 +297 Aruba
-            </option>
+              <option value="+1">
+                🇩🇴 +1
+              </option>
 
-            <option value="+298">
-              🇫🇴 +298 Îles Féroé
-            </option>
+              <option value="+55">
+                🇧🇷 +55
+              </option>
 
-            <option value="+299">
-              🇬🇱 +299 Groenland
-            </option>
+              <option value="+57">
+                🇨🇴 +57
+              </option>
 
-            <option value="+350">
-              🇬🇮 +350 Gibraltar
-            </option>
+              <option value="+58">
+                🇻🇪 +58
+              </option>
 
-            <option value="+356">
-              🇲🇹 +356 Malte
-            </option>
+              <option value="+91">
+                🇮🇳 +91
+              </option>
 
-            <option value="+357">
-              🇨🇾 +357 Chypre
-            </option>
+              <option value="+86">
+                🇨🇳 +86
+              </option>
 
-            <option value="+376">
-              🇦🇩 +376 Andorre
-            </option>
+              <option value="+81">
+                🇯🇵 +81
+              </option>
 
-            <option value="+377">
-              🇲🇨 +377 Monaco
-            </option>
+              <option value="+82">
+                🇰🇷 +82
+              </option>
 
-            <option value="+378">
-              🇸🇲 +378 Saint-Marin
-            </option>
+              <option value="+971">
+                🇦🇪 +971
+              </option>
 
-            <option value="+379">
-              🇻🇦 +379 Vatican
-            </option>
+              <option value="+27">
+                🇿🇦 +27
+              </option>
 
-            <option value="+382">
-              🇲🇪 +382 Monténégro
-            </option>
+              <option value="+234">
+                🇳🇬 +234
+              </option>
 
-            <option value="+383">
-              🇽🇰 +383 Kosovo
-            </option>
+              <option value="+254">
+                🇰🇪 +254
+              </option>
 
-            <option value="+387">
-              🇧🇦 +387 Bosnie-Herzégovine
-            </option>
+            </select>
 
-            <option value="+389">
-              🇲🇰 +389 Macédoine du Nord
-            </option>
 
-            <option value="+501">
-              🇧🇿 +501 Belize
-            </option>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="Votre numéro"
+              required
+            >
 
-            <option value="+502">
-              🇬🇹 +502 Guatemala
-            </option>
+          </div>
 
-            <option value="+503">
-              🇸🇻 +503 Salvador
-            </option>
+        </div>
 
-            <option value="+504">
-              🇭🇳 +504 Honduras
-            </option>
 
-            <option value="+505">
-              🇳🇮 +505 Nicaragua
-            </option>
+        <!-- COMMUNE -->
 
-            <option value="+506">
-              🇨🇷 +506 Costa Rica
-            </option>
+        <div class="form-group">
 
-            <option value="+507">
-              🇵🇦 +507 Panama
-            </option>
+          <label for="communeSelect">
+            Commune
+          </label>
 
-            <option value="+508">
-              🇵🇲 +508 Saint-Pierre-et-Miquelon
-            </option>
+          <select
+            id="communeSelect"
+            name="commune"
+            required
+          ></select>
 
-            <option value="+509">
-              🇭🇹 +509 Haïti
-            </option>
+        </div>
 
-            <option value="+590">
-              🇬🇵 +590 Guadeloupe
-            </option>
 
-            <option value="+591">
-              🇧🇴 +591 Bolivie
-            </option>
+        <!-- ZONE -->
 
-            <option value="+592">
-              🇬🇾 +592 Guyana
-            </option>
+        <div class="form-group">
 
-            <option value="+593">
-              🇪🇨 +593 Équateur
-            </option>
+          <label for="area">
+            Zone / Quartier
+          </label>
 
-            <option value="+594">
-              🇬🇫 +594 Guyane française
-            </option>
+          <input
+            type="text"
+            id="area"
+            name="area"
+            placeholder="Votre zone"
+            required
+          >
 
-            <option value="+595">
-              🇵🇾 +595 Paraguay
-            </option>
+        </div>
 
-            <option value="+596">
-              🇲🇶 +596 Martinique
-            </option>
 
-            <option value="+597">
-              🇸🇷 +597 Suriname
-            </option>
+        <!-- REPÈRE -->
 
-            <option value="+598">
-              🇺🇾 +598 Uruguay
-            </option>
+        <div class="form-group">
 
-            <option value="+599">
-              🇨🇼 +599 Curaçao
-            </option>
+          <label for="landmark">
+            Adresse / Repère
+          </label>
 
-            <option value="+670">
-              🇹🇱 +670 Timor oriental
-            </option>
+          <textarea
+            id="landmark"
+            name="landmark"
+            rows="3"
+            placeholder="Exemple : près de..."
+            required
+          ></textarea>
 
-            <option value="+672">
-              🇦🇺 +672 Territoires australiens
-            </option>
+        </div>
 
-            <option value="+673">
-              🇧🇳 +673 Brunei
-            </option>
 
-            <option value="+674">
-              🇳🇷 +674 Nauru
-            </option>
+        <!-- PAIEMENT -->
 
-            <option value="+675">
-              🇵🇬 +675 Papouasie-Nouvelle-Guinée
-            </option>
+        <div class="form-group">
 
-            <option value="+676">
-              🇹🇴 +676 Tonga
-            </option>
+          <label for="paymentSelect">
+            Moyen de paiement
+          </label>
 
-            <option value="+677">
-              🇸🇧 +677 Îles Salomon
-            </option>
+          <select
+            id="paymentSelect"
+            name="payment"
+            required
+          >
 
-            <option value="+678">
-              🇻🇺 +678 Vanuatu
+            <option value="">
+              Choisir un moyen de paiement
             </option>
 
-            <option value="+679">
-              🇫🇯 +679 Fidji
+            <option value="MonCash">
+              MonCash
             </option>
 
-            <option value="+680">
-              🇵🇼 +680 Palaos
+            <option value="NatCash">
+              NatCash
             </option>
 
-            <option value="+681">
-              🇼🇫 +681 Wallis-et-Futuna
-            </option>
+          </select>
 
-            <option value="+682">
-              🇨🇰 +682 Îles Cook
-            </option>
+        </div>
 
-            <option value="+683">
-              🇳🇺 +683 Niue
-            </option>
 
-            <option value="+685">
-              🇼🇸 +685 Samoa
-            </option>
+        <!-- MONCASH -->
 
-            <option value="+686">
-              🇰🇮 +686 Kiribati
-            </option>
+        <div
+          id="moncashPaymentInfo"
+          style="display:none;"
+        >
 
-            <option value="+687">
-              🇳🇨 +687 Nouvelle-Calédonie
-            </option>
+          <strong>
+            Paiement MonCash
+          </strong>
 
-            <option value="+688">
-              🇹🇻 +688 Tuvalu
-            </option>
+          <p>
+            Effectuez le paiement sur votre
+            numéro MonCash indiqué par RC STORE.
+          </p>
 
-            <option value="+689">
-              🇵🇫 +689 Polynésie française
-            </option>
+        </div>
 
-            <option value="+690">
-              🇹🇰 +690 Tokelau
-            </option>
 
-            <option value="+691">
-              🇫🇲 +691 Micronésie
-            </option>
+        <!-- NATCASH -->
 
-            <option value="+692">
-              🇲🇭 +692 Îles Marshall
-            </option>
+        <div
+          id="natcashPaymentInfo"
+          style="display:none;"
+        >
 
-            <option value="+850">
-              🇰🇵 +850 Corée du Nord
-            </option>
+          <strong>
+            Paiement NatCash
+          </strong>
 
-            <option value="+852">
-              🇭🇰 +852 Hong Kong
-            </option>
+          <p>
+            Envoyez le montant total à :
+          </p>
 
-            <option value="+853">
-              🇲🇴 +853 Macao
-            </option>
+          <div class="payment-number">
+            +50941551464
+          </div>
 
-            <option value="+855">
-              🇰🇭 +855 Cambodge
-            </option>
+          <p>
+            Nom : <strong>Cherlot René</strong>
+          </p>
 
-            <option value="+856">
-              🇱🇦 +856 Laos
-            </option>
+          <p>
+            Après le paiement, ajoutez votre
+            preuve de paiement ci-dessous.
+          </p>
 
-            <option value="+880">
-              🇧🇩 +880 Bangladesh
-            </option>
+        </div>
 
-            <option value="+886">
-              🇹🇼 +886 Taïwan
-            </option>
 
-            <option value="+960">
-              🇲🇻 +960 Maldives
-            </option>
+        <!-- PREUVE -->
 
-            <option value="+961">
-              🇱🇧 +961 Liban
-            </option>
+        <div class="form-group">
 
-            <option value="+962">
-              🇯🇴 +962 Jordanie
-            </option>
+          <label for="paymentProof">
+            Preuve de paiement
+          </label>
 
-            <option value=
+          <input
+            type="
