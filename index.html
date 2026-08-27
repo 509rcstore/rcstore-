@@ -1,1400 +1,464 @@
-// =====================================
-// RC STORE — SCRIPT
-// =====================================
+<!doctype html>
+<html lang="fr">
 
-const products = [
-  {
-    id: 1,
-    name: "Produit exemple 1",
-    price: 2500,
-    category: "Mode",
-    emoji: "👕",
-    desc: "Ajoutez ici les détails du produit lorsque vous l'aurez en stock."
-  },
-  {
-    id: 2,
-    name: "Produit exemple 2",
-    price: 3500,
-    category: "Accessoires",
-    emoji: "👜",
-    desc: "Un espace prêt à recevoir votre photo, description et caractéristiques."
-  },
-  {
-    id: 3,
-    name: "Produit exemple 3",
-    price: 5000,
-    category: "Électronique",
-    emoji: "🎧",
-    desc: "Remplacez cet exemple par votre véritable produit."
-  },
-  {
-    id: 4,
-    name: "Produit exemple 4",
-    price: 1800,
-    category: "Beauté",
-    emoji: "✨",
-    desc: "Les produits définitifs pourront être ajoutés plus tard."
-  },
-  {
-    id: 5,
-    name: "Produit exemple 5",
-    price: 4200,
-    category: "Maison",
-    emoji: "🏠",
-    desc: "Votre catalogue peut être agrandi sans refaire toute la boutique."
-  },
-  {
-    id: 6,
-    name: "Produit exemple 6",
-    price: 3000,
-    category: "Mode",
-    emoji: "👟",
-    desc: "Photo, prix et informations seront affichés ici."
-  },
-  {
-    id: 7,
-    name: "Produit exemple 7",
-    price: 6500,
-    category: "Électronique",
-    emoji: "⌚",
-    desc: "Fiche produit prête pour votre futur catalogue."
-  },
-  {
-    id: 8,
-    name: "Produit exemple 8",
-    price: 2200,
-    category: "Accessoires",
-    emoji: "🕶️",
-    desc: "Ajoutez vos articles au fur et à mesure."
-  }
-];
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <title>RC STORE — Boutique en ligne</title>
 
-// =====================================
-// SUPABASE
-// =====================================
+  <meta
+    name="description"
+    content="RC STORE — Boutique en ligne. Découvrez nos produits, commandez facilement et choisissez votre livraison."
+  >
 
-const SUPABASE_URL =
-  "https://simlfhbsfsxthtzefufj.supabase.co";
+  <link rel="stylesheet" href="style.css">
+</head>
 
-const SUPABASE_KEY =
-  "sb_publishable_ZKacsfCd6dI-srcCWJeh0g_PpYB6G-M";
+<body>
 
-const NATCASH_NUMBER =
-  "41551464";
+  <header class="topbar">
 
-const PAYMENT_BUCKET =
-  "preuves-de-paiement";
+    <a class="brand" href="#" aria-label="RC STORE">
+      <span class="brand-mark">RC</span>
+      <span>STORE</span>
+    </a>
 
+    <div class="search-wrap">
 
-// =====================================
-// LIVRAISON
-// =====================================
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Rechercher un produit..."
+        aria-label="Rechercher"
+      >
 
-const communes = [
-  "Arcahaie"
-];
-
-const zones = [
-  "Saint-Médard",
-  "Belle Fraîcheur",
-  "Cortade",
-  "Bourg",
-  "Bas Cortade",
-  "Boulard",
-  "Merotte",
-  "Corail",
-  "Pont-Callebasse",
-  "Carrefour Poy",
-  "Pierre Michel",
-  "Robert Vigner",
-  "Thoman",
-  "Poy la Ravine",
-  "Barrière Poy",
-  "Hostin",
-  "Ponce",
-  "Labarre",
-  "Pont-Mathéux",
-  "Saint-Ard",
-  "Brois Brûlé",
-  "Digue Mathéux",
-  "Digue Broby"
-];
-
-
-// =====================================
-// VARIABLES
-// =====================================
-
-let cart =
-  JSON.parse(
-    localStorage.getItem("rc_cart") || "[]"
-  );
-
-let currentCategory = "Tous";
-
-let paymentCheckTimer = null;
-
-
-// =====================================
-// HELPER
-// =====================================
-
-const $ = id =>
-  document.getElementById(id);
-
-
-// =====================================
-// PRIX
-// =====================================
-
-function money(number) {
-
-  return new Intl.NumberFormat("fr-FR")
-    .format(Number(number) || 0) + " HTG";
-
-}
-
-
-// =====================================
-// PANIER
-// =====================================
-
-function getCartTotal() {
-
-  return cart.reduce(
-    (sum, item) =>
-      sum +
-      Number(item.price) *
-      Number(item.qty),
-    0
-  );
-
-}
-
-
-function getCartQuantity() {
-
-  return cart.reduce(
-    (sum, item) =>
-      sum + Number(item.qty),
-    0
-  );
-
-}
-
-
-function saveCart() {
-
-  localStorage.setItem(
-    "rc_cart",
-    JSON.stringify(cart)
-  );
-
-  renderCart();
-
-}
-
-
-// =====================================
-// PRODUITS
-// =====================================
-
-function renderProducts() {
-
-  const search =
-    $("searchInput")
-      ? $("searchInput")
-          .value
-          .toLowerCase()
-          .trim()
-      : "";
-
-  const list =
-    products.filter(product => {
-
-      const categoryOK =
-        currentCategory === "Tous" ||
-        product.category === currentCategory;
-
-      const searchOK =
-        !search ||
-        product.name
-          .toLowerCase()
-          .includes(search) ||
-        product.category
-          .toLowerCase()
-          .includes(search);
-
-      return categoryOK && searchOK;
-
-    });
-
-
-  if ($("resultCount")) {
-
-    $("resultCount")
-      .textContent =
-      list.length + " produit(s)";
-
-  }
-
-
-  if ($("productGrid")) {
-
-    $("productGrid")
-      .innerHTML =
-      list.map(product => `
-
-        <article
-          class="product"
-          onclick="openProduct(${product.id})">
-
-          <div class="product-img">
-            ${product.emoji}
-          </div>
-
-          <div class="product-info">
-
-            <div class="category">
-              ${product.category}
-            </div>
-
-            <h3>
-              ${product.name}
-            </h3>
-
-            <div class="price">
-              ${money(product.price)}
-            </div>
-
-          </div>
-
-        </article>
-
-      `).join("");
-
-  }
-
-}
-
-
-// =====================================
-// PANIER
-// =====================================
-
-function addToCart(id) {
-
-  const product =
-    products.find(
-      item => item.id === id
-    );
-
-  if (!product) return;
-
-
-  const existing =
-    cart.find(
-      item => item.id === id
-    );
-
-
-  if (existing) {
-
-    existing.qty++;
-
-  } else {
-
-    cart.push({
-      ...product,
-      qty: 1
-    });
-
-  }
-
-
-  saveCart();
-
-  toast("Produit ajouté au panier");
-
-}
-
-
-function changeQty(id, difference) {
-
-  const item =
-    cart.find(
-      product => product.id === id
-    );
-
-  if (!item) return;
-
-
-  item.qty += difference;
-
-
-  if (item.qty <= 0) {
-
-    cart =
-      cart.filter(
-        product => product.id !== id
-      );
-
-  }
-
-
-  saveCart();
-
-}
-
-
-function removeItem(id) {
-
-  cart =
-    cart.filter(
-      product => product.id !== id
-    );
-
-  saveCart();
-
-}
-
-
-// =====================================
-// AFFICHER PANIER
-// =====================================
-
-function renderCart() {
-
-  if ($("cartCount")) {
-
-    $("cartCount")
-      .textContent =
-      getCartQuantity();
-
-  }
-
-
-  if (!$("cartItems"))
-    return;
-
-
-  if (!cart.length) {
-
-    $("cartItems")
-      .innerHTML =
-      "<p>Votre panier est vide.</p>";
-
-    if ($("cartTotal")) {
-
-      $("cartTotal")
-        .textContent =
-        "0 HTG";
-
-    }
-
-    return;
-
-  }
-
-
-  $("cartItems")
-    .innerHTML =
-    cart.map(item => `
-
-      <div class="cart-row">
-
-        <div class="cart-thumb">
-          ${item.emoji}
-        </div>
-
-        <div style="flex:1">
-
-          <h4>
-            ${item.name}
-          </h4>
-
-          <strong>
-            ${money(item.price)}
-          </strong>
-
-          <div class="qty">
-
-            <button
-              onclick="changeQty(${item.id},-1)">
-              −
-            </button>
-
-            <span>
-              ${item.qty}
-            </span>
-
-            <button
-              onclick="changeQty(${item.id},1)">
-              +
-            </button>
-
-            <button
-              onclick="removeItem(${item.id})">
-              🗑️
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    `).join("");
-
-
-  if ($("cartTotal")) {
-
-    $("cartTotal")
-      .textContent =
-      money(getCartTotal());
-
-  }
-
-}
-
-
-// =====================================
-// DETAIL PRODUIT
-// =====================================
-
-function openProduct(id) {
-
-  const product =
-    products.find(
-      item => item.id === id
-    );
-
-  if (!product) return;
-
-
-  $("productDetail")
-    .innerHTML = `
-
-      <div class="detail">
-
-        <div class="detail-img">
-          ${product.emoji}
-        </div>
-
-        <div>
-
-          <div class="category">
-            ${product.category}
-          </div>
-
-          <h2>
-            ${product.name}
-          </h2>
-
-          <div class="big-price">
-            ${money(product.price)}
-          </div>
-
-          <p>
-            ${product.desc}
-          </p>
-
-          <p>
-            <strong>🚚 Livraison :</strong>
-            environ 1 à 2 jours selon la zone.
-          </p>
-
-          <button
-            class="primary"
-            onclick="
-              addToCart(${product.id});
-              closeModals()
-            ">
-
-            Ajouter au panier
-
-          </button>
-
-        </div>
-
-      </div>
-
-    `;
-
-
-  $("productModal")
-    .classList.remove("hidden");
-
-  $("overlay")
-    .classList.remove("hidden");
-
-}
-
-
-// =====================================
-// MODALS
-// =====================================
-
-function openCart() {
-
-  $("cartDrawer")
-    .classList.add("open");
-
-  $("overlay")
-    .classList.remove("hidden");
-
-}
-
-
-function closeModals() {
-
-  document
-    .querySelectorAll(".modal")
-    .forEach(modal =>
-      modal.classList.add("hidden")
-    );
-
-
-  if ($("cartDrawer")) {
-
-    $("cartDrawer")
-      .classList.remove("open");
-
-  }
-
-
-  if ($("overlay")) {
-
-    $("overlay")
-      .classList.add("hidden");
-
-  }
-
-}
-
-
-// =====================================
-// TOAST
-// =====================================
-
-function toast(message) {
-
-  if (!$("toast")) {
-
-    alert(message);
-    return;
-
-  }
-
-
-  $("toast")
-    .textContent =
-    message;
-
-  $("toast")
-    .classList.add("show");
-
-
-  setTimeout(() => {
-
-    $("toast")
-      .classList.remove("show");
-
-  }, 2200);
-
-}
-
-
-// =====================================
-// LIVRAISON
-// =====================================
-
-function setupDeliveryFields() {
-
-  const communeSelect =
-    $("communeSelect");
-
-  const zoneSelect =
-    $("zoneSelect");
-
-
-  if (communeSelect) {
-
-    communeSelect.innerHTML =
-      '<option value="">Choisir une commune</option>';
-
-    communes.forEach(
-      commune => {
-
-        const option =
-          document.createElement("option");
-
-        option.value = commune;
-        option.textContent = commune;
-
-        communeSelect.appendChild(option);
-
-      }
-    );
-
-  }
-
-
-  if (zoneSelect) {
-
-    zoneSelect.innerHTML =
-      '<option value="">Choisir une zone</option>';
-
-    zones.forEach(
-      zone => {
-
-        const option =
-          document.createElement("option");
-
-        option.value = zone;
-        option.textContent = zone;
-
-        zoneSelect.appendChild(option);
-
-      }
-    );
-
-  }
-
-}
-
-
-// =====================================
-// PAIEMENT NATCASH
-// =====================================
-
-function setupPaymentFields() {
-
-  const paymentSelect =
-    $("paymentSelect");
-
-  const paymentInfo =
-    $("natcashPaymentInfo");
-
-
-  if (!paymentSelect ||
-      !paymentInfo) return;
-
-
-  paymentSelect.onchange =
-    updatePaymentInfo;
-
-
-  updatePaymentInfo();
-
-}
-
-
-function updatePaymentInfo() {
-
-  const paymentSelect =
-    $("paymentSelect");
-
-  const paymentInfo =
-    $("natcashPaymentInfo");
-
-  const amount =
-    $("natcashAmount");
-
-
-  if (!paymentSelect ||
-      !paymentInfo) return;
-
-
-  if (paymentSelect.value === "NatCash") {
-
-    paymentInfo.style.display =
-      "block";
-
-
-    if (amount) {
-
-      amount.textContent =
-        money(getCartTotal());
-
-    }
-
-  } else {
-
-    paymentInfo.style.display =
-      "none";
-
-  }
-
-}
-
-
-// =====================================
-// CREER COMMANDE SUPABASE
-// =====================================
-
-async function createOrder(orderData) {
-
-  const response =
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/commandes`,
-      {
-
-        method: "POST",
-
-        headers: {
-
-          "Content-Type":
-            "application/json",
-
-          "apikey":
-            SUPABASE_KEY,
-
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
-
-          "Prefer":
-            "return=representation"
-
-        },
-
-        body:
-          JSON.stringify(orderData)
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    const text =
-      await response.text();
-
-    throw new Error(
-      "Erreur Supabase : " +
-      text
-    );
-
-  }
-
-
-  const data =
-    await response.json();
-
-
-  if (!data.length) {
-
-    throw new Error(
-      "Commande non enregistrée."
-    );
-
-  }
-
-
-  return data[0];
-
-}
-
-
-// =====================================
-// UPLOAD PREUVE
-// =====================================
-
-async function uploadPaymentProof(
-  file,
-  orderId
-) {
-
-  if (!file) {
-
-    throw new Error(
-      "Ajoutez la preuve de paiement."
-    );
-
-  }
-
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp"
-  ];
-
-
-  if (!allowedTypes.includes(file.type)) {
-
-    throw new Error(
-      "Format accepté : JPG, PNG ou WEBP."
-    );
-
-  }
-
-
-  if (file.size > 10 * 1024 * 1024) {
-
-    throw new Error(
-      "La preuve ne doit pas dépasser 10 MB."
-    );
-
-  }
-
-
-  const extension =
-    file.name
-      .split(".")
-      .pop()
-      .toLowerCase();
-
-
-  const filePath =
-    `${orderId}/${Date.now()}-preuve.${extension}`;
-
-
-  const response =
-    await fetch(
-      `${SUPABASE_URL}/storage/v1/object/${PAYMENT_BUCKET}/${filePath}`,
-      {
-
-        method: "POST",
-
-        headers: {
-
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
-
-          "apikey":
-            SUPABASE_KEY,
-
-          "Content-Type":
-            file.type,
-
-          "x-upsert":
-            "false"
-
-        },
-
-        body: file
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    const text =
-      await response.text();
-
-    throw new Error(
-      "Erreur upload preuve : " +
-      text
-    );
-
-  }
-
-
-  return filePath;
-
-}
-
-
-// =====================================
-// UPDATE COMMANDE
-// =====================================
-
-async function updateOrder(
-  orderId,
-  updateData
-) {
-
-  const response =
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}`,
-      {
-
-        method: "PATCH",
-
-        headers: {
-
-          "Content-Type":
-            "application/json",
-
-          "apikey":
-            SUPABASE_KEY,
-
-          "Authorization":
-            `Bearer ${SUPABASE_KEY}`,
-
-          "Prefer":
-            "return=representation"
-
-        },
-
-        body:
-          JSON.stringify(updateData)
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    const text =
-      await response.text();
-
-    throw new Error(text);
-
-  }
-
-
-  const data =
-    await response.json();
-
-  return data[0] || null;
-
-}
-
-
-// =====================================
-// SOUMETTRE COMMANDE
-// =====================================
-
-async function submitOrder(event) {
-
-  event.preventDefault();
-
-
-  if (!cart.length) {
-
-    toast(
-      "Votre panier est vide."
-    );
-
-    return;
-
-  }
-
-
-  const form =
-    event.currentTarget;
-
-  const formData =
-    new FormData(form);
-
-
-  const name =
-    String(
-      formData.get("name") || ""
-    ).trim();
-
-  const phone =
-    String(
-      formData.get("phone") || ""
-    ).trim();
-
-  const commune =
-    String(
-      formData.get("commune") || ""
-    ).trim();
-
-  const zone =
-    String(
-      formData.get("area") || ""
-    ).trim();
-
-  const landmark =
-    String(
-      formData.get("landmark") || ""
-    ).trim();
-
-  const payment =
-    String(
-      formData.get("payment") || ""
-    ).trim();
-
-
-  if (
-    !name ||
-    !phone ||
-    !commune ||
-    !zone ||
-    !landmark ||
-    !payment
-  ) {
-
-    toast(
-      "Veuillez remplir tous les champs."
-    );
-
-    return;
-
-  }
-
-
-  const proofInput =
-    $("paymentProof");
-
-  const proofFile =
-    proofInput &&
-    proofInput.files
-      ? proofInput.files[0]
-      : null;
-
-
-  if (
-    payment === "NatCash" &&
-    !proofFile
-  ) {
-
-    toast(
-      "Ajoutez la preuve NatCash."
-    );
-
-    return;
-
-  }
-
-
-  const total =
-    getCartTotal();
-
-
-  const items =
-    cart.map(item => ({
-
-      id: item.id,
-      name: item.name,
-      price: Number(item.price),
-      qty: Number(item.qty),
-      category: item.category
-
-    }));
-
-
-  const button =
-    form.querySelector(
-      'button[type="submit"]'
-    );
-
-
-  if (button) {
-
-    button.disabled = true;
-    button.textContent =
-      "Enregistrement...";
-
-  }
-
-
-  try {
-
-    // 1 — créer commande
-
-    const order =
-      await createOrder({
-
-        name,
-        phone,
-        commune,
-        zone,
-        landmark,
-
-        payment_method:
-          payment,
-
-        total,
-
-        quantity:
-          getCartQuantity(),
-
-        items,
-
-        status:
-          "pending",
-
-        created_at:
-          new Date().toISOString()
-
-      });
-
-
-    // 2 — envoyer preuve
-
-    if (payment === "NatCash") {
-
-      const proofPath =
-        await uploadPaymentProof(
-          proofFile,
-          order.id
-        );
-
-
-      await updateOrder(
-        order.id,
-        {
-          payment_proof:
-            proofPath
-        }
-      );
-
-    }
-
-
-    // 3 — vider panier
-
-    cart = [];
-
-    saveCart();
-
-
-    form.reset();
-
-
-    if ($("natcashPaymentInfo")) {
-
-      $("natcashPaymentInfo")
-        .style.display = "none";
-
-    }
-
-
-    closeModals();
-
-
-    showPendingMessage(order);
-
-
-    // 4 — vérifier statut
-
-    if (payment === "NatCash") {
-
-      startPaymentStatusCheck(
-        order.id
-      );
-
-    }
-
-  } catch (error) {
-
-    console.error(error);
-
-    toast(
-      error.message ||
-      "Une erreur est survenue."
-    );
-
-  } finally {
-
-    if (button) {
-
-      button.disabled = false;
-
-      button.textContent =
-        "Confirmer la commande";
-
-    }
-
-  }
-
-}
-
-
-// =====================================
-// ATTENTE PAIEMENT
-// =====================================
-
-function showPendingMessage(order) {
-
-  const old =
-    $("rcPendingBox");
-
-  if (old) old.remove();
-
-
-  const box =
-    document.createElement("div");
-
-
-  box.id =
-    "rcPendingBox";
-
-
-  box.style.cssText = `
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:99998;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:18px;
-  `;
-
-
-  box.innerHTML = `
-
-    <div style="
-      background:#fff;
-      width:100%;
-      max-width:480px;
-      border-radius:16px;
-      padding:25px;
-      text-align:center;
-      font-family:Arial,sans-serif;
-    ">
-
-      <div style="font-size:45px;">
-        ⏳
-      </div>
-
-      <h2>
-        Paiement en vérification
-      </h2>
-
-      <p>
-        Votre commande
-        <strong>#${order.id}</strong>
-        a été enregistrée.
-      </p>
-
-      <p>
-        Nous vérifions votre paiement NatCash.
-      </p>
-
-      <p>
-        Dès que le paiement est accepté,
-        votre reçu apparaîtra automatiquement.
-      </p>
-
-      <button
-        id="closePendingBtn"
-        class="primary"
-        style="
-          margin-top:15px;
-          padding:12px 20px;
-        ">
-        Compris
+      <button id="searchBtn" type="button">
+        🔎
       </button>
 
     </div>
 
-  `;
+    <button
+      class="icon-btn"
+      id="cartBtn"
+      type="button"
+      aria-label="Panier"
+    >
+      🛒
+      <span id="cartCount">0</span>
+    </button>
+
+  </header>
 
 
-  document.body.appendChild(box);
+  <nav class="nav">
+
+    <button class="nav-link active" data-category="Tous" type="button">
+      Tous
+    </button>
+
+    <button class="nav-link" data-category="Mode" type="button">
+      Mode
+    </button>
+
+    <button class="nav-link" data-category="Beauté" type="button">
+      Beauté
+    </button>
+
+    <button class="nav-link" data-category="Électronique" type="button">
+      Électronique
+    </button>
+
+    <button class="nav-link" data-category="Maison" type="button">
+      Maison
+    </button>
+
+    <button class="nav-link" data-category="Accessoires" type="button">
+      Accessoires
+    </button>
+
+  </nav>
 
 
-  $("closePendingBtn").onclick =
-    () => box.remove();
+  <main>
 
-}
+    <section class="hero">
 
+      <div>
 
-// =====================================
-// VERIFICATION STATUT
-// =====================================
+        <p class="eyebrow">
+          BIENVENUE CHEZ RC STORE
+        </p>
 
-function startPaymentStatusCheck(orderId) {
+        <h1>
+          Tout ce dont vous avez besoin,
+          <br>
+          <span>en un seul endroit.</span>
+        </h1>
 
-  if (paymentCheckTimer) {
+        <p>
+          Découvrez nos produits, consultez les prix,
+          ajoutez vos articles au panier et passez votre
+          commande en quelques étapes.
+        </p>
 
-    clearInterval(
-      paymentCheckTimer
-    );
+        <a href="#products" class="hero-btn">
+          Voir les produits
+        </a>
 
-  }
-
-
-  paymentCheckTimer =
-    setInterval(
-      async () => {
-
-        try {
-
-          const response =
-            await fetch(
-              `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}&select=*`,
-              {
-
-                headers: {
-
-                  "apikey":
-                    SUPABASE_KEY,
-
-                  "Authorization":
-                    `Bearer ${SUPABASE_KEY}`
-
-                }
-
-              }
-            );
+      </div>
 
 
-          if (!response.ok)
-            return;
+      <div class="hero-card">
+
+        <div class="hero-logo">
+          RC
+        </div>
+
+        <strong>
+          STORE
+        </strong>
+
+        <small>
+          QUALITÉ • STYLE • SATISFACTION
+        </small>
+
+      </div>
+
+    </section>
 
 
-          const data =
-            await response.json();
+    <section class="section" id="products">
+
+      <div class="section-head">
+
+        <div>
+
+          <p class="eyebrow">
+            NOS PRODUITS
+          </p>
+
+          <h2>
+            Découvrez notre sélection
+          </h2>
+
+        </div>
+
+        <span id="resultCount"></span>
+
+      </div>
 
 
-          if (!data.length)
-            return;
+      <div
+        id="productGrid"
+        class="product-grid"
+      ></div>
+
+    </section>
+
+  </main>
 
 
-          const order =
-            data[0];
+  <div
+    class="overlay hidden"
+    id="overlay"
+  ></div>
 
 
-          if (
-            order.status === "paid" ||
-            order.status === "paye" ||
-            order.status === "accepted"
-          ) {
+  <aside
+    class="drawer"
+    id="cartDrawer"
+  >
 
-            clearInterval(
-              paymentCheckTimer
-            );
+    <div class="drawer-head">
 
+      <h2>
+        Votre panier
+      </h2>
 
-            showPaidReceipt(
-              order
-            );
+      <button
+        class="close"
+        data-close
+        type="button"
+      >
+        ×
+      </button>
 
-          }
-
-        } catch (error) {
-
-          console.error(
-            "Vérification paiement :",
-            error
-          );
-
-        }
-
-      },
-      5000
-    );
-
-}
+    </div>
 
 
-// =====================================
-// REÇU
-// =====================================
-
-function showPaidReceipt(order) {
-
-  const old =
-    $("rcReceiptBox");
-
-  if (old) old.remove();
+    <div id="cartItems"></div>
 
 
-  let items = [];
+    <div class="cart-total">
+
+      <span>
+        Total
+      </span>
+
+      <strong id="cartTotal">
+        0 HTG
+      </strong>
+
+    </div>
 
 
-  try {
+    <button
+      class="primary full"
+      id="checkoutBtn"
+      type="button"
+    >
+      Passer la commande
+    </button>
 
-    items =
-      typeof order.
+  </aside>
+
+
+  <div
+    class="modal hidden"
+    id="productModal"
+  >
+
+    <button
+      class="close modal-close"
+      data-close
+      type="button"
+    >
+      ×
+    </button>
+
+    <div id="productDetail"></div>
+
+  </div>
+
+
+  <div
+    class="modal checkout-modal hidden"
+    id="checkoutModal"
+  >
+
+    <button
+      class="close modal-close"
+      data-close
+      type="button"
+    >
+      ×
+    </button>
+
+
+    <div class="checkout">
+
+      <p class="eyebrow">
+        COMMANDE
+      </p>
+
+      <h2>
+        Finaliser votre commande
+      </h2>
+
+
+      <div id="checkoutSummary"></div>
+
+
+      <form id="orderForm">
+
+        <label>
+
+          Nom complet
+
+          <input
+            required
+            name="name"
+            placeholder="Votre nom"
+          >
+
+        </label>
+
+
+        <label>
+
+          Téléphone
+
+          <input
+            required
+            name="phone"
+            placeholder="509..."
+          >
+
+        </label>
+
+
+        <label>
+
+          Commune
+
+          <select
+            required
+            name="commune"
+            id="communeSelect"
+          >
+
+            <option value="">
+              Choisir une commune
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <label>
+
+          Quartier / zone
+
+          <input
+            required
+            name="area"
+            placeholder="Votre quartier"
+          >
+
+        </label>
+
+
+        <label>
+
+          Point de repère
+
+          <input
+            required
+            name="landmark"
+            placeholder="Ex. près du marché..."
+          >
+
+        </label>
+
+
+        <label>
+
+          Mode de paiement
+
+          <select
+            required
+            name="payment"
+            id="paymentSelect"
+          >
+
+            <option value="">
+              Choisir
+            </option>
+
+            <option value="MonCash">
+              MonCash
+            </option>
+
+            <option value="NatCash">
+              NatCash
+            </option>
+
+            <option value="Paiement à la livraison">
+              Paiement à la livraison
+            </option>
+
+          </select>
+
+        </label>
+
+
+        <div
+          id="natcashPaymentInfo"
+          class="delivery-box"
+          style="display:none; margin-top:12px;"
+        >
+
+          <strong>
+            💰 Paiement par NatCash
+          </strong>
+
+          <p>
+            Envoyez le montant exact de votre
+            commande au numéro NatCash :
+          </p>
+
+          <h3 style="font-size:24px; margin:8px 0;">
+            📱 41551464
+          </h3>
+
+          <p>
+            Après avoir effectué le paiement,
+            prenez une capture d'écran de votre
+            reçu NatCash et ajoutez-la ci-dessous.
+          </p>
+
+
+          <label style="display:block; margin-top:12px;">
+
+            📸 Preuve de paiement
+
+            <input
+              type="file"
+              id="paymentProof"
+              name="paymentProof"
+              accept="image/jpeg,image/png,image/webp"
+            >
+
+          </label>
+
+
+          <small style="display:block; margin-top:8px;">
+            Formats acceptés : JPG, PNG, WEBP.
+          </small>
+
+        </div>
+
+
+        <div class="delivery-box">
+
+          <strong>
+            🚚 Livraison estimée
+          </strong>
+
+          <span>
+            En général : 1 à 2 jours selon la zone.
+          </span>
+
+        </div>
+
+
+        <button
+          class="primary full"
+          type="submit"
+        >
+          Confirmer la commande
+        </button>
+
+
+      </form>
+
+
+      <p class="tiny">
+
+        Pour NatCash, votre paiement sera vérifié
+        avant la validation définitive de la commande.
+        Une fois le paiement accepté, votre reçu RC STORE
+        sera disponible.
+
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+
+  <!-- Le JavaScript est dans le fichier script.js -->
+  <script src="script.js"></script>
+
+</body>
+
+</html>
