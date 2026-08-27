@@ -1,921 +1,1308 @@
-<!doctype html>
-<html lang="fr">
+// =====================================
+// RC STORE — SCRIPT COMPLET
+// IMAGES + PRIX TEST 10 HTG
+// =====================================
+
+
+// =====================================
+// PRODUITS
+// =====================================
+
+const products = [
+
+  {
+    id: 1,
+    name: "T-Shirt Premium",
+    price: 10,
+    category: "Mode",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80",
+    desc: "T-shirt moderne et confortable."
+  },
+
+  {
+    id: 2,
+    name: "Sac Élégant",
+    price: 10,
+    category: "Accessoires",
+    image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80",
+    desc: "Sac élégant pour toutes les occasions."
+  },
+
+  {
+    id: 3,
+    name: "Casque Audio",
+    price: 10,
+    category: "Électronique",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+    desc: "Casque audio moderne avec excellent confort."
+  },
+
+  {
+    id: 4,
+    name: "Produit Beauté",
+    price: 10,
+    category: "Beauté",
+    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80",
+    desc: "Produit beauté pour votre routine quotidienne."
+  },
+
+  {
+    id: 5,
+    name: "Décoration Maison",
+    price: 10,
+    category: "Maison",
+    image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+    desc: "Un article élégant pour votre maison."
+  },
+
+  {
+    id: 6,
+    name: "Chaussures Sport",
+    price: 10,
+    category: "Mode",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    desc: "Chaussures confortables pour le sport et la vie quotidienne."
+  },
+
+  {
+    id: 7,
+    name: "Montre Moderne",
+    price: 10,
+    category: "Électronique",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+    desc: "Montre élégante au design moderne."
+  },
+
+  {
+    id: 8,
+    name: "Lunettes",
+    price: 10,
+    category: "Accessoires",
+    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80",
+    desc: "Lunettes modernes et élégantes."
+  }
+
+];
+
+
+// =====================================
+// SUPABASE
+// =====================================
+
+const SUPABASE_URL =
+  "https://simlfhbsfsxthtzefufj.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_ZKacsfCd6dI-srcCWJeh0g_PpYB6G-M";
+
+const NATCASH_NUMBER =
+  "+50941551464";
+
+const NATCASH_NAME =
+  "Cherlot René";
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+const PAYMENT_BUCKET =
+  "preuves-de-paiement";
 
-  <title>RC STORE — Boutique en ligne</title>
 
-  <meta
-    name="description"
-    content="RC STORE — Boutique en ligne. Découvrez nos produits et commandez facilement."
-  >
+// =====================================
+// COMMUNE
+// =====================================
 
-  <link rel="stylesheet" href="style.css">
-</head>
+const communes = [
+  "Arcahaie"
+];
 
-<body>
 
-<header class="topbar">
+// =====================================
+// ZONES
+// =====================================
 
-  <a class="brand" href="#" aria-label="RC STORE">
-    <span class="brand-mark">RC</span>
-    <span>STORE</span>
-  </a>
+const zones = [
+  "Saint-Médard",
+  "Belle Fraîcheur",
+  "Cortade",
+  "Bourg",
+  "Bas Cortade",
+  "Boulard",
+  "Merotte",
+  "Corail",
+  "Pont-Callebasse",
+  "Carrefour Poy",
+  "Pierre Michel",
+  "Robert Vigner",
+  "Thoman",
+  "Poy la Ravine",
+  "Barrière Poy",
+  "Hostin",
+  "Ponce",
+  "Labarre",
+  "Pont-Mathéux",
+  "Saint-Ard",
+  "Brois Brûlé",
+  "Digue Mathéux",
+  "Digue Broby"
+];
 
-  <div class="search-wrap">
 
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="Rechercher un produit..."
-      aria-label="Rechercher"
-    >
+// =====================================
+// VARIABLES
+// =====================================
 
-    <button id="searchBtn">🔎</button>
+let cart =
+  JSON.parse(
+    localStorage.getItem("rc_cart") || "[]"
+  );
 
-  </div>
+let currentCategory = "Tous";
 
-  <button
-    class="icon-btn"
-    id="cartBtn"
-    aria-label="Panier"
-  >
-    🛒
-    <span id="cartCount">0</span>
-  </button>
+let paymentCheckTimer = null;
 
-</header>
 
+// =====================================
+// HELPER
+// =====================================
 
-<nav class="nav">
+const $ = id =>
+  document.getElementById(id);
 
-  <button class="nav-link active" data-category="Tous">
-    Tous
-  </button>
 
-  <button class="nav-link" data-category="Mode">
-    Mode
-  </button>
+// =====================================
+// PRIX
+// =====================================
 
-  <button class="nav-link" data-category="Beauté">
-    Beauté
-  </button>
+function money(number) {
 
-  <button class="nav-link" data-category="Électronique">
-    Électronique
-  </button>
+  return new Intl.NumberFormat("fr-FR")
+    .format(Number(number) || 0) +
+    " HTG";
 
-  <button class="nav-link" data-category="Maison">
-    Maison
-  </button>
+}
 
-  <button class="nav-link" data-category="Accessoires">
-    Accessoires
-  </button>
 
-</nav>
+// =====================================
+// PANIER
+// =====================================
 
+function saveCart() {
 
-<main>
+  localStorage.setItem(
+    "rc_cart",
+    JSON.stringify(cart)
+  );
 
-<section class="hero">
+  renderCart();
 
-  <div>
+}
 
-    <p class="eyebrow">
-      BIENVENUE CHEZ RC STORE
-    </p>
 
-    <h1>
-      Tout ce dont vous avez besoin,
-      <br>
-      <span>en un seul endroit.</span>
-    </h1>
+function getCartTotal() {
 
-    <p>
-      Découvrez nos produits, consultez les prix,
-      ajoutez vos articles au panier et passez votre
-      commande en quelques étapes.
-    </p>
+  return cart.reduce(
+    (sum, item) =>
+      sum +
+      Number(item.price) *
+      Number(item.qty),
+    0
+  );
 
-    <a href="#products" class="hero-btn">
-      Voir les produits
-    </a>
+}
 
-  </div>
 
-  <div class="hero-card">
+function getCartQuantity() {
 
-    <div class="hero-logo">
-      RC
-    </div>
+  return cart.reduce(
+    (sum, item) =>
+      sum +
+      Number(item.qty),
+    0
+  );
 
-    <strong>
-      STORE
-    </strong>
+}
 
-    <small>
-      QUALITÉ • STYLE • SATISFACTION
-    </small>
 
-  </div>
+// =====================================
+// PRODUITS
+// =====================================
 
-</section>
+function renderProducts() {
 
+  const searchInput =
+    $("searchInput");
 
-<section class="section" id="products">
+  const search =
+    searchInput
+      ? searchInput.value
+          .toLowerCase()
+          .trim()
+      : "";
 
-  <div class="section-head">
 
-    <div>
+  const list =
+    products.filter(product => {
 
-      <p class="eyebrow">
-        NOS PRODUITS
-      </p>
+      const categoryOK =
+        currentCategory === "Tous" ||
+        product.category === currentCategory;
 
-      <h2>
-        Découvrez notre sélection
-      </h2>
+      const searchOK =
+        !search ||
+        product.name
+          .toLowerCase()
+          .includes(search) ||
+        product.category
+          .toLowerCase()
+          .includes(search);
 
-    </div>
+      return categoryOK && searchOK;
 
-    <span id="resultCount"></span>
+    });
 
-  </div>
 
-  <div
-    id="productGrid"
-    class="product-grid"
-  ></div>
+  if ($("resultCount")) {
 
-</section>
+    $("resultCount").textContent =
+      list.length + " produit(s)";
 
-</main>
+  }
 
 
-<div
-  class="overlay hidden"
-  id="overlay"
-></div>
+  if ($("productGrid")) {
 
+    $("productGrid").innerHTML =
+      list.map(product => `
 
-<!-- PANIER -->
-
-<aside
-  class="drawer"
-  id="cartDrawer"
->
-
-  <div class="drawer-head">
-
-    <h2>
-      Votre panier
-    </h2>
-
-    <button
-      class="close"
-      data-close
-    >
-      ×
-    </button>
-
-  </div>
-
-  <div id="cartItems"></div>
-
-  <div class="cart-total">
-
-    <span>
-      Total
-    </span>
-
-    <strong id="cartTotal">
-      0 HTG
-    </strong>
-
-  </div>
-
-  <button
-    class="primary full"
-    id="checkoutBtn"
-  >
-    Passer la commande
-  </button>
-
-</aside>
-
-
-<!-- DETAIL PRODUIT -->
-
-<div
-  class="modal hidden"
-  id="productModal"
->
-
-  <button
-    class="close modal-close"
-    data-close
-  >
-    ×
-  </button>
-
-  <div id="productDetail"></div>
-
-</div>
-
-
-<!-- CHECKOUT -->
-
-<div
-  class="modal checkout-modal hidden"
-  id="checkoutModal"
->
-
-  <button
-    class="close modal-close"
-    data-close
-  >
-    ×
-  </button>
-
-  <div class="checkout">
-
-    <p class="eyebrow">
-      COMMANDE
-    </p>
-
-    <h2>
-      Finaliser votre commande
-    </h2>
-
-    <div id="checkoutSummary"></div>
-
-    <form id="orderForm">
-
-      <label>
-
-        Nom complet
-
-        <input
-          required
-          name="name"
-          placeholder="Votre nom"
+        <article
+          class="product"
+          onclick="openProduct(${product.id})"
         >
 
-      </label>
+          <div class="product-img">
+
+            <img
+              src="${product.image}"
+              alt="${product.name}"
+              loading="lazy"
+              onerror="
+                this.style.display='none';
+                this.parentElement.innerHTML='🛍️';
+              "
+              style="
+                width:100%;
+                height:100%;
+                object-fit:cover;
+                display:block;
+              "
+            >
+
+          </div>
 
 
-      <!-- TELEPHONE -->
+          <div class="product-info">
 
-      <label>
+            <div class="category">
+              ${product.category}
+            </div>
 
-        Téléphone
+            <h3>
+              ${product.name}
+            </h3>
 
-        <div
-          style="
-            display:flex;
-            gap:8px;
-            width:100%;
-          "
-        >
+            <div class="price">
+              ${money(product.price)}
+            </div>
 
-          <select
-            required
-            name="countryCode"
-            id="countryCode"
+          </div>
+
+        </article>
+
+      `).join("");
+
+  }
+
+}
+
+
+// =====================================
+// AJOUT PANIER
+// =====================================
+
+function addToCart(id) {
+
+  const product =
+    products.find(
+      item => item.id === id
+    );
+
+
+  if (!product) {
+
+    toast("Produit introuvable");
+
+    return;
+
+  }
+
+
+  const existing =
+    cart.find(
+      item => item.id === id
+    );
+
+
+  if (existing) {
+
+    existing.qty++;
+
+  } else {
+
+    cart.push({
+      ...product,
+      qty: 1
+    });
+
+  }
+
+
+  saveCart();
+
+  toast("Produit ajouté au panier");
+
+}
+
+
+// =====================================
+// QUANTITÉ
+// =====================================
+
+function changeQty(id, difference) {
+
+  const item =
+    cart.find(
+      product => product.id === id
+    );
+
+
+  if (!item) return;
+
+
+  item.qty += difference;
+
+
+  if (item.qty <= 0) {
+
+    cart =
+      cart.filter(
+        product =>
+          product.id !== id
+      );
+
+  }
+
+
+  saveCart();
+
+}
+
+
+// =====================================
+// SUPPRIMER
+// =====================================
+
+function removeItem(id) {
+
+  cart =
+    cart.filter(
+      product =>
+        product.id !== id
+    );
+
+  saveCart();
+
+}
+
+
+// =====================================
+// AFFICHER PANIER
+// =====================================
+
+function renderCart() {
+
+  if (!$("cartCount"))
+    return;
+
+
+  $("cartCount").textContent =
+    getCartQuantity();
+
+
+  if (!$("cartItems"))
+    return;
+
+
+  if (!cart.length) {
+
+    $("cartItems").innerHTML =
+      "<p>Votre panier est vide.</p>";
+
+    if ($("cartTotal")) {
+
+      $("cartTotal").textContent =
+        "0 HTG";
+
+    }
+
+    return;
+
+  }
+
+
+  $("cartItems").innerHTML =
+    cart.map(item => `
+
+      <div class="cart-row">
+
+        <div class="cart-thumb">
+
+          <img
+            src="${item.image}"
+            alt="${item.name}"
             style="
-              width:145px;
-              flex-shrink:0;
+              width:60px;
+              height:60px;
+              object-fit:cover;
+              border-radius:8px;
             "
-          >
-
-            <option value="+509">
-              🇭🇹 +509 Haïti
-            </option>
-
-            <option value="+1">
-              🇺🇸 +1 États-Unis
-            </option>
-
-            <option value="+1">
-              🇨🇦 +1 Canada
-            </option>
-
-            <option value="+33">
-              🇫🇷 +33 France
-            </option>
-
-            <option value="+34">
-              🇪🇸 +34 Espagne
-            </option>
-
-            <option value="+44">
-              🇬🇧 +44 Royaume-Uni
-            </option>
-
-            <option value="+49">
-              🇩🇪 +49 Allemagne
-            </option>
-
-            <option value="+39">
-              🇮🇹 +39 Italie
-            </option>
-
-            <option value="+52">
-              🇲🇽 +52 Mexique
-            </option>
-
-            <option value="+55">
-              🇧🇷 +55 Brésil
-            </option>
-
-            <option value="+57">
-              🇨🇴 +57 Colombie
-            </option>
-
-            <option value="+58">
-              🇻🇪 +58 Venezuela
-            </option>
-
-            <option value="+56">
-              🇨🇱 +56 Chili
-            </option>
-
-            <option value="+51">
-              🇵🇪 +51 Pérou
-            </option>
-
-            <option value="+54">
-              🇦🇷 +54 Argentine
-            </option>
-
-            <option value="+591">
-              🇧🇴 +591 Bolivie
-            </option>
-
-            <option value="+593">
-              🇪🇨 +593 Équateur
-            </option>
-
-            <option value="+598">
-              🇺🇾 +598 Uruguay
-            </option>
-
-            <option value="+502">
-              🇬🇹 +502 Guatemala
-            </option>
-
-            <option value="+503">
-              🇸🇻 +503 Salvador
-            </option>
-
-            <option value="+504">
-              🇭🇳 +504 Honduras
-            </option>
-
-            <option value="+505">
-              🇳🇮 +505 Nicaragua
-            </option>
-
-            <option value="+506">
-              🇨🇷 +506 Costa Rica
-            </option>
-
-            <option value="+507">
-              🇵🇦 +507 Panama
-            </option>
-
-            <option value="+509">
-              🇭🇹 +509 Haïti
-            </option>
-
-            <option value="+32">
-              🇧🇪 +32 Belgique
-            </option>
-
-            <option value="+41">
-              🇨🇭 +41 Suisse
-            </option>
-
-            <option value="+31">
-              🇳🇱 +31 Pays-Bas
-            </option>
-
-            <option value="+351">
-              🇵🇹 +351 Portugal
-            </option>
-
-            <option value="+30">
-              🇬🇷 +30 Grèce
-            </option>
-
-            <option value="+43">
-              🇦🇹 +43 Autriche
-            </option>
-
-            <option value="+45">
-              🇩🇰 +45 Danemark
-            </option>
-
-            <option value="+46">
-              🇸🇪 +46 Suède
-            </option>
-
-            <option value="+47">
-              🇳🇴 +47 Norvège
-            </option>
-
-            <option value="+48">
-              🇵🇱 +48 Pologne
-            </option>
-
-            <option value="+7">
-              🇷🇺 +7 Russie
-            </option>
-
-            <option value="+90">
-              🇹🇷 +90 Turquie
-            </option>
-
-            <option value="+20">
-              🇪🇬 +20 Égypte
-            </option>
-
-            <option value="+27">
-              🇿🇦 +27 Afrique du Sud
-            </option>
-
-            <option value="+212">
-              🇲🇦 +212 Maroc
-            </option>
-
-            <option value="+213">
-              🇩🇿 +213 Algérie
-            </option>
-
-            <option value="+216">
-              🇹🇳 +216 Tunisie
-            </option>
-
-            <option value="+221">
-              🇸🇳 +221 Sénégal
-            </option>
-
-            <option value="+225">
-              🇨🇮 +225 Côte d'Ivoire
-            </option>
-
-            <option value="+226">
-              🇧🇫 +226 Burkina Faso
-            </option>
-
-            <option value="+227">
-              🇳🇪 +227 Niger
-            </option>
-
-            <option value="+228">
-              🇹🇬 +228 Togo
-            </option>
-
-            <option value="+229">
-              🇧🇯 +229 Bénin
-            </option>
-
-            <option value="+230">
-              🇲🇺 +230 Maurice
-            </option>
-
-            <option value="+231">
-              🇱🇷 +231 Liberia
-            </option>
-
-            <option value="+234">
-              🇳🇬 +234 Nigeria
-            </option>
-
-            <option value="+237">
-              🇨🇲 +237 Cameroun
-            </option>
-
-            <option value="+243">
-              🇨🇩 +243 RD Congo
-            </option>
-
-            <option value="+244">
-              🇦🇴 +244 Angola
-            </option>
-
-            <option value="+248">
-              🇸🇨 +248 Seychelles
-            </option>
-
-            <option value="+249">
-              🇸🇩 +249 Soudan
-            </option>
-
-            <option value="+250">
-              🇷🇼 +250 Rwanda
-            </option>
-
-            <option value="+251">
-              🇪🇹 +251 Éthiopie
-            </option>
-
-            <option value="+254">
-              🇰🇪 +254 Kenya
-            </option>
-
-            <option value="+255">
-              🇹🇿 +255 Tanzanie
-            </option>
-
-            <option value="+256">
-              🇺🇬 +256 Ouganda
-            </option>
-
-            <option value="+260">
-              🇿🇲 +260 Zambie
-            </option>
-
-            <option value="+263">
-              🇿🇼 +263 Zimbabwe
-            </option>
-
-            <option value="+264">
-              🇳🇦 +264 Namibie
-            </option>
-
-            <option value="+265">
-              🇲🇼 +265 Malawi
-            </option>
-
-            <option value="+266">
-              🇱🇸 +266 Lesotho
-            </option>
-
-            <option value="+267">
-              🇧🇼 +267 Botswana
-            </option>
-
-            <option value="+268">
-              🇸🇿 +268 Eswatini
-            </option>
-
-            <option value="+269">
-              🇰🇲 +269 Comores
-            </option>
-
-            <option value="+81">
-              🇯🇵 +81 Japon
-            </option>
-
-            <option value="+82">
-              🇰🇷 +82 Corée du Sud
-            </option>
-
-            <option value="+86">
-              🇨🇳 +86 Chine
-            </option>
-
-            <option value="+91">
-              🇮🇳 +91 Inde
-            </option>
-
-            <option value="+92">
-              🇵🇰 +92 Pakistan
-            </option>
-
-            <option value="+93">
-              🇦🇫 +93 Afghanistan
-            </option>
-
-            <option value="+94">
-              🇱🇰 +94 Sri Lanka
-            </option>
-
-            <option value="+95">
-              🇲🇲 +95 Myanmar
-            </option>
-
-            <option value="+98">
-              🇮🇷 +98 Iran
-            </option>
-
-            <option value="+972">
-              🇮🇱 +972 Israël
-            </option>
-
-            <option value="+971">
-              🇦🇪 +971 Émirats arabes unis
-            </option>
-
-            <option value="+966">
-              🇸🇦 +966 Arabie saoudite
-            </option>
-
-            <option value="+974">
-              🇶🇦 +974 Qatar
-            </option>
-
-            <option value="+965">
-              🇰🇼 +965 Koweït
-            </option>
-
-            <option value="+61">
-              🇦🇺 +61 Australie
-            </option>
-
-            <option value="+64">
-              🇳🇿 +64 Nouvelle-Zélande
-            </option>
-
-          </select>
-
-
-          <input
-            required
-            name="phone"
-            id="phoneInput"
-            type="tel"
-            inputmode="numeric"
-            placeholder="Votre numéro"
-            style="flex:1;"
           >
 
         </div>
 
-      </label>
+
+        <div style="flex:1">
+
+          <h4>
+            ${item.name}
+          </h4>
+
+          <strong>
+            ${money(item.price)}
+          </strong>
 
 
-      <!-- COMMUNE -->
+          <div class="qty">
 
-      <label>
+            <button
+              onclick="changeQty(${item.id},-1)"
+            >
+              −
+            </button>
 
-        Commune
+            <span>
+              ${item.qty}
+            </span>
 
-        <select
-          required
-          name="commune"
-          id="communeSelect"
-        >
+            <button
+              onclick="changeQty(${item.id},1)"
+            >
+              +
+            </button>
 
-          <option value="">
-            Choisir une commune
-          </option>
+            <button
+              onclick="removeItem(${item.id})"
+            >
+              🗑️
+            </button>
 
-          <option value="Arcahaie">
-            Arcahaie
-          </option>
+          </div>
 
-        </select>
+        </div>
 
-      </label>
+      </div>
 
-
-      <!-- ZONE -->
-
-      <label>
-
-        Quartier / zone
-
-        <select
-          required
-          name="area"
-          id="zoneSelect"
-        >
-
-          <option value="">
-            Choisir une zone
-          </option>
-
-          <option>Saint-Médard</option>
-          <option>Belle Fraîcheur</option>
-          <option>Cortade</option>
-          <option>Bourg</option>
-          <option>Bas Cortade</option>
-          <option>Boulard</option>
-          <option>Merotte</option>
-          <option>Corail</option>
-          <option>Pont-Callebasse</option>
-          <option>Carrefour Poy</option>
-          <option>Pierre Michel</option>
-          <option>Robert Vigner</option>
-          <option>Thoman</option>
-          <option>Poy la Ravine</option>
-          <option>Barrière Poy</option>
-          <option>Hostin</option>
-          <option>Ponce</option>
-          <option>Labarre</option>
-          <option>Pont-Mathéux</option>
-          <option>Saint-Ard</option>
-          <option>Brois Brûlé</option>
-          <option>Digue Mathéux</option>
-          <option>Digue Broby</option>
-
-        </select>
-
-      </label>
+    `).join("");
 
 
-      <!-- POINT DE REPERE -->
+  if ($("cartTotal")) {
 
-      <label>
+    $("cartTotal").textContent =
+      money(getCartTotal());
 
-        Point de repère
+  }
 
-        <input
-          required
-          name="landmark"
-          placeholder="Ex. près du marché..."
-        >
-
-      </label>
+}
 
 
-      <!-- PAIEMENT -->
+// =====================================
+// DETAIL PRODUIT
+// =====================================
 
-      <label>
+function openProduct(id) {
 
-        Mode de paiement
-
-        <select
-          required
-          name="payment"
-          id="paymentSelect"
-        >
-
-          <option value="">
-            Choisir
-          </option>
-
-          <option value="MonCash">
-            MonCash
-          </option>
-
-          <option value="NatCash">
-            NatCash
-          </option>
-
-          <option value="Paiement à la livraison">
-            Paiement à la livraison
-          </option>
-
-        </select>
-
-      </label>
+  const product =
+    products.find(
+      item => item.id === id
+    );
 
 
-      <!-- NATCASH -->
+  if (!product) return;
 
-      <div
-        id="natcashPaymentInfo"
-        class="delivery-box"
-        style="
-          display:none;
-          margin-top:15px;
-        "
-      >
 
-        <strong>
-          💰 Paiement par NatCash
-        </strong>
+  $("productDetail").innerHTML = `
 
-        <p>
-          Votre commande sera enregistrée
-          avant l'envoi de la preuve.
-        </p>
+    <div class="detail">
 
-        <p>
-          Envoyez le montant exact de votre
-          commande au numéro :
-        </p>
+      <div class="detail-img">
 
-        <h3
+        <img
+          src="${product.image}"
+          alt="${product.name}"
           style="
-            font-size:25px;
-            margin:10px 0;
+            width:100%;
+            max-height:400px;
+            object-fit:cover;
+            border-radius:15px;
           "
         >
-          📱 +50941551464
-        </h3>
+
+      </div>
+
+
+      <div>
+
+        <div class="category">
+          ${product.category}
+        </div>
+
+        <h2>
+          ${product.name}
+        </h2>
+
+        <div class="big-price">
+          ${money(product.price)}
+        </div>
+
+        <p>
+          ${product.desc}
+        </p>
 
         <p>
           <strong>
-            👤 Nom : Cherlot René
+            🚚 Livraison :
           </strong>
+          environ 1 à 2 jours
+          selon la zone.
         </p>
 
-        <p>
-          Montant à payer :
-          <strong id="natcashTotal">
-            0 HTG
-          </strong>
-        </p>
 
-        <p>
-          Après le paiement, ajoutez la
-          preuve de paiement ci-dessous.
-        </p>
-
-        <label
-          style="
-            display:block;
-            margin-top:12px;
+        <button
+          class="primary"
+          onclick="
+            addToCart(${product.id});
+            closeModals();
           "
         >
-
-          📸 Preuve de paiement
-
-          <input
-            type="file"
-            id="paymentProof"
-            name="paymentProof"
-            accept="image/jpeg,image/png,image/webp"
-          >
-
-        </label>
-
-        <small>
-          Formats acceptés : JPG, PNG, WEBP.
-          Maximum 10 MB.
-        </small>
+          Ajouter au panier
+        </button>
 
       </div>
 
+    </div>
 
-      <!-- MONCASH -->
+  `;
 
-      <div
-        id="moncashPaymentInfo"
-        class="delivery-box"
-        style="
-          display:none;
-          margin-top:15px;
-        "
-      >
 
-        <strong>
-          💵 Paiement par MonCash
-        </strong>
+  $("productModal")
+    .classList.remove("hidden");
+
+
+  $("overlay")
+    .classList.remove("hidden");
+
+}
+
+
+// =====================================
+// OUVRIR PANIER
+// =====================================
+
+function openCart() {
+
+  $("cartDrawer")
+    .classList.add("open");
+
+  $("overlay")
+    .classList.remove("hidden");
+
+}
+
+
+// =====================================
+// FERMER
+// =====================================
+
+function closeModals() {
+
+  document
+    .querySelectorAll(".modal")
+    .forEach(modal =>
+      modal.classList.add("hidden")
+    );
+
+
+  if ($("cartDrawer")) {
+
+    $("cartDrawer")
+      .classList.remove("open");
+
+  }
+
+
+  if ($("overlay")) {
+
+    $("overlay")
+      .classList.add("hidden");
+
+  }
+
+}
+
+
+// =====================================
+// MESSAGE
+// =====================================
+
+function toast(message) {
+
+  if (!$("toast")) {
+
+    alert(message);
+
+    return;
+
+  }
+
+
+  $("toast").textContent =
+    message;
+
+
+  $("toast")
+    .classList.add("show");
+
+
+  setTimeout(() => {
+
+    $("toast")
+      .classList.remove("show");
+
+  }, 2200);
+
+}
+
+
+// =====================================
+// LIVRAISON
+// =====================================
+
+function setupDeliveryFields() {
+
+  const communeSelect =
+    $("communeSelect");
+
+
+  if (communeSelect) {
+
+    communeSelect.innerHTML =
+      '<option value="">Choisir une commune</option>';
+
+
+    communes.forEach(
+      commune => {
+
+        const option =
+          document.createElement("option");
+
+        option.value = commune;
+
+        option.textContent = commune;
+
+        communeSelect.appendChild(option);
+
+      }
+    );
+
+  }
+
+
+  const areaInput =
+    document.querySelector(
+      'input[name="area"]'
+    );
+
+
+  if (
+    areaInput &&
+    !document.querySelector(
+      'select[name="area"]'
+    )
+  ) {
+
+    const zoneSelect =
+      document.createElement("select");
+
+    zoneSelect.name = "area";
+
+    zoneSelect.required = true;
+
+    zoneSelect.id = "zoneSelect";
+
+
+    zoneSelect.innerHTML =
+      '<option value="">Choisir une zone</option>';
+
+
+    zones.forEach(
+      zone => {
+
+        const option =
+          document.createElement("option");
+
+        option.value = zone;
+
+        option.textContent = zone;
+
+        zoneSelect.appendChild(option);
+
+      }
+    );
+
+
+    areaInput.replaceWith(zoneSelect);
+
+  }
+
+}
+
+
+// =====================================
+// PAIEMENT
+// =====================================
+
+function setupPaymentFields() {
+
+  const paymentSelect =
+    document.querySelector(
+      'select[name="payment"]'
+    );
+
+
+  if (!paymentSelect)
+    return;
+
+
+  const paymentInfo =
+    $("natcashPaymentInfo");
+
+
+  const moncashInfo =
+    $("moncashPaymentInfo");
+
+
+  function updatePaymentInfo() {
+
+    if (paymentInfo) {
+
+      paymentInfo.style.display =
+        paymentSelect.value === "NatCash"
+          ? "block"
+          : "none";
+
+    }
+
+
+    if (moncashInfo) {
+
+      moncashInfo.style.display =
+        paymentSelect.value === "MonCash"
+          ? "block"
+          : "none";
+
+    }
+
+
+    if ($("natcashTotal")) {
+
+      $("natcashTotal").textContent =
+        money(getCartTotal());
+
+    }
+
+  }
+
+
+  paymentSelect.onchange =
+    updatePaymentInfo;
+
+
+  updatePaymentInfo();
+
+}
+
+
+// =====================================
+// SUPABASE — CREER COMMANDE
+// =====================================
+
+async function createOrder(orderData) {
+
+  const response =
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/commandes`,
+      {
+
+        method: "POST",
+
+        headers: {
+
+          "Content-Type":
+            "application/json",
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`,
+
+          "Prefer":
+            "return=representation"
+
+        },
+
+        body:
+          JSON.stringify(orderData)
+
+      }
+    );
+
+
+  if (!response.ok) {
+
+    const text =
+      await response.text();
+
+    throw new Error(
+      text ||
+      "Impossible d'enregistrer la commande."
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+
+  if (!data.length) {
+
+    throw new Error(
+      "La commande n'a pas été retournée par Supabase."
+    );
+
+  }
+
+
+  return data[0];
+
+}
+
+
+// =====================================
+// UPLOAD PREUVE
+// =====================================
+
+async function uploadPaymentProof(file, orderId) {
+
+  if (!file) {
+
+    throw new Error(
+      "Ajoutez la preuve de paiement."
+    );
+
+  }
+
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp"
+  ];
+
+
+  if (
+    !allowedTypes.includes(file.type)
+  ) {
+
+    throw new Error(
+      "Utilisez une image JPG, PNG ou WEBP."
+    );
+
+  }
+
+
+  if (
+    file.size > 10 * 1024 * 1024
+  ) {
+
+    throw new Error(
+      "La preuve ne doit pas dépasser 10 MB."
+    );
+
+  }
+
+
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+
+  const filePath =
+    `${orderId}/${Date.now()}-preuve.${extension}`;
+
+
+  const response =
+    await fetch(
+      `${SUPABASE_URL}/storage/v1/object/${PAYMENT_BUCKET}/${filePath}`,
+      {
+
+        method: "POST",
+
+        headers: {
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`,
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Content-Type":
+            file.type,
+
+          "x-upsert":
+            "false"
+
+        },
+
+        body: file
+
+      }
+    );
+
+
+  if (!response.ok) {
+
+    const text =
+      await response.text();
+
+    throw new Error(
+      "Erreur upload preuve : " +
+      text
+    );
+
+  }
+
+
+  return filePath;
+
+}
+
+
+// =====================================
+// METTRE A JOUR COMMANDE
+// =====================================
+
+async function updateOrder(
+  orderId,
+  updateData
+) {
+
+  const response =
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}`,
+      {
+
+        method: "PATCH",
+
+        headers: {
+
+          "Content-Type":
+            "application/json",
+
+          "apikey":
+            SUPABASE_KEY,
+
+          "Authorization":
+            `Bearer ${SUPABASE_KEY}`,
+
+          "Prefer":
+            "return=representation"
+
+        },
+
+        body:
+          JSON.stringify(updateData)
+
+      }
+    );
+
+
+  if (!response.ok) {
+
+    const text =
+      await response.text();
+
+    throw new Error(
+      text ||
+      "Impossible de mettre à jour la commande."
+    );
+
+  }
+
+
+  const data =
+    await response.json();
+
+  return data[0] || null;
+
+}
+
+
+// =====================================
+// STATUT PAIEMENT
+// =====================================
+
+function startPaymentStatusCheck(orderId) {
+
+  if (paymentCheckTimer) {
+
+    clearInterval(
+      paymentCheckTimer
+    );
+
+  }
+
+
+  paymentCheckTimer =
+    setInterval(
+      async () => {
+
+        try {
+
+          const response =
+            await fetch(
+              `${SUPABASE_URL}/rest/v1/commandes?id=eq.${encodeURIComponent(orderId)}&select=*`,
+              {
+
+                headers: {
+
+                  "apikey":
+                    SUPABASE_KEY,
+
+                  "Authorization":
+                    `Bearer ${SUPABASE_KEY}`
+
+                }
+
+              }
+            );
+
+
+          if (!response.ok)
+            return;
+
+
+          const data =
+            await response.json();
+
+
+          if (!data.length)
+            return;
+
+
+          const order =
+            data[0];
+
+
+          if (
+            order.status === "paid" ||
+            order.status === "paye" ||
+            order.status === "accepted"
+          ) {
+
+            clearInterval(
+              paymentCheckTimer
+            );
+
+            showPaidReceipt(order);
+
+          }
+
+        } catch (error) {
+
+          console.error(error);
+
+        }
+
+      },
+      5000
+    );
+
+}
+
+
+// =====================================
+// RECU
+// =====================================
+
+function showPaidReceipt(order) {
+
+  const old =
+    $("rcReceiptBox");
+
+
+  if (old)
+    old.remove();
+
+
+  let items = [];
+
+
+  try {
+
+    items =
+      typeof order.items === "string"
+        ? JSON.parse(order.items)
+        : (
+            Array.isArray(order.items)
+              ? order.items
+              : []
+          );
+
+  } catch {
+
+    items = [];
+
+  }
+
+
+  const itemsHtml =
+    items.map(
+      item => `
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:10px;
+          margin:7px 0;
+        ">
+
+          <span>
+            ${item.name || "Produit"}
+            ×
+            ${item.qty || 1}
+          </span>
+
+          <strong>
+            ${money(
+              Number(item.price || 0) *
+              Number(item.qty || 1)
+            )}
+          </strong>
+
+        </div>
+
+      `
+    ).join("");
+
+
+  const date =
+    order.created_at
+      ? new Date(
+          order.created_at
+        ).toLocaleString("fr-FR")
+      : new Date()
+          .toLocaleString("fr-FR");
+
+
+  const receipt =
+    document.createElement("div");
+
+
+  receipt.id =
+    "rcReceiptBox";
+
+
+  receipt.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  `;
+
+
+  receipt.innerHTML = `
+
+    <div
+      id="rcReceiptContent"
+      style="
+        background:white;
+        width:100%;
+        max-width:520px;
+        max-height:90vh;
+        overflow:auto;
+        border-radius:16px;
+        padding:22px;
+        font-family:Arial,sans-serif;
+      "
+    >
+
+      <div style="text-align:center">
+
+        <h2>
+          RC STORE
+        </h2>
+
+        <h3>
+          REÇU DE PAIEMENT
+        </h3>
 
         <p>
-          Le paiement MonCash sera traité
-          selon les informations disponibles
-          au moment de la commande.
+          ✅ Paiement accepté
         </p>
 
       </div>
 
+      <hr>
 
-      <!-- LIVRAISON -->
+      <p>
+        <strong>N° commande :</strong>
+        ${order.id || ""}
+      </p>
 
-      <div class="delivery-box">
+      <p>
+        <strong>Client :</strong>
+        ${order.name || ""}
+      </p>
 
-        <strong>
-          🚚 Livraison estimée
-        </strong>
+      <p>
+        <strong>Téléphone :</strong>
+        ${order.phone || ""}
+      </p>
 
-        <span>
-          En général : 1 à 2 jours selon la zone.
-        </span>
-
-      </div>
-
-
-      <button
-        class="primary full"
-        type="submit"
-      >
-        Confirmer la commande
-      </button>
-
-    </form>
-
-
-    <p class="tiny">
-
-      Pour NatCash, votre paiement sera vérifié
-      avant la validation définitive de la commande.
-
-      Après validation par RC STORE,
-      le reçu sera disponible automatiquement.
-
-    </p>
-
-  </div>
-
-</div>
-
-
-<div
-  class="toast"
-  id="toast"
-></div>
-
-
-<script src="script.js"></script>
-
-</body>
-</html>
+      <p>
+        <strong>Commune 
