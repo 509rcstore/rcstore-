@@ -1,972 +1,1197 @@
-// =====================================
-// RC STORE — SCRIPT.JS
-// VERSION CORRIGÉE
-// =====================================
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RC STORE</title>
 
-// =====================================
-// PRODUITS — PRIX TEST 10 HTG
-// =====================================
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f7f7f7;color:#111}
+header{background:#111;color:#fff;padding:16px;position:sticky;top:0;z-index:50}
+.header{display:flex;align-items:center;gap:12px;max-width:1200px;margin:auto}
+.logo{font-size:28px;font-weight:900}
+.search{flex:1;display:flex}
+.search input{width:100%;padding:13px;border:0;border-radius:10px 0 0 10px}
+.search button{border:0;padding:0 18px;border-radius:0 10px 10px 0}
+.cart-btn{background:none;color:#fff;border:0;font-size:25px;cursor:pointer}
+nav{display:flex;gap:8px;overflow:auto;background:#fff;padding:12px}
+nav button{border:0;background:#eee;padding:11px 17px;border-radius:25px;cursor:pointer}
+nav button.active{background:#111;color:#fff}
+.hero{margin:25px auto;padding:40px;max-width:1200px;background:#111;color:#fff;border-radius:25px}
+.hero h1{font-size:45px;margin:15px 0}
+.hero p{font-size:18px;line-height:1.6}
+.hero button{padding:14px 22px;border:0;border-radius:10px;font-weight:bold}
+.section{max-width:1200px;margin:auto;padding:20px}
+.section h2{font-size:35px}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.product-card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px #ddd}
+.product-image{width:100%;height:220px;border:0;padding:0;background:#eee;cursor:pointer}
+.product-image img{width:100%;height:100%;object-fit:cover}
+.product-content{padding:15px}
+.product-content h3{margin:8px 0}
+.product-content p{color:#666;min-height:45px}
+.product-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.primary{background:#111;color:#fff;border:0;padding:12px 15px;border-radius:10px;cursor:pointer;font-weight:bold}
+.full{width:100%}
+.overlay{position:fixed;inset:0;background:#0009;z-index:90}
+.hidden{display:none!important}
+
+/* PANIER */
+.drawer{position:fixed;right:-430px;top:0;width:min(430px,100%);height:100vh;background:#fff;z-index:100;transition:.3s;display:flex;flex-direction:column}
+.drawer.open{right:0}
+.drawer-head{padding:20px;display:flex;justify-content:space-between;border-bottom:1px solid #ddd}
+.close{border:0;background:#eee;border-radius:50%;width:38px;height:38px;font-size:22px;cursor:pointer}
+#cartItems{flex:1;overflow:auto;padding:15px}
+.cart-item{display:flex;gap:10px;align-items:center;border-bottom:1px solid #eee;padding:12px 0}
+.cart-img{width:65px;height:65px;border-radius:10px;overflow:hidden;background:#eee}
+.cart-img img{width:100%;height:100%;object-fit:cover}
+.cart-info{flex:1}
+.qty{display:flex;align-items:center;gap:8px;margin-top:7px}
+.qty button{width:28px;height:28px;border:0;background:#111;color:#fff;border-radius:6px;cursor:pointer}
+.remove{border:0;background:#eee;border-radius:7px;padding:7px;cursor:pointer}
+.cart-total{padding:20px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-size:20px;font-weight:bold}
+
+/* MODAL */
+.modal{position:fixed;z-index:110;left:50%;top:50%;transform:translate(-50%,-50%);width:min(700px,94%);max-height:92vh;overflow:auto;background:#fff;border-radius:22px;padding:25px}
+.detail{display:grid;grid-template-columns:1fr 1fr;gap:25px}
+.detail img{width:100%;border-radius:15px}
+form label{display:block;font-weight:bold;margin:13px 0}
+form input,form select{width:100%;padding:13px;margin-top:6px;border:1px solid #ccc;border-radius:10px;font-size:16px}
+.summary{background:#f2f2f2;padding:15px;border-radius:12px;margin-bottom:18px}
+.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ddd}
+.payment-info{background:#f2f2f2;padding:18px;border-radius:15px;margin:10px 0}
+.payment-number{font-size:24px;font-weight:900}
+.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(100px);background:#111;color:#fff;padding:14px 22px;border-radius:10px;z-index:200;transition:.3s}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:800px){
+.product-grid{grid-template-columns:repeat(2,1fr)}
+.hero h1{font-size:35px}
+.detail{grid-template-columns:1fr}
+}
+@media(max-width:500px){
+.product-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+.product-image{height:170px}
+.product-content{padding:10px}
+.product-content h3{font-size:17px}
+.product-content p{font-size:13px}
+.product-bottom{flex-direction:column;align-items:stretch}
+.primary{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="header">
+<div class="logo">RC STORE</div>
+
+<div class="search">
+<input id="searchInput" type="search" placeholder="Rechercher un produit...">
+<button id="searchBtn">🔎</button>
+</div>
+
+<button class="cart-btn" id="cartBtn">
+🛒 <span id="cartCount">0</span>
+</button>
+</div>
+</header>
+
+<nav>
+<button class="active nav-link" data-category="Tous">Tous</button>
+<button class="nav-link" data-category="Mode">Mode</button>
+<button class="nav-link" data-category="Beauté">Beauté</button>
+<button class="nav-link" data-category="Électronique">Électronique</button>
+<button class="nav-link" data-category="Accessoires">Accessoires</button>
+</nav>
+
+<section class="hero">
+<h1>Tout ce dont vous avez besoin, en un seul endroit.</h1>
+<p>Découvrez nos produits, ajoutez-les au panier et passez votre commande facilement.</p>
+<button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+Voir les produits
+</button>
+</section>
+
+<section class="section" id="products">
+<p><b>NOS PRODUITS</b></p>
+<h2>Découvrez notre sélection</h2>
+<div id="resultCount"></div>
+<div class="product-grid" id="productGrid"></div>
+</section>
+
+<div id="overlay" class="overlay hidden"></div>
+
+<!-- PANIER -->
+<aside id="cartDrawer" class="drawer">
+
+<div class="drawer-head">
+<h2>Votre panier</h2>
+<button class="close" data-close>×</button>
+</div>
+
+<div id="cartItems"></div>
+
+<div class="cart-total">
+<span>Total</span>
+<span id="cartTotal">0 HTG</span>
+</div>
+
+<div style="padding:15px">
+<button class="primary full" id="checkoutBtn">
+Passer la commande
+</button>
+</div>
+
+</aside>
+
+<!-- DETAIL -->
+<div id="productModal" class="modal hidden">
+
+<button class="close" data-close>×</button>
+
+<div id="productDetail"></div>
+
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkoutModal" class="modal hidden">
+
+<button class="close" data-close>×</button>
+
+<h2>Finaliser votre commande</h2>
+
+<div id="checkoutSummary"></div>
+
+<form id="orderForm">
+
+<label>
+Nom complet
+<input required name="name" placeholder="Votre nom complet">
+</label>
+
+<label>
+Indicatif du pays
+<select name="countryCode" required>
+
+<option value="+509">🇭🇹 Haïti +509</option>
+<option value="+1">🇺🇸 États-Unis +1</option>
+<option value="+1">🇨🇦 Canada +1</option>
+<option value="+33">🇫🇷 France +33</option>
+<option value="+34">🇪🇸 Espagne +34</option>
+<option value="+44">🇬🇧 Royaume-Uni +44</option>
+<option value="+49">🇩🇪 Allemagne +49</option>
+<option value="+39">🇮🇹 Italie +39</option>
+<option value="+52">🇲🇽 Mexique +52</option>
+<option value="+55">🇧🇷 Brésil +55</option>
+<option value="+57">🇨🇴 Colombie +57</option>
+<option value="+58">🇻🇪 Venezuela +58</option>
+<option value="+61">🇦🇺 Australie +61</option>
+<option value="+81">🇯🇵 Japon +81</option>
+<option value="+82">🇰🇷 Corée du Sud +82</option>
+<option value="+86">🇨🇳 Chine +86</option>
+<option value="+91">🇮🇳 Inde +91</option>
+<option value="+27">🇿🇦 Afrique du Sud +27</option>
+<option value="+234">🇳🇬 Nigeria +234</option>
+<option value="+243">🇨🇩 RDC +243</option>
+<option value="+250">🇷🇼 Rwanda +250</option>
+<option value="+251">🇪🇹 Éthiopie +251</option>
+<option value="+254">🇰🇪 Kenya +254</option>
+<option value="+255">🇹🇿 Tanzanie +255</option>
+<option value="+256">🇺🇬 Ouganda +256</option>
+<option value="+260">🇿🇲 Zambie +260</option>
+<option value="+263">🇿🇼 Zimbabwe +263</option>
+<option value="+351">🇵🇹 Portugal +351</option>
+<option value="+352">🇱🇺 Luxembourg +352</option>
+<option value="+353">🇮🇪 Irlande +353</option>
+<option value="+41">🇨🇭 Suisse +41</option>
+<option value="+43">🇦🇹 Autriche +43</option>
+<option value="+45">🇩🇰 Danemark +45</option>
+<option value="+46">🇸🇪 Suède +46</option>
+<option value="+47">🇳🇴 Norvège +47</option>
+<option value="+48">🇵🇱 Pologne +48</option>
+<option value="+7">🇷🇺 Russie +7</option>
+<option value="+971">🇦🇪 Émirats arabes unis +971</option>
+<option value="+974">🇶🇦 Qatar +974</option>
+<option value="+966">🇸🇦 Arabie saoudite +966</option>
+
+</select>
+</label>
+
+<label>
+Numéro de téléphone
+<input required name="phone" placeholder="Ex: 41551464">
+</label>
+
+<label>
+Commune
+<select required name="commune" id="communeSelect"></select>
+</label>
+
+<label>
+Zone
+<select required name="area" id="areaSelect">
+<option value="">Choisir une zone</option>
+</select>
+</label>
+
+<label>
+Point de repère
+<input required name="landmark" placeholder="Ex. près du marché...">
+</label>
+
+<label>
+Mode de paiement
+<select required name="payment" id="paymentSelect">
+<option value="">Choisir</option>
+<option value="MonCash">MonCash</option>
+<option value="NatCash">NatCash</option>
+</select>
+</label>
+
+<div id="natcashInfo" class="payment-info" style="display:none">
+
+<h3>💰 Paiement NatCash</h3>
+
+<p>Envoyez le montant exact de votre commande à :</p>
+
+<div class="payment-number">
++509 4155 1464
+</div>
+
+<p><b>Nom : Cherlot René</b></p>
+
+<p>
+Après le paiement, ajoutez la preuve de paiement ci-dessous.
+</p>
+
+<label>
+Preuve de paiement
+<input type="file" name="paymentProof" id="paymentProof" accept="image/*">
+</label>
+
+</div>
+
+<button class="primary full" type="submit">
+Confirmer la commande
+</button>
+
+</form>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+
+/* =====================================
+   PRODUITS TEST — 10 HTG
+===================================== */
 
 const products = [
-  {
-    id: 1,
-    name: "T-Shirt Premium",
-    price: 10,
-    category: "Mode",
-    image: "https://placehold.co/600x600/png?text=T-Shirt",
-    emoji: "👕",
-    desc: "T-Shirt élégant et confortable pour tous les jours."
-  },
-  {
-    id: 2,
-    name: "Sac à main",
-    price: 10,
-    category: "Accessoires",
-    image: "https://placehold.co/600x600/png?text=Sac+a+main",
-    emoji: "👜",
-    desc: "Sac à main moderne et pratique."
-  },
-  {
-    id: 3,
-    name: "Écouteurs Bluetooth",
-    price: 10,
-    category: "Électronique",
-    image: "https://placehold.co/600x600/png?text=Ecouteurs",
-    emoji: "🎧",
-    desc: "Écouteurs sans fil avec un son de qualité."
-  },
-  {
-    id: 4,
-    name: "Parfum",
-    price: 10,
-    category: "Beauté",
-    image: "https://placehold.co/600x600/png?text=Parfum",
-    emoji: "🌸",
-    desc: "Un parfum agréable pour toutes les occasions."
-  },
-  {
-    id: 5,
-    name: "Montre élégante",
-    price: 10,
-    category: "Accessoires",
-    image: "https://placehold.co/600x600/png?text=Montre",
-    emoji: "⌚",
-    desc: "Montre moderne avec un design élégant."
-  },
-  {
-    id: 6,
-    name: "Casquette",
-    price: 10,
-    category: "Mode",
-    image: "https://placehold.co/600x600/png?text=Casquette",
-    emoji: "🧢",
-    desc: "Casquette confortable pour compléter votre style."
-  },
-  {
-    id: 7,
-    name: "Enceinte Bluetooth",
-    price: 10,
-    category: "Électronique",
-    image: "https://placehold.co/600x600/png?text=Enceinte",
-    emoji: "🔊",
-    desc: "Profitez de votre musique avec un son puissant."
-  },
-  {
-    id: 8,
-    name: "Lunettes de soleil",
-    price: 10,
-    category: "Accessoires",
-    image: "https://placehold.co/600x600/png?text=Lunettes",
-    emoji: "🕶️",
-    desc: "Lunettes élégantes pour votre look quotidien."
-  }
+
+{
+id:1,
+name:"T-Shirt Premium",
+price:10,
+category:"Mode",
+emoji:"👕",
+desc:"T-Shirt élégant et confortable."
+},
+
+{
+id:2,
+name:"Sac à main",
+price:10,
+category:"Accessoires",
+emoji:"👜",
+desc:"Sac à main moderne et pratique."
+},
+
+{
+id:3,
+name:"Écouteurs Bluetooth",
+price:10,
+category:"Électronique",
+emoji:"🎧",
+desc:"Écouteurs sans fil avec un son de qualité."
+},
+
+{
+id:4,
+name:"Parfum",
+price:10,
+category:"Beauté",
+emoji:"🌸",
+desc:"Un parfum agréable pour toutes les occasions."
+},
+
+{
+id:5,
+name:"Montre élégante",
+price:10,
+category:"Accessoires",
+emoji:"⌚",
+desc:"Montre moderne et élégante."
+},
+
+{
+id:6,
+name:"Casquette",
+price:10,
+category:"Mode",
+emoji:"🧢",
+desc:"Casquette confortable."
+},
+
+{
+id:7,
+name:"Enceinte Bluetooth",
+price:10,
+category:"Électronique",
+emoji:"🔊",
+desc:"Un son puissant et agréable."
+},
+
+{
+id:8,
+name:"Lunettes de soleil",
+price:10,
+category:"Accessoires",
+emoji:"🕶️",
+desc:"Lunettes élégantes pour votre look."
+}
+
 ];
 
-// =====================================
-// VARIABLES
-// =====================================
+/* =====================================
+   PANIER
+===================================== */
 
-let cart = JSON.parse(localStorage.getItem("rc_cart") || "[]");
-let currentCategory = "Tous";
+let cart=JSON.parse(
+localStorage.getItem("rc_cart")||"[]"
+);
 
-// =====================================
-// PRIX
-// =====================================
+let currentCategory="Tous";
 
-function money(number) {
-  return (
-    new Intl.NumberFormat("fr-FR").format(
-      Number(number) || 0
-    ) + " HTG"
-  );
+function money(n){
+
+return new Intl.NumberFormat("fr-FR")
+.format(Number(n)||0)+" HTG";
+
 }
 
-// =====================================
-// PANIER
-// =====================================
+function cartTotal(){
 
-function getCartTotal() {
-  return cart.reduce(function(total, item) {
-    return total + Number(item.price) * Number(item.qty);
-  }, 0);
+return cart.reduce(
+(t,i)=>t+i.price*i.qty,
+0
+);
+
 }
 
-function getCartQuantity() {
-  return cart.reduce(function(total, item) {
-    return total + Number(item.qty);
-  }, 0);
+function cartQuantity(){
+
+return cart.reduce(
+(t,i)=>t+i.qty,
+0
+);
+
 }
 
-function saveCart() {
-  localStorage.setItem("rc_cart", JSON.stringify(cart));
-  renderCart();
+function saveCart(){
+
+localStorage.setItem(
+"rc_cart",
+JSON.stringify(cart)
+);
+
+renderCart();
+
 }
 
-function addToCart(id) {
+function addToCart(id){
 
-  const product = products.find(function(item) {
-    return item.id === Number(id);
-  });
+const product=products.find(
+p=>p.id===id
+);
 
-  if (!product) {
-    console.error("Produit introuvable :", id);
-    return;
-  }
+if(!product)return;
 
-  const existing = cart.find(function(item) {
-    return item.id === product.id;
-  });
+const existing=cart.find(
+p=>p.id===id
+);
 
-  if (existing) {
-    existing.qty = Number(existing.qty) + 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      emoji: product.emoji,
-      qty: 1
-    });
-  }
+if(existing){
 
-  saveCart();
+existing.qty++;
 
-  toast("Produit ajouté au panier 🛒");
+}else{
+
+cart.push({
+
+id:product.id,
+name:product.name,
+price:product.price,
+emoji:product.emoji,
+qty:1
+
+});
+
 }
 
-function changeQty(id, amount) {
+saveCart();
 
-  const item = cart.find(function(product) {
-    return product.id === Number(id);
-  });
+toast("Produit ajouté au panier 🛒");
 
-  if (!item) return;
-
-  item.qty = Number(item.qty) + Number(amount);
-
-  if (item.qty <= 0) {
-    cart = cart.filter(function(product) {
-      return product.id !== Number(id);
-    });
-  }
-
-  saveCart();
 }
 
-function removeItem(id) {
+function changeQty(id,amount){
 
-  cart = cart.filter(function(item) {
-    return item.id !== Number(id);
-  });
+const item=cart.find(
+p=>p.id===id
+);
 
-  saveCart();
+if(!item)return;
 
-  toast("Produit retiré du panier.");
+item.qty+=amount;
+
+if(item.qty<=0){
+
+cart=cart.filter(
+p=>p.id!==id
+);
+
 }
 
-// =====================================
-// AFFICHER LE PANIER
-// =====================================
+saveCart();
 
-function renderCart() {
-
-  const cartItems = document.getElementById("cartItems");
-  const cartCount = document.getElementById("cartCount");
-  const cartTotal = document.getElementById("cartTotal");
-
-  if (cartCount) {
-    cartCount.textContent = getCartQuantity();
-  }
-
-  if (cartTotal) {
-    cartTotal.textContent = money(getCartTotal());
-  }
-
-  if (!cartItems) return;
-
-  if (cart.length === 0) {
-
-    cartItems.innerHTML = `
-      <div class="empty-cart">
-        Votre panier est vide.
-      </div>
-    `;
-
-    return;
-  }
-
-  cartItems.innerHTML = cart.map(function(item) {
-
-    return `
-      <div class="cart-item">
-
-        <div class="cart-item-icon">
-          ${
-            item.image
-              ? `<img src="${item.image}" alt="${item.name}"
-                   style="width:55px;height:55px;object-fit:cover;border-radius:10px;">`
-              : item.emoji
-          }
-        </div>
-
-        <div class="cart-item-info">
-
-          <strong>${item.name}</strong>
-
-          <span>${money(item.price)}</span>
-
-          <div class="qty-controls">
-
-            <button
-              type="button"
-              onclick="changeQty(${item.id}, -1)">
-              −
-            </button>
-
-            <strong>${item.qty}</strong>
-
-            <button
-              type="button"
-              onclick="changeQty(${item.id}, 1)">
-              +
-            </button>
-
-          </div>
-
-        </div>
-
-        <button
-          type="button"
-          class="remove-item"
-          onclick="removeItem(${item.id})">
-          ×
-        </button>
-
-      </div>
-    `;
-
-  }).join("");
 }
 
-// =====================================
-// PRODUITS
-// =====================================
+function removeItem(id){
 
-function renderProducts() {
+cart=cart.filter(
+p=>p.id!==id
+);
 
-  const grid = document.getElementById("productGrid");
-  const resultCount = document.getElementById("resultCount");
-  const searchInput = document.getElementById("searchInput");
+saveCart();
 
-  if (!grid) return;
-
-  const search = searchInput
-    ? String(searchInput.value || "").toLowerCase().trim()
-    : "";
-
-  const filteredProducts = products.filter(function(product) {
-
-    const categoryOK =
-      currentCategory === "Tous" ||
-      product.category === currentCategory;
-
-    const searchOK =
-      search === "" ||
-      product.name.toLowerCase().includes(search) ||
-      product.category.toLowerCase().includes(search) ||
-      product.desc.toLowerCase().includes(search);
-
-    return categoryOK && searchOK;
-  });
-
-  if (resultCount) {
-
-    resultCount.textContent =
-      filteredProducts.length +
-      " produit" +
-      (filteredProducts.length > 1 ? "s" : "");
-  }
-
-  if (filteredProducts.length === 0) {
-
-    grid.innerHTML = `
-      <div class="empty-products">
-        Aucun produit trouvé.
-      </div>
-    `;
-
-    return;
-  }
-
-  grid.innerHTML = filteredProducts.map(function(product) {
-
-    return `
-      <article class="product-card">
-
-        <button
-          type="button"
-          class="product-image"
-          onclick="openProduct(${product.id})"
-          style="
-            width:100%;
-            border:0;
-            padding:0;
-            background:transparent;
-            cursor:pointer;
-          "
-        >
-
-          <img
-            src="${product.image}"
-            alt="${product.name}"
-            loading="lazy"
-            style="
-              width:100%;
-              height:240px;
-              object-fit:cover;
-              display:block;
-              border-radius:16px;
-            "
-            onerror="
-              this.style.display='none';
-              this.nextElementSibling.style.display='flex';
-            "
-          >
-
-          <span
-            style="
-              display:none;
-              width:100%;
-              height:240px;
-              align-items:center;
-              justify-content:center;
-              font-size:70px;
-              background:#f1f1f1;
-              border-radius:16px;
-            "
-          >
-            ${product.emoji}
-          </span>
-
-        </button>
-
-        <div class="product-content">
-
-          <small>${product.category}</small>
-
-          <h3>${product.name}</h3>
-
-          <p>${product.desc}</p>
-
-          <div class="product-bottom">
-
-            <strong>
-              ${money(product.price)}
-            </strong>
-
-            <button
-              type="button"
-              class="primary"
-              onclick="addToCart(${product.id})"
-            >
-              Ajouter au panier
-            </button>
-
-          </div>
-
-        </div>
-
-      </article>
-    `;
-
-  }).join("");
 }
 
-// =====================================
-// DETAIL PRODUIT
-// =====================================
+/* =====================================
+   IMAGES TEST
+===================================== */
 
-function openProduct(id) {
+function imageFor(product){
 
-  const product = products.find(function(item) {
-    return item.id === Number(id);
-  });
+const svg=`
 
-  const detail = document.getElementById("productDetail");
+<svg xmlns="http://www.w3.org/2000/svg"
+width="800"
+height="600">
 
-  if (!product || !detail) return;
+<rect width="800"
+height="600"
+fill="#eeeeee"/>
 
-  detail.innerHTML = `
-    <div class="product-detail">
+<text
+x="400"
+y="280"
+text-anchor="middle"
+font-size="130">
+${product.emoji}
+</text>
 
-      <div class="detail-image">
+<text
+x="400"
+y="410"
+text-anchor="middle"
+font-family="Arial"
+font-size="35"
+font-weight="bold">
+${product.name}
+</text>
 
-        <img
-          src="${product.image}"
-          alt="${product.name}"
-          style="
-            width:100%;
-            max-width:400px;
-            height:350px;
-            object-fit:cover;
-            border-radius:18px;
-          "
-        >
+<text
+x="400"
+y="465"
+text-anchor="middle"
+font-family="Arial"
+font-size="28">
+10 HTG
+</text>
 
-      </div>
+</svg>
+`;
 
-      <div>
+return "data:image/svg+xml;charset=UTF-8,"+
+encodeURIComponent(svg);
 
-        <small>${product.category}</small>
-
-        <h2>${product.name}</h2>
-
-        <h3>${money(product.price)}</h3>
-
-        <p>${product.desc}</p>
-
-        <button
-          type="button"
-          class="primary full"
-          onclick="
-            addToCart(${product.id});
-            closeModals();
-          "
-        >
-          Ajouter au panier
-        </button>
-
-      </div>
-
-    </div>
-  `;
-
-  const productModal =
-    document.getElementById("productModal");
-
-  const overlay =
-    document.getElementById("overlay");
-
-  if (productModal) {
-    productModal.classList.remove("hidden");
-  }
-
-  if (overlay) {
-    overlay.classList.remove("hidden");
-  }
 }
 
-// =====================================
-// OUVRIR PANIER
-// =====================================
+/* =====================================
+   RENDER PANIER
+===================================== */
 
-function openCart() {
+function renderCart(){
 
-  const drawer =
-    document.getElementById("cartDrawer");
+document.getElementById("cartCount")
+.textContent=cartQuantity();
 
-  const overlay =
-    document.getElementById("overlay");
+document.getElementById("cartTotal")
+.textContent=money(cartTotal());
 
-  if (drawer) {
-    drawer.classList.add("open");
-  }
+const box=document.getElementById("cartItems");
 
-  if (overlay) {
-    overlay.classList.remove("hidden");
-  }
+if(cart.length===0){
 
-  renderCart();
+box.innerHTML=
+"<p style='text-align:center'>Votre panier est vide.</p>";
+
+return;
+
 }
 
-// =====================================
-// FERMER
-// =====================================
+box.innerHTML=cart.map(item=>{
 
-function closeModals() {
+const product=products.find(
+p=>p.id===item.id
+);
 
-  document.querySelectorAll(".modal")
-    .forEach(function(modal) {
-      modal.classList.add("hidden");
-    });
+return `
 
-  const drawer =
-    document.getElementById("cartDrawer");
+<div class="cart-item">
 
-  if (drawer) {
-    drawer.classList.remove("open");
-  }
+<div class="cart-img">
 
-  const overlay =
-    document.getElementById("overlay");
+<img src="${imageFor(product)}">
 
-  if (overlay) {
-    overlay.classList.add("hidden");
-  }
+</div>
+
+<div class="cart-info">
+
+<b>${item.name}</b>
+
+<div>${money(item.price)}</div>
+
+<div class="qty">
+
+<button onclick="changeQty(${item.id},-1)">−</button>
+
+<b>${item.qty}</b>
+
+<button onclick="changeQty(${item.id},1)">+</button>
+
+</div>
+
+</div>
+
+<button class="remove"
+onclick="removeItem(${item.id})">
+×
+</button>
+
+</div>
+
+`;
+
+}).join("");
+
 }
 
-// =====================================
-// CHECKOUT
-// =====================================
+/* =====================================
+   PRODUITS
+===================================== */
 
-function openCheckout() {
+function renderProducts(){
 
-  if (cart.length === 0) {
+const grid=document.getElementById(
+"productGrid"
+);
 
-    toast("Votre panier est vide.");
+const search=document.getElementById(
+"searchInput"
+).value.toLowerCase().trim();
 
-    return;
-  }
+const list=products.filter(p=>{
 
-  const summary =
-    document.getElementById("checkoutSummary");
+const categoryOK=
+currentCategory==="Tous"||
+p.category===currentCategory;
 
-  if (summary) {
+const searchOK=
+!search||
+p.name.toLowerCase().includes(search)||
+p.category.toLowerCase().includes(search);
 
-    summary.innerHTML = `
-      <div class="checkout-summary">
+return categoryOK&&searchOK;
 
-        ${cart.map(function(item) {
+});
 
-          return `
-            <div class="summary-item">
+document.getElementById(
+"resultCount"
+).textContent=
+list.length+
+" produit"+
+(list.length>1?"s":"");
 
-              <span>
-                ${item.emoji}
-                ${item.name} × ${item.qty}
-              </span>
+grid.innerHTML=list.map(product=>`
 
-              <strong>
-                ${money(
-                  Number(item.price) *
-                  Number(item.qty)
-                )}
-              </strong>
+<article class="product-card">
 
-            </div>
-          `;
+<button class="product-image"
+onclick="openProduct(${product.id})">
 
-        }).join("")}
+<img src="${imageFor(product)}"
+alt="${product.name}">
 
-        <div class="summary-total">
+</button>
 
-          <span>Total</span>
+<div class="product-content">
 
-          <strong>
-            ${money(getCartTotal())}
-          </strong>
+<small>${product.category}</small>
 
-        </div>
+<h3>${product.name}</h3>
 
-      </div>
-    `;
-  }
+<p>${product.desc}</p>
 
-  closeModals();
+<div class="product-bottom">
 
-  const checkoutModal =
-    document.getElementById("checkoutModal");
+<strong>${money(product.price)}</strong>
 
-  const overlay =
-    document.getElementById("overlay");
+<button class="primary"
+onclick="addToCart(${product.id})">
 
-  if (checkoutModal) {
-    checkoutModal.classList.remove("hidden");
-  }
+Ajouter au panier
 
-  if (overlay) {
-    overlay.classList.remove("hidden");
-  }
+</button>
 
-  updatePaymentInfo();
+</div>
+
+</div>
+
+</article>
+
+`).join("");
+
 }
 
-// =====================================
-// PAIEMENT
-// =====================================
+/* =====================================
+   DETAIL
+===================================== */
 
-function updatePaymentInfo() {
+function openProduct(id){
 
-  const payment =
-    document.getElementById("paymentSelect");
+const p=products.find(
+x=>x.id===id
+);
 
-  const paymentInfo =
-    document.getElementById("natcashPaymentInfo");
+document.getElementById(
+"productDetail"
+).innerHTML=`
 
-  const proof =
-    document.getElementById("paymentProof");
+<div class="detail">
 
-  if (!payment) return;
+<div>
+<img src="${imageFor(p)}">
+</div>
 
-  const value =
-    payment.value;
+<div>
 
-  if (value === "NatCash") {
+<small>${p.category}</small>
 
-    if (paymentInfo) {
-      paymentInfo.style.display = "block";
-    }
+<h2>${p.name}</h2>
 
-    if (proof) {
-      proof.required = true;
-    }
+<h3>${money(p.price)}</h3>
 
-  } else {
+<p>${p.desc}</p>
 
-    if (paymentInfo) {
-      paymentInfo.style.display = "none";
-    }
+<button class="primary full"
+onclick="addToCart(${p.id});closeAll()">
 
-    if (proof) {
-      proof.required = false;
-    }
-  }
+Ajouter au panier
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+document.getElementById(
+"productModal"
+).classList.remove("hidden");
+
+document.getElementById(
+"overlay"
+).classList.remove("hidden");
+
 }
 
-// =====================================
-// COMMUNES + ZONES
-// =====================================
+/* =====================================
+   PANIER
+===================================== */
 
-function setupDeliveryFields() {
+function openCart(){
 
-  const communeSelect =
-    document.getElementById("communeSelect");
+document.getElementById(
+"cartDrawer"
+).classList.add("open");
 
-  if (!communeSelect) return;
+document.getElementById(
+"overlay"
+).classList.remove("hidden");
 
-  const communes = [
-    "Arcahaie",
-    "Cabaret",
-    "Port-au-Prince",
-    "Delmas",
-    "Pétion-Ville",
-    "Carrefour",
-    "Gressier",
-    "Léogâne",
-    "Croix-des-Bouquets",
-    "Tabarre",
-    "Cité Soleil",
-    "Kenscoff",
-    "Cayes",
-    "Jacmel",
-    "Jérémie",
-    "Gonaïves",
-    "Saint-Marc",
-    "Hinche",
-    "Mirebalais",
-    "Ouanaminthe",
-    "Cap-Haïtien",
-    "Fort-Liberté",
-    "Port-de-Paix"
-  ];
-
-  communeSelect.innerHTML = `
-    <option value="">
-      Choisir une commune
-    </option>
-  `;
-
-  communes.forEach(function(commune) {
-
-    const option =
-      document.createElement("option");
-
-    option.value = commune;
-    option.textContent = commune;
-
-    communeSelect.appendChild(option);
-  });
 }
 
-// =====================================
-// CODE PAYS
-// =====================================
+/* =====================================
+   CHECKOUT
+===================================== */
 
-function setupCountryCodes() {
+function openCheckout(){
 
-  const countrySelect =
-    document.getElementById("countryCode");
+if(cart.length===0){
 
-  if (!countrySelect) return;
+toast("Votre panier est vide.");
 
-  const countries = [
-    ["+509", "Haïti"],
-    ["+1", "États-Unis / Canada"],
-    ["+52", "Mexique"],
-    ["+33", "France"],
-    ["+34", "Espagne"],
-    ["+39", "Italie"],
-    ["+44", "Royaume-Uni"],
-    ["+49", "Allemagne"],
-    ["+32", "Belgique"],
-    ["+41", "Suisse"],
-    ["+351", "Portugal"],
-    ["+31", "Pays-Bas"],
-    ["+352", "Luxembourg"],
-    ["+212", "Maroc"],
-    ["+213", "Algérie"],
-    ["+216", "Tunisie"],
-    ["+221", "Sénégal"],
-    ["+225", "Côte d'Ivoire"],
-    ["+226", "Burkina Faso"],
-    ["+227", "Niger"],
-    ["+228", "Togo"],
-    ["+229", "Bénin"],
-    ["+230", "Maurice"],
-    ["+231", "Liberia"],
-    ["+232", "Sierra Leone"],
-    ["+233", "Ghana"],
-    ["+234", "Nigeria"],
-    ["+237", "Cameroun"],
-    ["+238", "Cap-Vert"],
-    ["+240", "Guinée équatoriale"],
-    ["+241", "Gabon"],
-    ["+242", "Congo"],
-    ["+243", "RD Congo"],
-    ["+244", "Angola"],
-    ["+249", "Soudan"],
-    ["+250", "Rwanda"],
-    ["+251", "Éthiopie"],
-    ["+252", "Somalie"],
-    ["+253", "Djibouti"],
-    ["+254", "Kenya"],
-    ["+255", "Tanzanie"],
-    ["+256", "Ouganda"],
-    ["+257", "Burundi"],
-    ["+258", "Mozambique"],
-    ["+260", "Zambie"],
-    ["+261", "Madagascar"],
-    ["+262", "La Réunion / Mayotte"],
-    ["+263", "Zimbabwe"],
-    ["+264", "Namibie"],
-    ["+265", "Malawi"],
-    ["+266", "Lesotho"],
-    ["+267", "Botswana"],
-    ["+268", "Eswatini"],
-    ["+269", "Comores"],
-    ["+27", "Afrique du Sud"],
-    ["+290", "Sainte-Hélène"],
-    ["+297", "Aruba"],
-    ["+298", "Îles Féroé"],
-    ["+299", "Groenland"],
-    ["+30", "Grèce"],
-    ["+36", "Hongrie"],
-    ["+370", "Lituanie"],
-    ["+371", "Lettonie"],
-    ["+372", "Estonie"],
-    ["+373", "Moldavie"],
-    ["+374", "Arménie"],
-    ["+375", "Biélorussie"],
-    ["+376", "Andorre"],
-    ["+377", "Monaco"],
-    ["+378", "Saint-Marin"],
-    ["+380", "Ukraine"],
-    ["+381", "Serbie"],
-    ["+382", "Monténégro"],
-    ["+385", "Croatie"],
-    ["+386", "Slovénie"],
-    ["+387", "Bosnie-Herzégovine"],
-    ["+389", "Macédoine du Nord"],
-    ["+40", "Roumanie"],
-    ["+43", "Autriche"],
-    ["+45", "Danemark"],
-    ["+46", "Suède"],
-    ["+47", "Norvège"],
-    ["+48", "Pologne"],
-    ["+51", "Pérou"],
-    ["+53", "Cuba"],
-    ["+54", "Argentine"],
-    ["+55", "Brésil"],
-    ["+56", "Chili"],
-    ["+57", "Colombie"],
-    ["+58", "Venezuela"],
-    ["+591", "Bolivie"],
-    ["+592", "Guyana"],
-    ["+593", "Équateur"],
-    ["+594", "Guyane française"],
-    ["+595", "Paraguay"],
-    ["+597", "Suriname"],
-    ["+598", "Uruguay"],
-    ["+599", "Curaçao / Caraïbes"],
-    ["+60", "Malaisie"],
-    ["+61", "Australie"],
-    ["+62", "Indonésie"],
-    ["+63", "Philippines"],
-    ["+64", "Nouvelle-Zélande"],
-    ["+65", "Singapour"],
-    ["+66", "Thaïlande"],
-    ["+81", "Japon"],
-    ["+82", "Corée du Sud"],
-    ["+84", "Vietnam"],
-    ["+86", "Chine"],
-    ["+90", "Turquie"],
-    ["+91", "Inde"],
-    ["+92", "Pakistan"],
-    ["+93", "Afghanistan"],
-    ["+94", "Sri Lanka"],
-    ["+95", "Myanmar"],
-    ["+98", "Iran"],
-    ["+211", "Soudan du Sud"],
-    ["+218", "Libye"],
-    ["+220", "Gambie"],
-    ["+222", "Mauritanie"],
-    ["+223", "Mali"],
-    ["+224", "Guinée"],
-    ["+235", "Tchad"],
-    ["+236", "République centrafricaine"],
-    ["+239", "São Tomé-et-Príncipe"],
-    ["+245", "Guinée-Bissau"],
-    ["+248", "Seychelles"],
-    ["+255", "Tanzanie"],
-    ["+257", "Burundi"],
-    ["+269", "Comores"],
-    ["+291", "Érythrée"],
-    ["+350", "Gibraltar"],
-    ["+352", "Luxembourg"],
-    ["+353", "Irlande"],
-    ["+354", "Islande"],
-    ["+356", "Malte"],
-    ["+357", "Chypre"],
-    ["+358", "Finlande"],
-    ["+359", "Bulgarie"],
-    ["+421", "Slovaquie"],
-    ["+423", "Liechtenstein"],
-    ["+7", "Russie / Kazakhstan"],
-    ["+971", "Émirats arabes unis"],
-    ["+972", "Israël"],
-    ["+974", "Qatar"],
-    ["+966", "Arabie saoudite"],
-    ["+973", "Bahreïn"],
-    ["+965", "Koweït"],
-    ["+968", "Oman"],
-    ["+962", "Jordanie"],
-    ["+964", "Irak"],
-    ["+967", "Yémen"],
-    ["+880", "Bangladesh"],
-    ["+960", "Maldives"],
-    ["+961", "Liban"],
-    ["+977", "Népal"],
-    ["+993", "Turkménistan"],
-    ["+994", "Azerbaïdjan"],
-    ["+995", "Géorgie"],
-    ["+998", "Ouzbékistan"]
-  ];
+return;
 
-  countrySelect.innerHTML = "";
-
-  countries.forEach(function(country) {
-
-    const option =
-      document.createElement("option");
-
-    option.value = country[0];
-    option.textContent =
-      country[0] + " — " + country[1];
-
-    if (country[0] === "+509") {
-      option.selected = true;
-    }
-
-    countrySelect.appendChild(option);
-  });
 }
 
-// =====================================
-// MESSAGE
-// =====================================
+document.getElementById(
+"checkoutSummary"
+).innerHTML=`
 
-function toast(message) {
+<div class="summary">
 
-  const element =
-    document.getElementById("toast");
+${cart.map(i=>`
 
-  if (!element) {
-    alert(message);
-    return;
-  }
+<div class="summary-row">
 
-  element.textContent = message;
+<span>${i.name} × ${i.qty}</span>
 
-  element.classList.add("show");
+<b>${money(i.price*i.qty)}</b>
 
-  setTimeout(function() {
-    element.classList.remove("show");
-  }, 2500);
+</div>
+
+`).join("")}
+
+<div class="summary-row">
+
+<b>Total</b>
+
+<b>${money(cartTotal())}</b>
+
+</div>
+
+</div>
+
+`;
+
+closeAll();
+
+document.getElementById(
+"checkoutModal"
+).classList.remove("hidden");
+
+document.getElementById(
+"overlay"
+).classList.remove("hidden");
+
 }
 
-// =====================================
-// RECHERCHE
-// =====================================
+/* =====================================
+   COMMUNES + ZONES
+===================================== */
 
-function setupSearch() {
+const deliveryData={
 
-  const input =
-    document.getElementById("searchInput");
+"Arcahaie":[
+"Saint-Medard",
+"Belle Fraîcheur",
+"Cortade",
+"Bourg",
+"Bas Cortade",
+"Boulard",
+"Merotte",
+"Corail",
+"Pont-Callebasse",
+"Carefour Poy",
+"Pierre Michel",
+"Robert Vigner",
+"Thoman",
+"Poy la Ravine",
+"Barrière Poy",
+"Hostin",
+"Ponce",
+"Labarre",
+"Pont Matheux",
+"Saint-Ard",
+"Brois Brûlé",
+"Digue Matheux",
+"Digue Broby"
+],
 
-  const button =
-    document.getElementById("searchBtn");
+"Akayè":[
+"Centre",
+"Zone 1",
+"Zone 2"
+],
 
-  if (input) {
+"Cabaret":[
+"Centre",
+"Zone 1",
+"Zone 2"
+],
 
-    input.addEventListener(
-      "input",
-      renderProducts
-    );
-  }
+"Port-au-Prince":[
+"Centre-ville",
+"Zone 1",
+"Zone 2",
+"Zone 3"
+],
 
-  if (button) {
+"Delmas":[
+"Delmas 1",
+"Delmas 2",
+"Delmas 3"
+],
 
-    button.addEventListener(
-      "click",
-      renderProducts
-    );
-  }
+"Pétion-Ville":[
+"Centre",
+"Zone 1",
+"Zone 2"
+],
+
+"Carrefour":[
+"Centre",
+"Zone 1",
+"Zone 2"
+],
+
+"Gressier":[
+"Centre",
+"Zone 1"
+],
+
+"Léogâne":[
+"Centre",
+"Zone 1",
+"Zone 2"
+],
+
+"Croix-des-Bouquets":[
+"Centre",
+"Zone 1",
+"Zone 2"
+],
+
+"Tabarre":[
+"Centre",
+"Zone 1",
+"Zone 2"
+],
+
+"Cité Soleil":[
+"Centre",
+"Zone 1"
+],
+
+"Kenscoff":[
+"Centre",
+"Zone 1"
+]
+
+};
+
+function setupDelivery(){
+
+const commune=
+document.getElementById(
+"communeSelect"
+);
+
+const area=
+document.getElementById(
+"areaSelect"
+);
+
+commune.innerHTML=
+`<option value="">Choisir une commune</option>`;
+
+Object.keys(deliveryData)
+.forEach(c=>{
+
+const option=
+document.createElement("option");
+
+option.value=c;
+option.textContent=c;
+
+commune.appendChild(option);
+
+});
+
+commune.addEventListener(
+"change",
+()=>{
+
+area.innerHTML=
+`<option value="">Choisir une zone</option>`;
+
+const zones=
+deliveryData[commune.value]||[];
+
+zones.forEach(z=>{
+
+const option=
+document.createElement("option");
+
+option.value=z;
+option.textContent=z;
+
+area.appendChild(option);
+
+});
+
+});
+
 }
 
-// =====================================
-// CATÉGORIES
-// =====================================
+/* =====================================
+   PAIEMENT NATCASH
+===================================== */
 
-function setupCategories() {
+document.getElementById(
+"paymentSelect"
+).addEventListener(
+"change",
+function(){
 
-  document.querySelectorAll(".nav-link")
-    .forEach(function(button) {
+const info=
+document.getElementById(
+"natcashInfo"
+);
 
-      button.addEventListener(
-        "click",
-        function() {
+const proof=
+document.getElementById(
+"paymentProof"
+);
 
-          document.querySelectorAll(".nav-link")
-            .forEach(function(btn) {
-              btn.classList.remove("active");
-            });
+if(this.value==="NatCash"){
 
-          button.classList.add("active");
+info.style.display="block";
 
-          currentCategory =
-            button.dataset.category || "Tous";
+proof.required=true;
 
-          renderProducts();
-        }
-      );
+}else{
+
+info.style.display="none";
+
+proof.required=false;
+
+}
+
+});
+
+/* =====================================
+   FORMULAIRE
+===================================== */
+
+document.getElementById(
+"orderForm"
+).addEventListener(
+"submit",
+function(e){
+
+e.preventDefault();
+
+const data=new FormData(this);
+
+const payment=data.get("payment");
+
+if(
+payment==="NatCash" &&
+!data.get("paymentProof").name
+){
+
+toast(
+"Ajoutez votre preuve NatCash."
+);
+
+return;
+
+}
+
+const order=
+"RC-"+Date.now()
+.toString()
+.slice(-8);
+
+alert(
+
+"Commande enregistrée !\n\n"+
+"Numéro : "+order+
+"\n"+
+"Total : "+money(cartTotal())+
+"\n\n"+
+"RC STORE vous contactera pour confirmer votre commande."
+
+);
+
+cart=[];
+
+saveCart();
+
+this.reset();
+
+document.getElementById(
+"natcashInfo"
+).style.display="none";
+
+closeAll();
+
+});
+
+/* =====================================
+   FERMER
+===================================== */
+
+function closeAll(){
+
+document.querySelectorAll(
+".modal"
+).forEach(m=>
+m.classList.add("hidden")
+);
+
+document.getElementById(
+"cartDrawer"
+).classList.remove("open");
+
+document.getElementById(
+"overlay"
+).classList.add("hidden");
+
+}
+
+document.querySelectorAll(
+"[data-close]"
+).forEach(b=>
+b.addEventListener(
+"click",
+closeAll
+)
+);
+
+document.getElementById(
+"overlay"
+).addEventListener(
+"click",
+closeAll
+);
+
+/* =====================================
+   RECHERCHE
+===================================== */
+
+document.getElementById(
+"searchInput"
+).addEventListener(
+"input",
+renderProducts
+);
+
+document.getElementById(
+"searchBtn"
+).addEventListener(
+"click",
+renderProducts
+);
+
+/* =====================================
+   CATEGORIES
+===================================== */
+
+document.querySelectorAll(
+".nav-link"
+).forEach(button=>{
+
+button.addEventListener(
+"click",
+()=>{
+
+document.querySelectorAll(
+".nav-link"
+).forEach(b=>
+b.classList.remove("active")
+);
+
+button.classList.add("active");
+
+currentCategory=
+button.dataset.category;
+
+renderProducts();
+
+}
+);
+
+});
+
+/* =====================================
+   BOUTONS
+===================================== */
+
+document.getElementById(
+"cartBtn"
+).addEventListener(
+"click",
+openCart
+);
+
+document.getElementById(
+"checkoutBtn"
+).addEventListener(
+"click",
+openCheckout
+);
+
+/* =====================================
+   TOAST
+===================================== */
+
+function toast(message){
+
+const t=document.getElementById(
+"toast"
+);
+
+t.textContent=message;
+
+t.classList.add("show");
+
+setTimeout(
+()=>t.classList.remove("show"),
+2500
+);
+
+}
+
+/* =====================================
+   START
+===================================== */
+
+setupDelivery();
+
+renderProducts();
+
+renderCart();
+
+</script>
+
+</body>
+</html>
