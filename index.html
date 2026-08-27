@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="fr">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -16,13 +17,17 @@
 
 <body>
 
-<!-- ================================
+<!-- =====================================================
      HEADER
-================================ -->
+====================================================== -->
 
 <header class="topbar">
 
-  <a class="brand" href="#">
+  <a
+    class="brand"
+    href="#"
+    aria-label="RC STORE"
+  >
     <span class="brand-mark">RC</span>
     <span>STORE</span>
   </a>
@@ -33,9 +38,14 @@
       id="searchInput"
       type="search"
       placeholder="Rechercher un produit..."
+      aria-label="Rechercher un produit"
     >
 
-    <button id="searchBtn" type="button">
+    <button
+      id="searchBtn"
+      type="button"
+      aria-label="Rechercher"
+    >
       🔎
     </button>
 
@@ -45,6 +55,7 @@
     class="icon-btn"
     id="cartBtn"
     type="button"
+    aria-label="Panier"
   >
     🛒
     <span id="cartCount">0</span>
@@ -53,9 +64,9 @@
 </header>
 
 
-<!-- ================================
-     CATEGORIES
-================================ -->
+<!-- =====================================================
+     NAVIGATION
+====================================================== -->
 
 <nav class="nav">
 
@@ -110,450 +121,131 @@
 </nav>
 
 
-<!-- ================================
-     HERO
-================================ -->
+<!-- =====================================================
+     CONTENU
+====================================================== -->
 
 <main>
 
-<section class="hero">
+  <!-- HERO -->
 
-  <div>
-
-    <p class="eyebrow">
-      BIENVENUE CHEZ RC STORE
-    </p>
-
-    <h1>
-      Tout ce dont vous avez besoin,
-      <br>
-      <span>en un seul endroit.</span>
-    </h1>
-
-    <p>
-      Découvrez nos produits, ajoutez-les
-      au panier et passez votre commande
-      facilement.
-    </p>
-
-    <a
-      href="#products"
-      class="hero-btn"
-    >
-      Voir les produits
-    </a>
-
-  </div>
-
-  <div class="hero-card">
-
-    <div class="hero-logo">
-      RC
-    </div>
-
-    <strong>
-      STORE
-    </strong>
-
-    <small>
-      QUALITÉ • STYLE • SATISFACTION
-    </small>
-
-  </div>
-
-</section>
-
-
-<!-- ================================
-     PRODUITS
-================================ -->
-
-<section
-  class="section"
-  id="products"
->
-
-  <div class="section-head">
+  <section class="hero">
 
     <div>
 
       <p class="eyebrow">
-        NOS PRODUITS
+        BIENVENUE CHEZ RC STORE
       </p>
 
-      <h2>
-        Découvrez notre sélection
-      </h2>
+      <h1>
+        Tout ce dont vous avez besoin,
+        <br>
+        <span>en un seul endroit.</span>
+      </h1>
+
+      <p>
+        Découvrez nos produits, ajoutez-les au panier
+        et passez votre commande facilement.
+      </p>
+
+      <a
+        href="#products"
+        class="hero-btn"
+      >
+        Voir les produits
+      </a>
 
     </div>
 
-    <span id="resultCount">
-      8 produit(s)
-    </span>
+    <div class="hero-card">
 
-  </div>
+      <div class="hero-logo">
+        RC
+      </div>
+
+      <strong>
+        STORE
+      </strong>
+
+      <small>
+        QUALITÉ • STYLE • SATISFACTION
+      </small>
+
+    </div>
+
+  </section>
 
 
-  <div
-    id="productGrid"
-    class="product-grid"
+  <!-- =================================================
+       PRODUITS
+  ================================================== -->
+
+  <section
+    class="section"
+    id="products"
   >
 
-    <!-- PRODUIT 1 -->
+    <div class="section-head">
 
-    <article class="product">
+      <div>
 
-      <div class="product-img">
+        <p class="eyebrow">
+          NOS PRODUITS
+        </p>
 
-        <img
-          src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80"
-          alt="T-Shirt Premium"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Mode
-        </div>
-
-        <h3>
-          T-Shirt Premium
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(1)"
-        >
-          🛒 Ajouter au panier
-        </button>
+        <h2>
+          Découvrez notre sélection
+        </h2>
 
       </div>
 
-    </article>
+      <span id="resultCount">
+        0 produit(s)
+      </span>
 
+    </div>
 
-    <!-- PRODUIT 2 -->
 
-    <article class="product">
+    <div
+      id="productGrid"
+      class="product-grid"
+    ></div>
 
-      <div class="product-img">
-
-        <img
-          src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80"
-          alt="Sac Élégant"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Accessoires
-        </div>
-
-        <h3>
-          Sac Élégant
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(2)"
-        >
-          🛒 Ajouter au panier
-        </button>
-
-      </div>
-
-    </article>
-
-
-    <!-- PRODUIT 3 -->
-
-    <article class="product">
-
-      <div class="product-img">
-
-        <img
-          src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
-          alt="Casque Audio"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Électronique
-        </div>
-
-        <h3>
-          Casque Audio
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(3)"
-        >
-          🛒 Ajouter au panier
-        </button>
-
-      </div>
-
-    </article>
-
-
-    <!-- PRODUIT 4 -->
-
-    <article class="product">
-
-      <div class="product-img">
-
-        <img
-          src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
-          alt="Produit Beauté"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Beauté
-        </div>
-
-        <h3>
-          Produit Beauté
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(4)"
-        >
-          🛒 Ajouter au panier
-        </button>
-
-      </div>
-
-    </article>
-
-
-    <!-- PRODUIT 5 -->
-
-    <article class="product">
-
-      <div class="product-img">
-
-        <img
-          src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80"
-          alt="Décoration Maison"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Maison
-        </div>
-
-        <h3>
-          Décoration Maison
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(5)"
-        >
-          🛒 Ajouter au panier
-        </button>
-
-      </div>
-
-    </article>
-
-
-    <!-- PRODUIT 6 -->
-
-    <article class="product">
-
-      <div class="product-img">
-
-        <img
-          src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
-          alt="Chaussures Sport"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Mode
-        </div>
-
-        <h3>
-          Chaussures Sport
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(6)"
-        >
-          🛒 Ajouter au panier
-        </button>
-
-      </div>
-
-    </article>
-
-
-    <!-- PRODUIT 7 -->
-
-    <article class="product">
-
-      <div class="product-img">
-
-        <img
-          src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80"
-          alt="Montre Moderne"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Électronique
-        </div>
-
-        <h3>
-          Montre Moderne
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(7)"
-        >
-          🛒 Ajouter au panier
-        </button>
-
-      </div>
-
-    </article>
-
-
-    <!-- PRODUIT 8 -->
-
-    <article class="product">
-
-      <div class="product-img">
-
-        <img
-          src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80"
-          alt="Lunettes"
-        >
-
-      </div>
-
-      <div class="product-info">
-
-        <div class="category">
-          Accessoires
-        </div>
-
-        <h3>
-          Lunettes
-        </h3>
-
-        <div class="price">
-          10 GDS
-        </div>
-
-        <button
-          class="primary full"
-          type="button"
-          onclick="addToCart(8)"
-        >
-          🛒 Ajouter au panier
-        </button>
-
-      </div>
-
-    </article>
-
-  </div>
-
-</section>
+  </section>
 
 </main>
 
 
-<!-- ================================
+<!-- =====================================================
      OVERLAY
-================================ -->
+====================================================== -->
 
 <div
-  class="overlay hidden"
   id="overlay"
+  class="overlay hidden"
 ></div>
 
 
-<!-- ================================
+<!-- =====================================================
      PANIER
-================================ -->
+====================================================== -->
 
 <aside
-  class="drawer"
   id="cartDrawer"
+  class="drawer"
 >
 
   <div class="drawer-head">
 
     <h2>
-      Votre panier
+      🛒 Votre panier
     </h2>
 
     <button
       class="close"
-      data-close
       type="button"
+      data-close
+      aria-label="Fermer le panier"
     >
       ×
     </button>
@@ -561,7 +253,10 @@
   </div>
 
 
-  <div id="cartItems">
+  <div
+    id="cartItems"
+    class="cart-items"
+  >
 
     <p>
       Votre panier est vide.
@@ -584,29 +279,29 @@
 
 
   <button
-    class="primary full"
     id="checkoutBtn"
+    class="primary full"
     type="button"
   >
-    Passer la commande
+    🛍️ Passer la commande
   </button>
 
 </aside>
 
 
-<!-- ================================
-     DETAIL PRODUIT
-================================ -->
+<!-- =====================================================
+     MODAL PRODUIT
+====================================================== -->
 
 <div
-  class="modal hidden"
   id="productModal"
+  class="modal hidden"
 >
 
   <button
     class="close modal-close"
-    data-close
     type="button"
+    data-close
   >
     ×
   </button>
@@ -616,19 +311,19 @@
 </div>
 
 
-<!-- ================================
+<!-- =====================================================
      CHECKOUT
-================================ -->
+====================================================== -->
 
 <div
-  class="modal checkout-modal hidden"
   id="checkoutModal"
+  class="modal checkout-modal hidden"
 >
 
   <button
     class="close modal-close"
-    data-close
     type="button"
+    data-close
   >
     ×
   </button>
@@ -645,28 +340,39 @@
     </h2>
 
 
-    <div id="checkoutSummary"></div>
+    <!-- RÉSUMÉ -->
+
+    <div
+      id="checkoutSummary"
+      class="checkout-summary"
+    ></div>
 
 
     <form id="orderForm">
 
 
-      <!-- NOM -->
+      <!-- =================================================
+           NOM
+      ================================================== -->
 
       <label>
 
         Nom complet
 
         <input
-          required
+          type="text"
           name="name"
-          placeholder="Votre nom"
+          required
+          autocomplete="name"
+          placeholder="Votre nom complet"
         >
 
       </label>
 
 
-      <!-- TELEPHONE -->
+      <!-- =================================================
+           TÉLÉPHONE
+      ================================================== -->
 
       <label>
 
@@ -676,16 +382,18 @@
           style="
             display:flex;
             gap:8px;
+            width:100%;
           "
         >
 
           <select
-            required
             name="countryCode"
             id="countryCode"
+            required
+            aria-label="Indicatif du pays"
             style="
-              width:145px;
-              flex-shrink:0;
+              width:150px;
+              min-width:150px;
             "
           >
 
@@ -701,12 +409,20 @@
               🇨🇦 +1 Canada
             </option>
 
+            <option value="+52">
+              🇲🇽 +52 Mexique
+            </option>
+
             <option value="+33">
               🇫🇷 +33 France
             </option>
 
             <option value="+34">
               🇪🇸 +34 Espagne
+            </option>
+
+            <option value="+39">
+              🇮🇹 +39 Italie
             </option>
 
             <option value="+44">
@@ -717,44 +433,392 @@
               🇩🇪 +49 Allemagne
             </option>
 
-            <option value="+52">
-              🇲🇽 +52 Mexique
+            <option value="+30">
+              🇬🇷 +30 Grèce
             </option>
 
-            <option value="+55">
-              🇧🇷 +55 Brésil
+            <option value="+31">
+              🇳🇱 +31 Pays-Bas
             </option>
 
-            <option value="+57">
-              🇨🇴 +57 Colombie
+            <option value="+32">
+              🇧🇪 +32 Belgique
             </option>
 
-            <option value="+58">
-              🇻🇪 +58 Venezuela
+            <option value="+41">
+              🇨🇭 +41 Suisse
             </option>
 
-            <option value="+51">
-              🇵🇪 +51 Pérou
+            <option value="+43">
+              🇦🇹 +43 Autriche
             </option>
 
-            <option value="+54">
-              🇦🇷 +54 Argentine
+            <option value="+45">
+              🇩🇰 +45 Danemark
             </option>
 
-            <option value="+56">
-              🇨🇱 +56 Chili
+            <option value="+46">
+              🇸🇪 +46 Suède
             </option>
 
-            <option value="+591">
-              🇧🇴 +591 Bolivie
+            <option value="+47">
+              🇳🇴 +47 Norvège
             </option>
 
-            <option value="+593">
-              🇪🇨 +593 Équateur
+            <option value="+48">
+              🇵🇱 +48 Pologne
             </option>
 
-            <option value="+598">
-              🇺🇾 +598 Uruguay
+            <option value="+351">
+              🇵🇹 +351 Portugal
+            </option>
+
+            <option value="+353">
+              🇮🇪 +353 Irlande
+            </option>
+
+            <option value="+354">
+              🇮🇸 +354 Islande
+            </option>
+
+            <option value="+358">
+              🇫🇮 +358 Finlande
+            </option>
+
+            <option value="+359">
+              🇧🇬 +359 Bulgarie
+            </option>
+
+            <option value="+370">
+              🇱🇹 +370 Lituanie
+            </option>
+
+            <option value="+371">
+              🇱🇻 +371 Lettonie
+            </option>
+
+            <option value="+372">
+              🇪🇪 +372 Estonie
+            </option>
+
+            <option value="+380">
+              🇺🇦 +380 Ukraine
+            </option>
+
+            <option value="+381">
+              🇷🇸 +381 Serbie
+            </option>
+
+            <option value="+385">
+              🇭🇷 +385 Croatie
+            </option>
+
+            <option value="+386">
+              🇸🇮 +386 Slovénie
+            </option>
+
+            <option value="+420">
+              🇨🇿 +420 Tchéquie
+            </option>
+
+            <option value="+421">
+              🇸🇰 +421 Slovaquie
+            </option>
+
+            <option value="+40">
+              🇷🇴 +40 Roumanie
+            </option>
+
+            <option value="+7">
+              🇷🇺 +7 Russie
+            </option>
+
+            <option value="+90">
+              🇹🇷 +90 Turquie
+            </option>
+
+            <option value="+20">
+              🇪🇬 +20 Égypte
+            </option>
+
+            <option value="+27">
+              🇿🇦 +27 Afrique du Sud
+            </option>
+
+            <option value="+211">
+              🇸🇸 +211 Soudan du Sud
+            </option>
+
+            <option value="+212">
+              🇲🇦 +212 Maroc
+            </option>
+
+            <option value="+213">
+              🇩🇿 +213 Algérie
+            </option>
+
+            <option value="+216">
+              🇹🇳 +216 Tunisie
+            </option>
+
+            <option value="+218">
+              🇱🇾 +218 Libye
+            </option>
+
+            <option value="+220">
+              🇬🇲 +220 Gambie
+            </option>
+
+            <option value="+221">
+              🇸🇳 +221 Sénégal
+            </option>
+
+            <option value="+222">
+              🇲🇷 +222 Mauritanie
+            </option>
+
+            <option value="+223">
+              🇲🇱 +223 Mali
+            </option>
+
+            <option value="+224">
+              🇬🇳 +224 Guinée
+            </option>
+
+            <option value="+225">
+              🇨🇮 +225 Côte d'Ivoire
+            </option>
+
+            <option value="+226">
+              🇧🇫 +226 Burkina Faso
+            </option>
+
+            <option value="+227">
+              🇳🇪 +227 Niger
+            </option>
+
+            <option value="+228">
+              🇹🇬 +228 Togo
+            </option>
+
+            <option value="+229">
+              🇧🇯 +229 Bénin
+            </option>
+
+            <option value="+230">
+              🇲🇺 +230 Maurice
+            </option>
+
+            <option value="+231">
+              🇱🇷 +231 Liberia
+            </option>
+
+            <option value="+232">
+              🇸🇱 +232 Sierra Leone
+            </option>
+
+            <option value="+233">
+              🇬🇭 +233 Ghana
+            </option>
+
+            <option value="+234">
+              🇳🇬 +234 Nigeria
+            </option>
+
+            <option value="+235">
+              🇹🇩 +235 Tchad
+            </option>
+
+            <option value="+236">
+              🇨🇫 +236 Centrafrique
+            </option>
+
+            <option value="+237">
+              🇨🇲 +237 Cameroun
+            </option>
+
+            <option value="+238">
+              🇨🇻 +238 Cap-Vert
+            </option>
+
+            <option value="+239">
+              🇸🇹 +239 Sao Tomé-et-Principe
+            </option>
+
+            <option value="+240">
+              🇬🇶 +240 Guinée équatoriale
+            </option>
+
+            <option value="+241">
+              🇬🇦 +241 Gabon
+            </option>
+
+            <option value="+242">
+              🇨🇬 +242 Congo
+            </option>
+
+            <option value="+243">
+              🇨🇩 +243 RD Congo
+            </option>
+
+            <option value="+244">
+              🇦🇴 +244 Angola
+            </option>
+
+            <option value="+245">
+              🇬🇼 +245 Guinée-Bissau
+            </option>
+
+            <option value="+248">
+              🇸🇨 +248 Seychelles
+            </option>
+
+            <option value="+249">
+              🇸🇩 +249 Soudan
+            </option>
+
+            <option value="+250">
+              🇷🇼 +250 Rwanda
+            </option>
+
+            <option value="+251">
+              🇪🇹 +251 Éthiopie
+            </option>
+
+            <option value="+252">
+              🇸🇴 +252 Somalie
+            </option>
+
+            <option value="+253">
+              🇩🇯 +253 Djibouti
+            </option>
+
+            <option value="+254">
+              🇰🇪 +254 Kenya
+            </option>
+
+            <option value="+255">
+              🇹🇿 +255 Tanzanie
+            </option>
+
+            <option value="+256">
+              🇺🇬 +256 Ouganda
+            </option>
+
+            <option value="+257">
+              🇧🇮 +257 Burundi
+            </option>
+
+            <option value="+258">
+              🇲🇿 +258 Mozambique
+            </option>
+
+            <option value="+260">
+              🇿🇲 +260 Zambie
+            </option>
+
+            <option value="+261">
+              🇲🇬 +261 Madagascar
+            </option>
+
+            <option value="+262">
+              🇷🇪 +262 Réunion
+            </option>
+
+            <option value="+263">
+              🇿🇼 +263 Zimbabwe
+            </option>
+
+            <option value="+264">
+              🇳🇦 +264 Namibie
+            </option>
+
+            <option value="+265">
+              🇲🇼 +265 Malawi
+            </option>
+
+            <option value="+266">
+              🇱🇸 +266 Lesotho
+            </option>
+
+            <option value="+267">
+              🇧🇼 +267 Botswana
+            </option>
+
+            <option value="+268">
+              🇸🇿 +268 Eswatini
+            </option>
+
+            <option value="+269">
+              🇰🇲 +269 Comores
+            </option>
+
+            <option value="+290">
+              🇸🇭 +290 Sainte-Hélène
+            </option>
+
+            <option value="+291">
+              🇪🇷 +291 Érythrée
+            </option>
+
+            <option value="+297">
+              🇦🇼 +297 Aruba
+            </option>
+
+            <option value="+298">
+              🇫🇴 +298 Îles Féroé
+            </option>
+
+            <option value="+299">
+              🇬🇱 +299 Groenland
+            </option>
+
+            <option value="+350">
+              🇬🇮 +350 Gibraltar
+            </option>
+
+            <option value="+356">
+              🇲🇹 +356 Malte
+            </option>
+
+            <option value="+357">
+              🇨🇾 +357 Chypre
+            </option>
+
+            <option value="+376">
+              🇦🇩 +376 Andorre
+            </option>
+
+            <option value="+377">
+              🇲🇨 +377 Monaco
+            </option>
+
+            <option value="+378">
+              🇸🇲 +378 Saint-Marin
+            </option>
+
+            <option value="+379">
+              🇻🇦 +379 Vatican
+            </option>
+
+            <option value="+382">
+              🇲🇪 +382 Monténégro
+            </option>
+
+            <option value="+383">
+              🇽🇰 +383 Kosovo
+            </option>
+
+            <option value="+387">
+              🇧🇦 +387 Bosnie-Herzégovine
+            </option>
+
+            <option value="+389">
+              🇲🇰 +389 Macédoine du Nord
+            </option>
+
+            <option value="+501">
+              🇧🇿 +501 Belize
             </option>
 
             <option value="+502">
@@ -781,393 +845,176 @@
               🇵🇦 +507 Panama
             </option>
 
-            <option value="+32">
-              🇧🇪 +32 Belgique
+            <option value="+508">
+              🇵🇲 +508 Saint-Pierre-et-Miquelon
             </option>
 
-            <option value="+41">
-              🇨🇭 +41 Suisse
+            <option value="+509">
+              🇭🇹 +509 Haïti
             </option>
 
-            <option value="+31">
-              🇳🇱 +31 Pays-Bas
+            <option value="+590">
+              🇬🇵 +590 Guadeloupe
             </option>
 
-            <option value="+351">
-              🇵🇹 +351 Portugal
+            <option value="+591">
+              🇧🇴 +591 Bolivie
             </option>
 
-            <option value="+39">
-              🇮🇹 +39 Italie
+            <option value="+592">
+              🇬🇾 +592 Guyana
             </option>
 
-            <option value="+30">
-              🇬🇷 +30 Grèce
+            <option value="+593">
+              🇪🇨 +593 Équateur
             </option>
 
-            <option value="+43">
-              🇦🇹 +43 Autriche
+            <option value="+594">
+              🇬🇫 +594 Guyane française
             </option>
 
-            <option value="+45">
-              🇩🇰 +45 Danemark
+            <option value="+595">
+              🇵🇾 +595 Paraguay
             </option>
 
-            <option value="+46">
-              🇸🇪 +46 Suède
+            <option value="+596">
+              🇲🇶 +596 Martinique
             </option>
 
-            <option value="+47">
-              🇳🇴 +47 Norvège
+            <option value="+597">
+              🇸🇷 +597 Suriname
             </option>
 
-            <option value="+48">
-              🇵🇱 +48 Pologne
+            <option value="+598">
+              🇺🇾 +598 Uruguay
             </option>
 
-            <option value="+7">
-              🇷🇺 +7 Russie
+            <option value="+599">
+              🇨🇼 +599 Curaçao
             </option>
 
-            <option value="+90">
-              🇹🇷 +90 Turquie
+            <option value="+670">
+              🇹🇱 +670 Timor oriental
             </option>
 
-            <option value="+20">
-              🇪🇬 +20 Égypte
+            <option value="+672">
+              🇦🇺 +672 Territoires australiens
             </option>
 
-            <option value="+27">
-              🇿🇦 +27 Afrique du Sud
+            <option value="+673">
+              🇧🇳 +673 Brunei
             </option>
 
-            <option value="+212">
-              🇲🇦 +212 Maroc
+            <option value="+674">
+              🇳🇷 +674 Nauru
             </option>
 
-            <option value="+213">
-              🇩🇿 +213 Algérie
+            <option value="+675">
+              🇵🇬 +675 Papouasie-Nouvelle-Guinée
             </option>
 
-            <option value="+216">
-              🇹🇳 +216 Tunisie
+            <option value="+676">
+              🇹🇴 +676 Tonga
             </option>
 
-            <option value="+221">
-              🇸🇳 +221 Sénégal
+            <option value="+677">
+              🇸🇧 +677 Îles Salomon
             </option>
 
-            <option value="+225">
-              🇨🇮 +225 Côte d'Ivoire
+            <option value="+678">
+              🇻🇺 +678 Vanuatu
             </option>
 
-            <option value="+226">
-              🇧🇫 +226 Burkina Faso
+            <option value="+679">
+              🇫🇯 +679 Fidji
             </option>
 
-            <option value="+227">
-              🇳🇪 +227 Niger
+            <option value="+680">
+              🇵🇼 +680 Palaos
             </option>
 
-            <option value="+228">
-              🇹🇬 +228 Togo
+            <option value="+681">
+              🇼🇫 +681 Wallis-et-Futuna
             </option>
 
-            <option value="+229">
-              🇧🇯 +229 Bénin
+            <option value="+682">
+              🇨🇰 +682 Îles Cook
             </option>
 
-            <option value="+234">
-              🇳🇬 +234 Nigeria
+            <option value="+683">
+              🇳🇺 +683 Niue
             </option>
 
-            <option value="+237">
-              🇨🇲 +237 Cameroun
+            <option value="+685">
+              🇼🇸 +685 Samoa
             </option>
 
-            <option value="+243">
-              🇨🇩 +243 RD Congo
+            <option value="+686">
+              🇰🇮 +686 Kiribati
             </option>
 
-            <option value="+244">
-              🇦🇴 +244 Angola
+            <option value="+687">
+              🇳🇨 +687 Nouvelle-Calédonie
             </option>
 
-            <option value="+254">
-              🇰🇪 +254 Kenya
+            <option value="+688">
+              🇹🇻 +688 Tuvalu
             </option>
 
-            <option value="+255">
-              🇹🇿 +255 Tanzanie
+            <option value="+689">
+              🇵🇫 +689 Polynésie française
             </option>
 
-            <option value="+256">
-              🇺🇬 +256 Ouganda
+            <option value="+690">
+              🇹🇰 +690 Tokelau
             </option>
 
-            <option value="+260">
-              🇿🇲 +260 Zambie
+            <option value="+691">
+              🇫🇲 +691 Micronésie
             </option>
 
-            <option value="+263">
-              🇿🇼 +263 Zimbabwe
+            <option value="+692">
+              🇲🇭 +692 Îles Marshall
             </option>
 
-            <option value="+81">
-              🇯🇵 +81 Japon
+            <option value="+850">
+              🇰🇵 +850 Corée du Nord
             </option>
 
-            <option value="+82">
-              🇰🇷 +82 Corée du Sud
+            <option value="+852">
+              🇭🇰 +852 Hong Kong
             </option>
 
-            <option value="+86">
-              🇨🇳 +86 Chine
+            <option value="+853">
+              🇲🇴 +853 Macao
             </option>
 
-            <option value="+91">
-              🇮🇳 +91 Inde
+            <option value="+855">
+              🇰🇭 +855 Cambodge
             </option>
 
-            <option value="+92">
-              🇵🇰 +92 Pakistan
+            <option value="+856">
+              🇱🇦 +856 Laos
             </option>
 
-            <option value="+971">
-              🇦🇪 +971 Émirats arabes unis
+            <option value="+880">
+              🇧🇩 +880 Bangladesh
             </option>
 
-            <option value="+966">
-              🇸🇦 +966 Arabie saoudite
+            <option value="+886">
+              🇹🇼 +886 Taïwan
             </option>
 
-            <option value="+974">
-              🇶🇦 +974 Qatar
+            <option value="+960">
+              🇲🇻 +960 Maldives
             </option>
 
-            <option value="+61">
-              🇦🇺 +61 Australie
+            <option value="+961">
+              🇱🇧 +961 Liban
             </option>
 
-            <option value="+64">
-              🇳🇿 +64 Nouvelle-Zélande
+            <option value="+962">
+              🇯🇴 +962 Jordanie
             </option>
 
-          </select>
-
-
-          <input
-            required
-            name="phone"
-            id="phoneInput"
-            type="tel"
-            inputmode="numeric"
-            placeholder="Votre numéro"
-            style="flex:1;"
-          >
-
-        </div>
-
-      </label>
-
-
-      <!-- COMMUNE -->
-
-      <label>
-
-        Commune
-
-        <select
-          required
-          name="commune"
-          id="communeSelect"
-        >
-
-          <option value="">
-            Choisir une commune
-          </option>
-
-          <option value="Arcahaie">
-            Arcahaie
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <!-- ZONE -->
-
-      <label>
-
-        Quartier / zone
-
-        <select
-          required
-          name="area"
-          id="zoneSelect"
-        >
-
-          <option value="">
-            Choisir une zone
-          </option>
-
-          <option>Saint-Médard</option>
-          <option>Belle Fraîcheur</option>
-          <option>Cortade</option>
-          <option>Bourg</option>
-          <option>Bas Cortade</option>
-          <option>Boulard</option>
-          <option>Merotte</option>
-          <option>Corail</option>
-          <option>Pont-Callebasse</option>
-          <option>Carrefour Poy</option>
-          <option>Pierre Michel</option>
-          <option>Robert Vigner</option>
-          <option>Thoman</option>
-          <option>Poy la Ravine</option>
-          <option>Barrière Poy</option>
-          <option>Hostin</option>
-          <option>Ponce</option>
-          <option>Labarre</option>
-          <option>Pont-Mathéux</option>
-          <option>Saint-Ard</option>
-          <option>Brois Brûlé</option>
-          <option>Digue Mathéux</option>
-          <option>Digue Broby</option>
-
-        </select>
-
-      </label>
-
-
-      <!-- REPERE -->
-
-      <label>
-
-        Point de repère
-
-        <input
-          required
-          name="landmark"
-          placeholder="Ex. près du marché..."
-        >
-
-      </label>
-
-
-      <!-- PAIEMENT -->
-
-      <label>
-
-        Mode de paiement
-
-        <select
-          required
-          name="payment"
-          id="paymentSelect"
-        >
-
-          <option value="">
-            Choisir
-          </option>
-
-          <option value="MonCash">
-            MonCash
-          </option>
-
-          <option value="NatCash">
-            NatCash
-          </option>
-
-          <option value="Paiement à la livraison">
-            Paiement à la livraison
-          </option>
-
-        </select>
-
-      </label>
-
-
-      <!-- NATCASH -->
-
-      <div
-        id="natcashPaymentInfo"
-        class="delivery-box"
-        style="
-          display:none;
-          margin-top:15px;
-        "
-      >
-
-        <strong>
-          💰 Paiement par NatCash
-        </strong>
-
-        <p>
-          Envoyez le montant exact de votre
-          commande au :
-        </p>
-
-        <h3>
-          📱 +50941551464
-        </h3>
-
-        <p>
-          👤 <strong>Cherlot René</strong>
-        </p>
-
-        <p>
-          Montant à payer :
-          <strong id="natcashTotal">
-            0 GDS
-          </strong>
-        </p>
-
-        <p>
-          Après le paiement, ajoutez votre
-          preuve de paiement.
-        </p>
-
-        <label>
-
-          📸 Preuve de paiement
-
-          <input
-            type="file"
-            id="paymentProof"
-            name="paymentProof"
-            accept="image/jpeg,image/png,image/webp"
-          >
-
-        </label>
-
-      </div>
-
-
-      <!-- MONCASH -->
-
-      <div
-        id="moncashPaymentInfo"
-        class="delivery-box"
-        style="
-          display:none;
-          margin-top:15px;
-        "
-      >
-
-        <strong>
-          💵 Paiement par MonCash
-        </strong>
-
-        <p>
-          Sélectionnez MonCash puis suivez
-          les instructions de paiement.
-        </p>
-
-      </div>
-
-
-      <!-- LIVRAISON -->
-
-      <div cl
+            <option value=
