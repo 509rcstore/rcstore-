@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="fr">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -17,9 +16,9 @@
 
 <body>
 
-<!-- =====================================
+<!-- ================================
      HEADER
-====================================== -->
+================================ -->
 
 <header class="topbar">
 
@@ -36,7 +35,7 @@
       placeholder="Rechercher un produit..."
     >
 
-    <button id="searchBtn">
+    <button id="searchBtn" type="button">
       🔎
     </button>
 
@@ -45,7 +44,7 @@
   <button
     class="icon-btn"
     id="cartBtn"
-    aria-label="Panier"
+    type="button"
   >
     🛒
     <span id="cartCount">0</span>
@@ -54,15 +53,16 @@
 </header>
 
 
-<!-- =====================================
-     NAVIGATION
-====================================== -->
+<!-- ================================
+     CATEGORIES
+================================ -->
 
 <nav class="nav">
 
   <button
     class="nav-link active"
     data-category="Tous"
+    type="button"
   >
     Tous
   </button>
@@ -70,6 +70,7 @@
   <button
     class="nav-link"
     data-category="Mode"
+    type="button"
   >
     Mode
   </button>
@@ -77,6 +78,7 @@
   <button
     class="nav-link"
     data-category="Beauté"
+    type="button"
   >
     Beauté
   </button>
@@ -84,6 +86,7 @@
   <button
     class="nav-link"
     data-category="Électronique"
+    type="button"
   >
     Électronique
   </button>
@@ -91,6 +94,7 @@
   <button
     class="nav-link"
     data-category="Maison"
+    type="button"
   >
     Maison
   </button>
@@ -98,6 +102,7 @@
   <button
     class="nav-link"
     data-category="Accessoires"
+    type="button"
   >
     Accessoires
   </button>
@@ -105,9 +110,9 @@
 </nav>
 
 
-<!-- =====================================
-     CONTENU
-====================================== -->
+<!-- ================================
+     HERO
+================================ -->
 
 <main>
 
@@ -126,8 +131,9 @@
     </h1>
 
     <p>
-      Découvrez nos produits et commandez
-      facilement en ligne.
+      Découvrez nos produits, ajoutez-les
+      au panier et passez votre commande
+      facilement.
     </p>
 
     <a
@@ -138,7 +144,6 @@
     </a>
 
   </div>
-
 
   <div class="hero-card">
 
@@ -159,9 +164,9 @@
 </section>
 
 
-<!-- =====================================
+<!-- ================================
      PRODUITS
-====================================== -->
+================================ -->
 
 <section
   class="section"
@@ -182,7 +187,9 @@
 
     </div>
 
-    <span id="resultCount"></span>
+    <span id="resultCount">
+      8 produit(s)
+    </span>
 
   </div>
 
@@ -200,12 +207,7 @@
 
         <img
           src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80"
-          alt="T-Shirt"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
+          alt="T-Shirt Premium"
         >
 
       </div>
@@ -224,6 +226,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(1)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -237,12 +247,7 @@
 
         <img
           src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80"
-          alt="Sac"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
+          alt="Sac Élégant"
         >
 
       </div>
@@ -261,6 +266,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(2)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -274,12 +287,7 @@
 
         <img
           src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80"
-          alt="Casque"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
+          alt="Casque Audio"
         >
 
       </div>
@@ -298,6 +306,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(3)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -311,12 +327,7 @@
 
         <img
           src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
-          alt="Beauté"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
+          alt="Produit Beauté"
         >
 
       </div>
@@ -335,6 +346,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(4)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -348,12 +367,7 @@
 
         <img
           src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80"
-          alt="Maison"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
+          alt="Décoration Maison"
         >
 
       </div>
@@ -372,6 +386,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(5)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -385,12 +407,7 @@
 
         <img
           src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
-          alt="Chaussures"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
+          alt="Chaussures Sport"
         >
 
       </div>
@@ -409,6 +426,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(6)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -422,12 +447,7 @@
 
         <img
           src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80"
-          alt="Montre"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
+          alt="Montre Moderne"
         >
 
       </div>
@@ -446,6 +466,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(7)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -460,11 +488,6 @@
         <img
           src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80"
           alt="Lunettes"
-          style="
-            width:100%;
-            height:100%;
-            object-fit:cover;
-          "
         >
 
       </div>
@@ -483,6 +506,14 @@
           10 GDS
         </div>
 
+        <button
+          class="primary full"
+          type="button"
+          onclick="addToCart(8)"
+        >
+          🛒 Ajouter au panier
+        </button>
+
       </div>
 
     </article>
@@ -494,9 +525,9 @@
 </main>
 
 
-<!-- =====================================
+<!-- ================================
      OVERLAY
-====================================== -->
+================================ -->
 
 <div
   class="overlay hidden"
@@ -504,9 +535,9 @@
 ></div>
 
 
-<!-- =====================================
+<!-- ================================
      PANIER
-====================================== -->
+================================ -->
 
 <aside
   class="drawer"
@@ -522,6 +553,7 @@
     <button
       class="close"
       data-close
+      type="button"
     >
       ×
     </button>
@@ -554,6 +586,7 @@
   <button
     class="primary full"
     id="checkoutBtn"
+    type="button"
   >
     Passer la commande
   </button>
@@ -561,9 +594,9 @@
 </aside>
 
 
-<!-- =====================================
-     MODAL PRODUIT
-====================================== -->
+<!-- ================================
+     DETAIL PRODUIT
+================================ -->
 
 <div
   class="modal hidden"
@@ -573,6 +606,7 @@
   <button
     class="close modal-close"
     data-close
+    type="button"
   >
     ×
   </button>
@@ -582,9 +616,9 @@
 </div>
 
 
-<!-- =====================================
+<!-- ================================
      CHECKOUT
-====================================== -->
+================================ -->
 
 <div
   class="modal checkout-modal hidden"
@@ -594,6 +628,7 @@
   <button
     class="close modal-close"
     data-close
+    type="button"
   >
     ×
   </button>
@@ -1006,7 +1041,7 @@
       </label>
 
 
-      <!-- POINT DE REPERE -->
+      <!-- REPERE -->
 
       <label>
 
@@ -1079,10 +1114,7 @@
         </h3>
 
         <p>
-          👤
-          <strong>
-            Cherlot René
-          </strong>
+          👤 <strong>Cherlot René</strong>
         </p>
 
         <p>
@@ -1129,9 +1161,8 @@
         </strong>
 
         <p>
-          Votre paiement MonCash sera traité
-          selon les informations de paiement
-          disponibles.
+          Sélectionnez MonCash puis suivez
+          les instructions de paiement.
         </p>
 
       </div>
@@ -1139,43 +1170,4 @@
 
       <!-- LIVRAISON -->
 
-      <div class="delivery-box">
-
-        <strong>
-          🚚 Livraison estimée
-        </strong>
-
-        <span>
-          En général : 1 à 2 jours selon la zone.
-        </span>
-
-      </div>
-
-
-      <!-- CONFIRMER -->
-
-      <button
-        class="primary full"
-        type="submit"
-      >
-        Confirmer la commande
-      </button>
-
-    </form>
-
-
-    <p class="tiny">
-
-      Pour NatCash, le paiement sera vérifié
-      avant la validation définitive de la commande.
-
-    </p>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================
-     TOAST
-===========================
+      <div cl
