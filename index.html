@@ -1,596 +1,972 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>RC STORE — Boutique en ligne</title>
-
-  <meta
-    name="description"
-    content="RC STORE — Boutique en ligne. Découvrez nos produits, commandez facilement et choisissez votre livraison."
-  >
-
-  <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-  <!-- =====================================
-       HEADER
-  ====================================== -->
-
-  <header class="topbar">
-
-    <a class="brand" href="#" aria-label="RC STORE">
-      <span class="brand-mark">RC</span>
-      <span>STORE</span>
-    </a>
-
-    <div class="search-wrap">
-
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="Rechercher un produit..."
-        aria-label="Rechercher"
-      >
-
-      <button id="searchBtn" type="button">
-        🔎
-      </button>
-
-    </div>
-
-    <!-- PANIER -->
-    <button
-      class="icon-btn"
-      id="cartBtn"
-      type="button"
-      aria-label="Ouvrir le panier"
-    >
-      🛒
-      <span id="cartCount">0</span>
-    </button>
-
-  </header>
-
-
-  <!-- =====================================
-       CATEGORIES
-  ====================================== -->
-
-  <nav class="nav">
-
-    <button
-      class="nav-link active"
-      type="button"
-      data-category="Tous"
-    >
-      Tous
-    </button>
-
-    <button
-      class="nav-link"
-      type="button"
-      data-category="Mode"
-    >
-      Mode
-    </button>
-
-    <button
-      class="nav-link"
-      type="button"
-      data-category="Beauté"
-    >
-      Beauté
-    </button>
-
-    <button
-      class="nav-link"
-      type="button"
-      data-category="Électronique"
-    >
-      Électronique
-    </button>
+// =====================================
+// RC STORE — SCRIPT.JS
+// VERSION CORRIGÉE
+// =====================================
+
+// =====================================
+// PRODUITS — PRIX TEST 10 HTG
+// =====================================
+
+const products = [
+  {
+    id: 1,
+    name: "T-Shirt Premium",
+    price: 10,
+    category: "Mode",
+    image: "https://placehold.co/600x600/png?text=T-Shirt",
+    emoji: "👕",
+    desc: "T-Shirt élégant et confortable pour tous les jours."
+  },
+  {
+    id: 2,
+    name: "Sac à main",
+    price: 10,
+    category: "Accessoires",
+    image: "https://placehold.co/600x600/png?text=Sac+a+main",
+    emoji: "👜",
+    desc: "Sac à main moderne et pratique."
+  },
+  {
+    id: 3,
+    name: "Écouteurs Bluetooth",
+    price: 10,
+    category: "Électronique",
+    image: "https://placehold.co/600x600/png?text=Ecouteurs",
+    emoji: "🎧",
+    desc: "Écouteurs sans fil avec un son de qualité."
+  },
+  {
+    id: 4,
+    name: "Parfum",
+    price: 10,
+    category: "Beauté",
+    image: "https://placehold.co/600x600/png?text=Parfum",
+    emoji: "🌸",
+    desc: "Un parfum agréable pour toutes les occasions."
+  },
+  {
+    id: 5,
+    name: "Montre élégante",
+    price: 10,
+    category: "Accessoires",
+    image: "https://placehold.co/600x600/png?text=Montre",
+    emoji: "⌚",
+    desc: "Montre moderne avec un design élégant."
+  },
+  {
+    id: 6,
+    name: "Casquette",
+    price: 10,
+    category: "Mode",
+    image: "https://placehold.co/600x600/png?text=Casquette",
+    emoji: "🧢",
+    desc: "Casquette confortable pour compléter votre style."
+  },
+  {
+    id: 7,
+    name: "Enceinte Bluetooth",
+    price: 10,
+    category: "Électronique",
+    image: "https://placehold.co/600x600/png?text=Enceinte",
+    emoji: "🔊",
+    desc: "Profitez de votre musique avec un son puissant."
+  },
+  {
+    id: 8,
+    name: "Lunettes de soleil",
+    price: 10,
+    category: "Accessoires",
+    image: "https://placehold.co/600x600/png?text=Lunettes",
+    emoji: "🕶️",
+    desc: "Lunettes élégantes pour votre look quotidien."
+  }
+];
+
+// =====================================
+// VARIABLES
+// =====================================
+
+let cart = JSON.parse(localStorage.getItem("rc_cart") || "[]");
+let currentCategory = "Tous";
+
+// =====================================
+// PRIX
+// =====================================
+
+function money(number) {
+  return (
+    new Intl.NumberFormat("fr-FR").format(
+      Number(number) || 0
+    ) + " HTG"
+  );
+}
 
-    <button
-      class="nav-link"
-      type="button"
-      data-category="Maison"
-    >
-      Maison
-    </button>
+// =====================================
+// PANIER
+// =====================================
 
-    <button
-      class="nav-link"
-      type="button"
-      data-category="Accessoires"
-    >
-      Accessoires
-    </button>
+function getCartTotal() {
+  return cart.reduce(function(total, item) {
+    return total + Number(item.price) * Number(item.qty);
+  }, 0);
+}
 
-  </nav>
+function getCartQuantity() {
+  return cart.reduce(function(total, item) {
+    return total + Number(item.qty);
+  }, 0);
+}
 
+function saveCart() {
+  localStorage.setItem("rc_cart", JSON.stringify(cart));
+  renderCart();
+}
 
-  <!-- =====================================
-       CONTENU
-  ====================================== -->
+function addToCart(id) {
 
-  <main>
+  const product = products.find(function(item) {
+    return item.id === Number(id);
+  });
 
-    <!-- HERO -->
+  if (!product) {
+    console.error("Produit introuvable :", id);
+    return;
+  }
 
-    <section class="hero">
+  const existing = cart.find(function(item) {
+    return item.id === product.id;
+  });
 
-      <div>
+  if (existing) {
+    existing.qty = Number(existing.qty) + 1;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      emoji: product.emoji,
+      qty: 1
+    });
+  }
 
-        <p class="eyebrow">
-          BIENVENUE CHEZ RC STORE
-        </p>
+  saveCart();
 
-        <h1>
-          Tout ce dont vous avez besoin,
-          <br>
-          <span>en un seul endroit.</span>
-        </h1>
+  toast("Produit ajouté au panier 🛒");
+}
 
-        <p>
-          Découvrez nos produits, consultez les prix,
-          ajoutez vos articles au panier et passez
-          votre commande en quelques étapes.
-        </p>
+function changeQty(id, amount) {
 
-        <a
-          href="#products"
-          class="hero-btn"
-        >
-          Voir les produits
-        </a>
+  const item = cart.find(function(product) {
+    return product.id === Number(id);
+  });
 
-      </div>
+  if (!item) return;
 
-      <div class="hero-card">
+  item.qty = Number(item.qty) + Number(amount);
 
-        <div class="hero-logo">
-          RC
-        </div>
+  if (item.qty <= 0) {
+    cart = cart.filter(function(product) {
+      return product.id !== Number(id);
+    });
+  }
 
-        <strong>
-          STORE
-        </strong>
+  saveCart();
+}
 
-        <small>
-          QUALITÉ • STYLE • SATISFACTION
-        </small>
+function removeItem(id) {
 
-      </div>
+  cart = cart.filter(function(item) {
+    return item.id !== Number(id);
+  });
 
-    </section>
+  saveCart();
 
+  toast("Produit retiré du panier.");
+}
 
-    <!-- =====================================
-         PRODUITS
-    ====================================== -->
+// =====================================
+// AFFICHER LE PANIER
+// =====================================
 
-    <section
-      class="section"
-      id="products"
-    >
+function renderCart() {
 
-      <div class="section-head">
+  const cartItems = document.getElementById("cartItems");
+  const cartCount = document.getElementById("cartCount");
+  const cartTotal = document.getElementById("cartTotal");
 
-        <div>
+  if (cartCount) {
+    cartCount.textContent = getCartQuantity();
+  }
 
-          <p class="eyebrow">
-            NOS PRODUITS
-          </p>
+  if (cartTotal) {
+    cartTotal.textContent = money(getCartTotal());
+  }
 
-          <h2>
-            Découvrez notre sélection
-          </h2>
+  if (!cartItems) return;
 
-        </div>
+  if (cart.length === 0) {
 
-        <span id="resultCount">
-          0 produit
-        </span>
-
-      </div>
-
-
-      <!-- Les produits seront ajoutés automatiquement
-           par script.js -->
-
-      <div
-        id="productGrid"
-        class="product-grid"
-      ></div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =====================================
-       OVERLAY
-  ====================================== -->
-
-  <div
-    class="overlay hidden"
-    id="overlay"
-  ></div>
-
-
-  <!-- =====================================
-       PANIER
-  ====================================== -->
-
-  <aside
-    class="drawer"
-    id="cartDrawer"
-    aria-label="Panier"
-  >
-
-    <div class="drawer-head">
-
-      <h2>
-        Votre panier
-      </h2>
-
-      <button
-        class="close"
-        type="button"
-        data-close
-      >
-        ×
-      </button>
-
-    </div>
-
-
-    <!-- Articles du panier -->
-
-    <div id="cartItems">
-
+    cartItems.innerHTML = `
       <div class="empty-cart">
         Votre panier est vide.
       </div>
+    `;
 
-    </div>
+    return;
+  }
 
+  cartItems.innerHTML = cart.map(function(item) {
 
-    <!-- Total -->
+    return `
+      <div class="cart-item">
 
-    <div class="cart-total">
+        <div class="cart-item-icon">
+          ${
+            item.image
+              ? `<img src="${item.image}" alt="${item.name}"
+                   style="width:55px;height:55px;object-fit:cover;border-radius:10px;">`
+              : item.emoji
+          }
+        </div>
 
-      <span>
-        Total
-      </span>
+        <div class="cart-item-info">
 
-      <strong id="cartTotal">
-        0 HTG
-      </strong>
+          <strong>${item.name}</strong>
 
-    </div>
+          <span>${money(item.price)}</span>
 
+          <div class="qty-controls">
 
-    <!-- Commander -->
+            <button
+              type="button"
+              onclick="changeQty(${item.id}, -1)">
+              −
+            </button>
 
-    <button
-      class="primary full"
-      id="checkoutBtn"
-      type="button"
-    >
-      Passer la commande
-    </button>
+            <strong>${item.qty}</strong>
 
-  </aside>
+            <button
+              type="button"
+              onclick="changeQty(${item.id}, 1)">
+              +
+            </button>
 
-
-  <!-- =====================================
-       DETAIL PRODUIT
-  ====================================== -->
-
-  <div
-    class="modal hidden"
-    id="productModal"
-  >
-
-    <button
-      class="close modal-close"
-      type="button"
-      data-close
-    >
-      ×
-    </button>
-
-    <div id="productDetail"></div>
-
-  </div>
-
-
-  <!-- =====================================
-       CHECKOUT
-  ====================================== -->
-
-  <div
-    class="modal checkout-modal hidden"
-    id="checkoutModal"
-  >
-
-    <button
-      class="close modal-close"
-      type="button"
-      data-close
-    >
-      ×
-    </button>
-
-
-    <div class="checkout">
-
-      <p class="eyebrow">
-        COMMANDE
-      </p>
-
-      <h2>
-        Finaliser votre commande
-      </h2>
-
-
-      <!-- Résumé panier -->
-
-      <div id="checkoutSummary"></div>
-
-
-      <!-- =================================
-           FORMULAIRE
-      ================================== -->
-
-      <form id="orderForm">
-
-
-        <!-- NOM -->
-
-        <label>
-          Nom complet
-
-          <input
-            required
-            type="text"
-            name="name"
-            placeholder="Votre nom complet"
-            autocomplete="name"
-          >
-
-        </label>
-
-
-        <!-- TELEPHONE -->
-
-        <label>
-          Téléphone
-
-          <input
-            required
-            type="tel"
-            name="phone"
-            placeholder="+509XXXXXXXX"
-            autocomplete="tel"
-          >
-
-        </label>
-
-
-        <!-- COMMUNE -->
-
-        <label>
-          Commune
-
-          <select
-            required
-            name="commune"
-            id="communeSelect"
-          >
-
-            <option value="">
-              Choisir une commune
-            </option>
-
-          </select>
-
-        </label>
-
-
-        <!-- QUARTIER / ZONE -->
-
-        <label>
-          Quartier / zone
-
-          <input
-            required
-            type="text"
-            name="area"
-            placeholder="Votre quartier / zone"
-          >
-
-        </label>
-
-
-        <!-- POINT DE REPERE -->
-
-        <label>
-          Point de repère
-
-          <input
-            required
-            type="text"
-            name="landmark"
-            placeholder="Ex. près du marché..."
-          >
-
-        </label>
-
-
-        <!-- =================================
-             PAIEMENT
-        ================================== -->
-
-        <label>
-          Mode de paiement
-
-          <select
-            required
-            name="payment"
-            id="paymentSelect"
-          >
-
-            <option value="">
-              Choisir un mode de paiement
-            </option>
-
-            <option value="MonCash">
-              MonCash
-            </option>
-
-            <option value="NatCash">
-              NatCash
-            </option>
-
-            <option value="Paiement à la livraison">
-              Paiement à la livraison
-            </option>
-
-          </select>
-
-        </label>
-
-
-        <!-- =================================
-             INFORMATIONS NATCASH
-        ================================== -->
-
-        <div
-          class="delivery-box"
-          id="natcashPaymentInfo"
-          style="display:none;"
-        >
-
-          <strong>
-            💰 Paiement par NatCash
-          </strong>
-
-          <p>
-            Envoyez le montant exact de votre
-            commande au numéro NatCash :
-          </p>
-
-          <div
-            style="
-              font-size:26px;
-              font-weight:800;
-              margin:12px 0;
-            "
-          >
-            📱 +509 41551464
           </div>
 
-          <p>
-            <strong>
-              Nom du compte :
-            </strong>
-            Cherlot René
-          </p>
-
-          <p>
-            Après avoir effectué le paiement,
-            prenez une capture d'écran de votre
-            reçu NatCash et ajoutez-la ci-dessous.
-          </p>
-
-
-          <!-- PREUVE -->
-
-          <label>
-            📸 Preuve de paiement
-
-            <input
-              type="file"
-              id="paymentProof"
-              name="paymentProof"
-              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-            >
-
-          </label>
-
-          <small>
-            Formats acceptés : JPG, PNG, WEBP.
-          </small>
-
         </div>
-
-
-        <!-- =================================
-             LIVRAISON
-        ================================== -->
-
-        <div class="delivery-box">
-
-          <strong>
-            🚚 Livraison estimée
-          </strong>
-
-          <span>
-            En général : 1 à 2 jours selon la zone.
-          </span>
-
-        </div>
-
-
-        <!-- =================================
-             CONFIRMATION
-        ================================== -->
 
         <button
-          class="primary full"
-          type="submit"
-        >
-          Confirmer la commande
+          type="button"
+          class="remove-item"
+          onclick="removeItem(${item.id})">
+          ×
         </button>
 
+      </div>
+    `;
 
-      </form>
+  }).join("");
+}
 
+// =====================================
+// PRODUITS
+// =====================================
 
-      <p class="tiny">
+function renderProducts() {
 
-        Après confirmation, RC STORE vous
-        contactera pour valider la commande
-        et les détails du paiement.
+  const grid = document.getElementById("productGrid");
+  const resultCount = document.getElementById("resultCount");
+  const searchInput = document.getElementById("searchInput");
 
-      </p>
+  if (!grid) return;
+
+  const search = searchInput
+    ? String(searchInput.value || "").toLowerCase().trim()
+    : "";
+
+  const filteredProducts = products.filter(function(product) {
+
+    const categoryOK =
+      currentCategory === "Tous" ||
+      product.category === currentCategory;
+
+    const searchOK =
+      search === "" ||
+      product.name.toLowerCase().includes(search) ||
+      product.category.toLowerCase().includes(search) ||
+      product.desc.toLowerCase().includes(search);
+
+    return categoryOK && searchOK;
+  });
+
+  if (resultCount) {
+
+    resultCount.textContent =
+      filteredProducts.length +
+      " produit" +
+      (filteredProducts.length > 1 ? "s" : "");
+  }
+
+  if (filteredProducts.length === 0) {
+
+    grid.innerHTML = `
+      <div class="empty-products">
+        Aucun produit trouvé.
+      </div>
+    `;
+
+    return;
+  }
+
+  grid.innerHTML = filteredProducts.map(function(product) {
+
+    return `
+      <article class="product-card">
+
+        <button
+          type="button"
+          class="product-image"
+          onclick="openProduct(${product.id})"
+          style="
+            width:100%;
+            border:0;
+            padding:0;
+            background:transparent;
+            cursor:pointer;
+          "
+        >
+
+          <img
+            src="${product.image}"
+            alt="${product.name}"
+            loading="lazy"
+            style="
+              width:100%;
+              height:240px;
+              object-fit:cover;
+              display:block;
+              border-radius:16px;
+            "
+            onerror="
+              this.style.display='none';
+              this.nextElementSibling.style.display='flex';
+            "
+          >
+
+          <span
+            style="
+              display:none;
+              width:100%;
+              height:240px;
+              align-items:center;
+              justify-content:center;
+              font-size:70px;
+              background:#f1f1f1;
+              border-radius:16px;
+            "
+          >
+            ${product.emoji}
+          </span>
+
+        </button>
+
+        <div class="product-content">
+
+          <small>${product.category}</small>
+
+          <h3>${product.name}</h3>
+
+          <p>${product.desc}</p>
+
+          <div class="product-bottom">
+
+            <strong>
+              ${money(product.price)}
+            </strong>
+
+            <button
+              type="button"
+              class="primary"
+              onclick="addToCart(${product.id})"
+            >
+              Ajouter au panier
+            </button>
+
+          </div>
+
+        </div>
+
+      </article>
+    `;
+
+  }).join("");
+}
+
+// =====================================
+// DETAIL PRODUIT
+// =====================================
+
+function openProduct(id) {
+
+  const product = products.find(function(item) {
+    return item.id === Number(id);
+  });
+
+  const detail = document.getElementById("productDetail");
+
+  if (!product || !detail) return;
+
+  detail.innerHTML = `
+    <div class="product-detail">
+
+      <div class="detail-image">
+
+        <img
+          src="${product.image}"
+          alt="${product.name}"
+          style="
+            width:100%;
+            max-width:400px;
+            height:350px;
+            object-fit:cover;
+            border-radius:18px;
+          "
+        >
+
+      </div>
+
+      <div>
+
+        <small>${product.category}</small>
+
+        <h2>${product.name}</h2>
+
+        <h3>${money(product.price)}</h3>
+
+        <p>${product.desc}</p>
+
+        <button
+          type="button"
+          class="primary full"
+          onclick="
+            addToCart(${product.id});
+            closeModals();
+          "
+        >
+          Ajouter au panier
+        </button>
+
+      </div>
 
     </div>
+  `;
 
-  </div>
+  const productModal =
+    document.getElementById("productModal");
 
+  const overlay =
+    document.getElementById("overlay");
 
-  <!-- =====================================
-       MESSAGE
-  ====================================== -->
+  if (productModal) {
+    productModal.classList.remove("hidden");
+  }
 
-  <div
-    class="toast"
-    id="toast"
-  ></div>
+  if (overlay) {
+    overlay.classList.remove("hidden");
+  }
+}
 
+// =====================================
+// OUVRIR PANIER
+// =====================================
 
-  <!-- =====================================
-       SCRIPT
-  ====================================== -->
+function openCart() {
 
-  <script src="script.js"></script>
+  const drawer =
+    document.getElementById("cartDrawer");
 
-</body>
-</html>
+  const overlay =
+    document.getElementById("overlay");
+
+  if (drawer) {
+    drawer.classList.add("open");
+  }
+
+  if (overlay) {
+    overlay.classList.remove("hidden");
+  }
+
+  renderCart();
+}
+
+// =====================================
+// FERMER
+// =====================================
+
+function closeModals() {
+
+  document.querySelectorAll(".modal")
+    .forEach(function(modal) {
+      modal.classList.add("hidden");
+    });
+
+  const drawer =
+    document.getElementById("cartDrawer");
+
+  if (drawer) {
+    drawer.classList.remove("open");
+  }
+
+  const overlay =
+    document.getElementById("overlay");
+
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
+}
+
+// =====================================
+// CHECKOUT
+// =====================================
+
+function openCheckout() {
+
+  if (cart.length === 0) {
+
+    toast("Votre panier est vide.");
+
+    return;
+  }
+
+  const summary =
+    document.getElementById("checkoutSummary");
+
+  if (summary) {
+
+    summary.innerHTML = `
+      <div class="checkout-summary">
+
+        ${cart.map(function(item) {
+
+          return `
+            <div class="summary-item">
+
+              <span>
+                ${item.emoji}
+                ${item.name} × ${item.qty}
+              </span>
+
+              <strong>
+                ${money(
+                  Number(item.price) *
+                  Number(item.qty)
+                )}
+              </strong>
+
+            </div>
+          `;
+
+        }).join("")}
+
+        <div class="summary-total">
+
+          <span>Total</span>
+
+          <strong>
+            ${money(getCartTotal())}
+          </strong>
+
+        </div>
+
+      </div>
+    `;
+  }
+
+  closeModals();
+
+  const checkoutModal =
+    document.getElementById("checkoutModal");
+
+  const overlay =
+    document.getElementById("overlay");
+
+  if (checkoutModal) {
+    checkoutModal.classList.remove("hidden");
+  }
+
+  if (overlay) {
+    overlay.classList.remove("hidden");
+  }
+
+  updatePaymentInfo();
+}
+
+// =====================================
+// PAIEMENT
+// =====================================
+
+function updatePaymentInfo() {
+
+  const payment =
+    document.getElementById("paymentSelect");
+
+  const paymentInfo =
+    document.getElementById("natcashPaymentInfo");
+
+  const proof =
+    document.getElementById("paymentProof");
+
+  if (!payment) return;
+
+  const value =
+    payment.value;
+
+  if (value === "NatCash") {
+
+    if (paymentInfo) {
+      paymentInfo.style.display = "block";
+    }
+
+    if (proof) {
+      proof.required = true;
+    }
+
+  } else {
+
+    if (paymentInfo) {
+      paymentInfo.style.display = "none";
+    }
+
+    if (proof) {
+      proof.required = false;
+    }
+  }
+}
+
+// =====================================
+// COMMUNES + ZONES
+// =====================================
+
+function setupDeliveryFields() {
+
+  const communeSelect =
+    document.getElementById("communeSelect");
+
+  if (!communeSelect) return;
+
+  const communes = [
+    "Arcahaie",
+    "Cabaret",
+    "Port-au-Prince",
+    "Delmas",
+    "Pétion-Ville",
+    "Carrefour",
+    "Gressier",
+    "Léogâne",
+    "Croix-des-Bouquets",
+    "Tabarre",
+    "Cité Soleil",
+    "Kenscoff",
+    "Cayes",
+    "Jacmel",
+    "Jérémie",
+    "Gonaïves",
+    "Saint-Marc",
+    "Hinche",
+    "Mirebalais",
+    "Ouanaminthe",
+    "Cap-Haïtien",
+    "Fort-Liberté",
+    "Port-de-Paix"
+  ];
+
+  communeSelect.innerHTML = `
+    <option value="">
+      Choisir une commune
+    </option>
+  `;
+
+  communes.forEach(function(commune) {
+
+    const option =
+      document.createElement("option");
+
+    option.value = commune;
+    option.textContent = commune;
+
+    communeSelect.appendChild(option);
+  });
+}
+
+// =====================================
+// CODE PAYS
+// =====================================
+
+function setupCountryCodes() {
+
+  const countrySelect =
+    document.getElementById("countryCode");
+
+  if (!countrySelect) return;
+
+  const countries = [
+    ["+509", "Haïti"],
+    ["+1", "États-Unis / Canada"],
+    ["+52", "Mexique"],
+    ["+33", "France"],
+    ["+34", "Espagne"],
+    ["+39", "Italie"],
+    ["+44", "Royaume-Uni"],
+    ["+49", "Allemagne"],
+    ["+32", "Belgique"],
+    ["+41", "Suisse"],
+    ["+351", "Portugal"],
+    ["+31", "Pays-Bas"],
+    ["+352", "Luxembourg"],
+    ["+212", "Maroc"],
+    ["+213", "Algérie"],
+    ["+216", "Tunisie"],
+    ["+221", "Sénégal"],
+    ["+225", "Côte d'Ivoire"],
+    ["+226", "Burkina Faso"],
+    ["+227", "Niger"],
+    ["+228", "Togo"],
+    ["+229", "Bénin"],
+    ["+230", "Maurice"],
+    ["+231", "Liberia"],
+    ["+232", "Sierra Leone"],
+    ["+233", "Ghana"],
+    ["+234", "Nigeria"],
+    ["+237", "Cameroun"],
+    ["+238", "Cap-Vert"],
+    ["+240", "Guinée équatoriale"],
+    ["+241", "Gabon"],
+    ["+242", "Congo"],
+    ["+243", "RD Congo"],
+    ["+244", "Angola"],
+    ["+249", "Soudan"],
+    ["+250", "Rwanda"],
+    ["+251", "Éthiopie"],
+    ["+252", "Somalie"],
+    ["+253", "Djibouti"],
+    ["+254", "Kenya"],
+    ["+255", "Tanzanie"],
+    ["+256", "Ouganda"],
+    ["+257", "Burundi"],
+    ["+258", "Mozambique"],
+    ["+260", "Zambie"],
+    ["+261", "Madagascar"],
+    ["+262", "La Réunion / Mayotte"],
+    ["+263", "Zimbabwe"],
+    ["+264", "Namibie"],
+    ["+265", "Malawi"],
+    ["+266", "Lesotho"],
+    ["+267", "Botswana"],
+    ["+268", "Eswatini"],
+    ["+269", "Comores"],
+    ["+27", "Afrique du Sud"],
+    ["+290", "Sainte-Hélène"],
+    ["+297", "Aruba"],
+    ["+298", "Îles Féroé"],
+    ["+299", "Groenland"],
+    ["+30", "Grèce"],
+    ["+36", "Hongrie"],
+    ["+370", "Lituanie"],
+    ["+371", "Lettonie"],
+    ["+372", "Estonie"],
+    ["+373", "Moldavie"],
+    ["+374", "Arménie"],
+    ["+375", "Biélorussie"],
+    ["+376", "Andorre"],
+    ["+377", "Monaco"],
+    ["+378", "Saint-Marin"],
+    ["+380", "Ukraine"],
+    ["+381", "Serbie"],
+    ["+382", "Monténégro"],
+    ["+385", "Croatie"],
+    ["+386", "Slovénie"],
+    ["+387", "Bosnie-Herzégovine"],
+    ["+389", "Macédoine du Nord"],
+    ["+40", "Roumanie"],
+    ["+43", "Autriche"],
+    ["+45", "Danemark"],
+    ["+46", "Suède"],
+    ["+47", "Norvège"],
+    ["+48", "Pologne"],
+    ["+51", "Pérou"],
+    ["+53", "Cuba"],
+    ["+54", "Argentine"],
+    ["+55", "Brésil"],
+    ["+56", "Chili"],
+    ["+57", "Colombie"],
+    ["+58", "Venezuela"],
+    ["+591", "Bolivie"],
+    ["+592", "Guyana"],
+    ["+593", "Équateur"],
+    ["+594", "Guyane française"],
+    ["+595", "Paraguay"],
+    ["+597", "Suriname"],
+    ["+598", "Uruguay"],
+    ["+599", "Curaçao / Caraïbes"],
+    ["+60", "Malaisie"],
+    ["+61", "Australie"],
+    ["+62", "Indonésie"],
+    ["+63", "Philippines"],
+    ["+64", "Nouvelle-Zélande"],
+    ["+65", "Singapour"],
+    ["+66", "Thaïlande"],
+    ["+81", "Japon"],
+    ["+82", "Corée du Sud"],
+    ["+84", "Vietnam"],
+    ["+86", "Chine"],
+    ["+90", "Turquie"],
+    ["+91", "Inde"],
+    ["+92", "Pakistan"],
+    ["+93", "Afghanistan"],
+    ["+94", "Sri Lanka"],
+    ["+95", "Myanmar"],
+    ["+98", "Iran"],
+    ["+211", "Soudan du Sud"],
+    ["+218", "Libye"],
+    ["+220", "Gambie"],
+    ["+222", "Mauritanie"],
+    ["+223", "Mali"],
+    ["+224", "Guinée"],
+    ["+235", "Tchad"],
+    ["+236", "République centrafricaine"],
+    ["+239", "São Tomé-et-Príncipe"],
+    ["+245", "Guinée-Bissau"],
+    ["+248", "Seychelles"],
+    ["+255", "Tanzanie"],
+    ["+257", "Burundi"],
+    ["+269", "Comores"],
+    ["+291", "Érythrée"],
+    ["+350", "Gibraltar"],
+    ["+352", "Luxembourg"],
+    ["+353", "Irlande"],
+    ["+354", "Islande"],
+    ["+356", "Malte"],
+    ["+357", "Chypre"],
+    ["+358", "Finlande"],
+    ["+359", "Bulgarie"],
+    ["+421", "Slovaquie"],
+    ["+423", "Liechtenstein"],
+    ["+7", "Russie / Kazakhstan"],
+    ["+971", "Émirats arabes unis"],
+    ["+972", "Israël"],
+    ["+974", "Qatar"],
+    ["+966", "Arabie saoudite"],
+    ["+973", "Bahreïn"],
+    ["+965", "Koweït"],
+    ["+968", "Oman"],
+    ["+962", "Jordanie"],
+    ["+964", "Irak"],
+    ["+967", "Yémen"],
+    ["+880", "Bangladesh"],
+    ["+960", "Maldives"],
+    ["+961", "Liban"],
+    ["+977", "Népal"],
+    ["+993", "Turkménistan"],
+    ["+994", "Azerbaïdjan"],
+    ["+995", "Géorgie"],
+    ["+998", "Ouzbékistan"]
+  ];
+
+  countrySelect.innerHTML = "";
+
+  countries.forEach(function(country) {
+
+    const option =
+      document.createElement("option");
+
+    option.value = country[0];
+    option.textContent =
+      country[0] + " — " + country[1];
+
+    if (country[0] === "+509") {
+      option.selected = true;
+    }
+
+    countrySelect.appendChild(option);
+  });
+}
+
+// =====================================
+// MESSAGE
+// =====================================
+
+function toast(message) {
+
+  const element =
+    document.getElementById("toast");
+
+  if (!element) {
+    alert(message);
+    return;
+  }
+
+  element.textContent = message;
+
+  element.classList.add("show");
+
+  setTimeout(function() {
+    element.classList.remove("show");
+  }, 2500);
+}
+
+// =====================================
+// RECHERCHE
+// =====================================
+
+function setupSearch() {
+
+  const input =
+    document.getElementById("searchInput");
+
+  const button =
+    document.getElementById("searchBtn");
+
+  if (input) {
+
+    input.addEventListener(
+      "input",
+      renderProducts
+    );
+  }
+
+  if (button) {
+
+    button.addEventListener(
+      "click",
+      renderProducts
+    );
+  }
+}
+
+// =====================================
+// CATÉGORIES
+// =====================================
+
+function setupCategories() {
+
+  document.querySelectorAll(".nav-link")
+    .forEach(function(button) {
+
+      button.addEventListener(
+        "click",
+        function() {
+
+          document.querySelectorAll(".nav-link")
+            .forEach(function(btn) {
+              btn.classList.remove("active");
+            });
+
+          button.classList.add("active");
+
+          currentCategory =
+            button.dataset.category || "Tous";
+
+          renderProducts();
+        }
+      );
