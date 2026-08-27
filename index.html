@@ -1,464 +1,1160 @@
-<!doctype html>
+RC STORE — index.html
+
+<!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC STORE — Boutique en ligne</title>
 
-  <title>RC STORE — Boutique en ligne</title>
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-  <meta
-    name="description"
-    content="RC STORE — Boutique en ligne. Découvrez nos produits, commandez facilement et choisissez votre livraison."
-  >
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f5f5;
+  color:#111;
+}
 
-  <link rel="stylesheet" href="style.css">
+header{
+  background:#111;
+  color:white;
+  padding:16px 20px;
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+
+.header{
+  max-width:1200px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+.logo{
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:3px;
+  white-space:nowrap;
+}
+
+.search{
+  flex:1;
+  display:flex;
+  max-width:600px;
+  margin:auto;
+}
+
+.search input{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:10px 0 0 10px;
+  font-size:16px;
+}
+
+.search button{
+  width:65px;
+  border:0;
+  background:#eee;
+  font-size:22px;
+  border-radius:0 10px 10px 0;
+}
+
+.cart-btn{
+  background:transparent;
+  border:0;
+  color:white;
+  font-size:25px;
+  cursor:pointer;
+}
+
+.cart-count{
+  background:white;
+  color:#111;
+  border-radius:50%;
+  padding:3px 8px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.categories{
+  background:white;
+  padding:15px;
+  overflow-x:auto;
+  white-space:nowrap;
+  border-bottom:1px solid #ddd;
+}
+
+.categories button{
+  border:0;
+  background:transparent;
+  padding:12px 20px;
+  font-size:16px;
+  cursor:pointer;
+  border-radius:25px;
+}
+
+.categories button.active{
+  background:#111;
+  color:white;
+}
+
+.hero{
+  max-width:1150px;
+  margin:30px auto;
+  padding:70px 45px;
+  border-radius:35px;
+  background:linear-gradient(135deg,#111,#30343a);
+  color:white;
+}
+
+.hero small{
+  letter-spacing:4px;
+  font-weight:bold;
+}
+
+.hero h1{
+  font-size:48px;
+  margin:20px 0;
+  max-width:700px;
+}
+
+.hero p{
+  font-size:20px;
+  line-height:1.6;
+  max-width:700px;
+  color:#ddd;
+}
+
+.hero button{
+  margin-top:25px;
+  padding:16px 25px;
+  border:0;
+  border-radius:12px;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.products-section{
+  max-width:1150px;
+  margin:50px auto;
+  padding:0 20px;
+}
+
+.section-title{
+  margin-bottom:25px;
+}
+
+.section-title small{
+  letter-spacing:4px;
+  font-weight:bold;
+}
+
+.section-title h2{
+  font-size:38px;
+  margin-top:10px;
+}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:22px;
+}
+
+.product{
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 4px 15px rgba(0,0,0,.08);
+}
+
+.product img{
+  width:100%;
+  height:230px;
+  object-fit:cover;
+  display:block;
+}
+
+.product-info{
+  padding:17px;
+}
+
+.category{
+  color:#777;
+  font-size:14px;
+  margin-bottom:8px;
+}
+
+.product h3{
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.product p{
+  color:#555;
+  line-height:1.5;
+  min-height:45px;
+}
+
+.price{
+  font-size:21px;
+  font-weight:bold;
+  margin:15px 0;
+}
+
+.add{
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:10px;
+  background:#111;
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.add:active{
+  transform:scale(.98);
+}
+
+/* PANIER */
+
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  z-index:90;
+}
+
+.overlay.show{
+  display:block;
+}
+
+.cart{
+  position:fixed;
+  right:0;
+  top:0;
+  height:100%;
+  width:min(430px,95%);
+  background:white;
+  z-index:100;
+  padding:25px;
+  overflow-y:auto;
+  transform:translateX(100%);
+  transition:.3s;
+}
+
+.cart.show{
+  transform:translateX(0);
+}
+
+.cart-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.close{
+  border:0;
+  background:#eee;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  font-size:20px;
+}
+
+.cart-item{
+  display:flex;
+  gap:12px;
+  padding:15px 0;
+  border-bottom:1px solid #ddd;
+}
+
+.cart-item img{
+  width:70px;
+  height:70px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.cart-item-info{
+  flex:1;
+}
+
+.qty{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+}
+
+.qty button{
+  border:1px solid #ccc;
+  background:white;
+  width:28px;
+  height:28px;
+  border-radius:6px;
+}
+
+.total{
+  font-size:23px;
+  font-weight:bold;
+  padding:20px 0;
+}
+
+/* FORMULAIRE */
+
+.order{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:120;
+  background:rgba(0,0,0,.65);
+  padding:20px;
+  overflow-y:auto;
+}
+
+.order.show{
+  display:block;
+}
+
+.order-box{
+  background:white;
+  max-width:650px;
+  margin:30px auto;
+  border-radius:22px;
+  padding:25px;
+}
+
+.order-box h2{
+  margin-bottom:20px;
+}
+
+.field{
+  margin-bottom:16px;
+}
+
+.field label{
+  display:block;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  padding:14px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:16px;
+}
+
+.phone{
+  display:flex;
+  gap:8px;
+}
+
+.phone select{
+  width:145px;
+}
+
+.phone input{
+  flex:1;
+}
+
+.natcash{
+  background:#f1f1f1;
+  padding:20px;
+  border-radius:15px;
+  margin:20px 0;
+}
+
+.natcash h3{
+  margin-bottom:12px;
+}
+
+.nat-number{
+  font-size:28px;
+  font-weight:bold;
+  margin:10px 0;
+}
+
+.nat-name{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.submit{
+  width:100%;
+  padding:16px;
+  background:#111;
+  color:white;
+  border:0;
+  border-radius:12px;
+  font-size:17px;
+  font-weight:bold;
+}
+
+.cancel{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  background:#eee;
+  border:0;
+  border-radius:12px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+  .products{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .hero h1{
+    font-size:38px;
+  }
+}
+
+@media(max-width:600px){
+  .header{
+    gap:10px;
+  }
+
+  .logo{
+    font-size:22px;
+  }
+
+  .search{
+    max-width:none;
+  }
+
+  .hero{
+    margin:20px;
+    padding:45px 25px;
+    border-radius:25px;
+  }
+
+  .hero h1{
+    font-size:34px;
+  }
+
+  .products-section{
+    padding:0 15px;
+  }
+
+  .products{
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+
+  .product img{
+    height:170px;
+  }
+
+  .product-info{
+    padding:12px;
+  }
+
+  .product h3{
+    font-size:17px;
+  }
+
+  .product p{
+    font-size:14px;
+  }
+
+  .price{
+    font-size:18px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <header class="topbar">
+<header>
+  <div class="header">
 
-    <a class="brand" href="#" aria-label="RC STORE">
-      <span class="brand-mark">RC</span>
-      <span>STORE</span>
-    </a>
+    <div class="logo">RC STORE</div>
 
-    <div class="search-wrap">
+    <div class="search">
+      <input id="search" type="search" placeholder="Rechercher un produit...">
+      <button>🔎</button>
+    </div>
 
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="Rechercher un produit..."
-        aria-label="Rechercher"
-      >
+    <button class="cart-btn" onclick="openCart()">
+      🛒 <span id="cartCount" class="cart-count">0</span>
+    </button>
 
-      <button id="searchBtn" type="button">
-        🔎
-      </button>
+  </div>
+</header>
+
+<nav class="categories">
+  <button class="active" onclick="filterCategory('Tous',this)">Tous</button>
+  <button onclick="filterCategory('Mode',this)">Mode</button>
+  <button onclick="filterCategory('Beauté',this)">Beauté</button>
+  <button onclick="filterCategory('Électronique',this)">Électronique</button>
+  <button onclick="filterCategory('Accessoires',this)">Accessoires</button>
+</nav>
+
+<section class="hero">
+  <small>BIENVENUE CHEZ RC STORE</small>
+
+  <h1>
+    Tout ce dont vous avez besoin,
+    en un seul endroit.
+  </h1>
+
+  <p>
+    Découvrez nos produits, consultez les prix,
+    ajoutez vos articles au panier et passez
+    votre commande facilement.
+  </p>
+
+  <button onclick="document.getElementById('products').scrollIntoView()">
+    Voir les produits
+  </button>
+</section>
+
+<section class="products-section">
+
+  <div class="section-title">
+    <small>NOS PRODUITS</small>
+    <h2>Découvrez notre sélection</h2>
+  </div>
+
+  <div id="products" class="products"></div>
+
+</section>
+
+<!-- PANIER -->
+
+<div id="overlay" class="overlay" onclick="closeCart()"></div>
+
+<aside id="cart" class="cart">
+
+  <div class="cart-header">
+    <h2>Votre panier</h2>
+    <button class="close" onclick="closeCart()">✕</button>
+  </div>
+
+  <div id="cartItems"></div>
+
+  <div class="total">
+    Total : <span id="cartTotal">0 HTG</span>
+  </div>
+
+  <button class="submit" onclick="openOrder()">
+    Passer la commande
+  </button>
+
+</aside>
+
+<!-- COMMANDE -->
+
+<div id="order" class="order">
+
+  <div class="order-box">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h2>Informations de livraison</h2>
+      <button class="close" onclick="closeOrder()">✕</button>
+    </div>
+
+    <div class="field">
+      <label>Nom complet</label>
+      <input id="customerName" type="text" placeholder="Votre nom complet">
+    </div>
+
+    <div class="field">
+      <label>Téléphone</label>
+
+      <div class="phone">
+
+        <select id="countryCode">
+          <option value="+509">🇭🇹 +509</option>
+          <option value="+1">🇺🇸 +1</option>
+          <option value="+1">🇨🇦 +1</option>
+          <option value="+33">🇫🇷 +33</option>
+          <option value="+34">🇪🇸 +34</option>
+          <option value="+44">🇬🇧 +44</option>
+          <option value="+49">🇩🇪 +49</option>
+          <option value="+39">🇮🇹 +39</option>
+          <option value="+52">🇲🇽 +52</option>
+          <option value="+55">🇧🇷 +55</option>
+          <option value="+56">🇨🇱 +56</option>
+          <option value="+57">🇨🇴 +57</option>
+          <option value="+58">🇻🇪 +58</option>
+          <option value="+41">🇨🇭 +41</option>
+          <option value="+32">🇧🇪 +32</option>
+          <option value="+31">🇳🇱 +31</option>
+          <option value="+351">🇵🇹 +351</option>
+          <option value="+81">🇯🇵 +81</option>
+          <option value="+82">🇰🇷 +82</option>
+          <option value="+86">🇨🇳 +86</option>
+        </select>
+
+        <input
+          id="customerPhone"
+          type="tel"
+          inputmode="numeric"
+          placeholder="41551564"
+        >
+
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Commune</label>
+
+      <select id="commune">
+        <option value="">Choisir une commune</option>
+        <option value="Arcahaie">Arcahaie</option>
+      </select>
 
     </div>
 
-    <button
-      class="icon-btn"
-      id="cartBtn"
-      type="button"
-      aria-label="Panier"
-    >
-      🛒
-      <span id="cartCount">0</span>
-    </button>
+    <div class="field">
 
-  </header>
+      <label>Quartier / zone</label>
 
+      <select id="zone">
 
-  <nav class="nav">
+        <option value="">Choisir une zone</option>
 
-    <button class="nav-link active" data-category="Tous" type="button">
-      Tous
-    </button>
+        <option>Saint-Médard</option>
+        <option>Belle Fraîcheur</option>
+        <option>Cortade</option>
+        <option>Bourg</option>
+        <option>Bas Cortade</option>
+        <option>Boulard</option>
+        <option>Merotte</option>
+        <option>Corail</option>
+        <option>Pierre Fouquet</option>
+        <option>Pierre Michel</option>
+        <option>Robert Vigner</option>
+        <option>Thoman</option>
+        <option>Poy la Ravine</option>
+        <option>Barrière Poy</option>
+        <option>Hostin</option>
+        <option>Ponce</option>
+        <option>Labarre</option>
+        <option>Pont-Mathéus</option>
+        <option>Saint-Ard</option>
+        <option>Brois Brûlé</option>
+        <option>Digue Mathéx</option>
+        <option>Digue Brody</option>
 
-    <button class="nav-link" data-category="Mode" type="button">
-      Mode
-    </button>
-
-    <button class="nav-link" data-category="Beauté" type="button">
-      Beauté
-    </button>
-
-    <button class="nav-link" data-category="Électronique" type="button">
-      Électronique
-    </button>
-
-    <button class="nav-link" data-category="Maison" type="button">
-      Maison
-    </button>
-
-    <button class="nav-link" data-category="Accessoires" type="button">
-      Accessoires
-    </button>
-
-  </nav>
-
-
-  <main>
-
-    <section class="hero">
-
-      <div>
-
-        <p class="eyebrow">
-          BIENVENUE CHEZ RC STORE
-        </p>
-
-        <h1>
-          Tout ce dont vous avez besoin,
-          <br>
-          <span>en un seul endroit.</span>
-        </h1>
-
-        <p>
-          Découvrez nos produits, consultez les prix,
-          ajoutez vos articles au panier et passez votre
-          commande en quelques étapes.
-        </p>
-
-        <a href="#products" class="hero-btn">
-          Voir les produits
-        </a>
-
-      </div>
-
-
-      <div class="hero-card">
-
-        <div class="hero-logo">
-          RC
-        </div>
-
-        <strong>
-          STORE
-        </strong>
-
-        <small>
-          QUALITÉ • STYLE • SATISFACTION
-        </small>
-
-      </div>
-
-    </section>
-
-
-    <section class="section" id="products">
-
-      <div class="section-head">
-
-        <div>
-
-          <p class="eyebrow">
-            NOS PRODUITS
-          </p>
-
-          <h2>
-            Découvrez notre sélection
-          </h2>
-
-        </div>
-
-        <span id="resultCount"></span>
-
-      </div>
-
-
-      <div
-        id="productGrid"
-        class="product-grid"
-      ></div>
-
-    </section>
-
-  </main>
-
-
-  <div
-    class="overlay hidden"
-    id="overlay"
-  ></div>
-
-
-  <aside
-    class="drawer"
-    id="cartDrawer"
-  >
-
-    <div class="drawer-head">
-
-      <h2>
-        Votre panier
-      </h2>
-
-      <button
-        class="close"
-        data-close
-        type="button"
-      >
-        ×
-      </button>
+      </select>
 
     </div>
 
+    <div class="field">
+      <label>Point de repère</label>
+      <input id="landmark" type="text" placeholder="Exemple : près de l'église">
+    </div>
 
-    <div id="cartItems"></div>
+    <div class="field">
+      <label>Mode de paiement</label>
 
+      <select id="payment">
+        <option value="NatCash">NatCash</option>
+      </select>
+    </div>
 
-    <div class="cart-total">
+    <div class="natcash">
 
-      <span>
-        Total
-      </span>
+      <h3>💰 Paiement par NatCash</h3>
 
-      <strong id="cartTotal">
-        0 HTG
-      </strong>
+      <p>
+        Envoyez le montant exact de votre commande au numéro :
+      </p>
+
+      <div class="nat-number">
+        📱 +509 41551564
+      </div>
+
+      <div class="nat-name">
+        👤 Cherlot René
+      </div>
+
+      <p style="margin-top:15px;">
+        Après avoir effectué le paiement, gardez votre reçu
+        NatCash comme preuve de paiement.
+      </p>
 
     </div>
 
+    <div class="total">
+      Total de la commande :
+      <span id="orderTotal">0 HTG</span>
+    </div>
 
-    <button
-      class="primary full"
-      id="checkoutBtn"
-      type="button"
-    >
-      Passer la commande
+    <button class="submit" onclick="confirmOrder()">
+      Confirmer la commande
     </button>
 
-  </aside>
-
-
-  <div
-    class="modal hidden"
-    id="productModal"
-  >
-
-    <button
-      class="close modal-close"
-      data-close
-      type="button"
-    >
-      ×
+    <button class="cancel" onclick="closeOrder()">
+      Annuler
     </button>
-
-    <div id="productDetail"></div>
 
   </div>
 
+</div>
 
-  <div
-    class="modal checkout-modal hidden"
-    id="checkoutModal"
-  >
+<script>
 
-    <button
-      class="close modal-close"
-      data-close
-      type="button"
-    >
-      ×
-    </button>
+const products = [
 
+  {
+    id:1,
+    name:"T-Shirt Premium",
+    category:"Mode",
+    price:10,
+    desc:"T-Shirt élégant et confortable pour tous les jours.",
+    image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80"
+  },
 
-    <div class="checkout">
+  {
+    id:2,
+    name:"Sac à main",
+    category:"Accessoires",
+    price:10,
+    desc:"Sac à main moderne et pratique.",
+    image:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80"
+  },
 
-      <p class="eyebrow">
-        COMMANDE
-      </p>
+  {
+    id:3,
+    name:"Écouteurs Bluetooth",
+    category:"Électronique",
+    price:10,
+    desc:"Écouteurs sans fil avec un son de qualité.",
+    image:"https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=800&q=80"
+  },
 
-      <h2>
-        Finaliser votre commande
-      </h2>
+  {
+    id:4,
+    name:"Parfum",
+    category:"Beauté",
+    price:10,
+    desc:"Un parfum agréable pour toutes les occasions.",
+    image:"https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=800&q=80"
+  },
 
+  {
+    id:5,
+    name:"Montre élégante",
+    category:"Accessoires",
+    price:10,
+    desc:"Montre moderne avec un design élégant.",
+    image:"https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=80"
+  },
 
-      <div id="checkoutSummary"></div>
+  {
+    id:6,
+    name:"Casquette",
+    category:"Mode",
+    price:10,
+    desc:"Casquette confortable pour compléter votre style.",
+    image:"https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=800&q=80"
+  },
 
+  {
+    id:7,
+    name:"Chaussures",
+    category:"Mode",
+    price:10,
+    desc:"Chaussures modernes et confortables.",
+    image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+  },
 
-      <form id="orderForm">
+  {
+    id:8,
+    name:"Lunettes",
+    category:"Accessoires",
+    price:10,
+    desc:"Lunettes élégantes pour compléter votre look.",
+    image:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80"
+  }
 
-        <label>
+];
 
-          Nom complet
+let cart = [];
+let currentCategory = "Tous";
 
-          <input
-            required
-            name="name"
-            placeholder="Votre nom"
-          >
+function money(value){
+  return Number(value).toLocaleString("fr-FR") + " HTG";
+}
 
-        </label>
+function renderProducts(){
 
+  const container = document.getElementById("products");
 
-        <label>
+  const search =
+    document.getElementById("search").value.toLowerCase().trim();
 
-          Téléphone
+  const list = products.filter(product => {
 
-          <input
-            required
-            name="phone"
-            placeholder="509..."
-          >
+    const categoryOK =
+      currentCategory === "Tous" ||
+      product.category === currentCategory;
 
-        </label>
+    const searchOK =
+      product.name.toLowerCase().includes(search) ||
+      product.category.toLowerCase().includes(search);
 
+    return categoryOK && searchOK;
 
-        <label>
+  });
 
-          Commune
+  container.innerHTML = "";
 
-          <select
-            required
-            name="commune"
-            id="communeSelect"
-          >
+  list.forEach(product => {
 
-            <option value="">
-              Choisir une commune
-            </option>
+    container.innerHTML += `
 
-          </select>
+      <article class="product">
 
-        </label>
-
-
-        <label>
-
-          Quartier / zone
-
-          <input
-            required
-            name="area"
-            placeholder="Votre quartier"
-          >
-
-        </label>
-
-
-        <label>
-
-          Point de repère
-
-          <input
-            required
-            name="landmark"
-            placeholder="Ex. près du marché..."
-          >
-
-        </label>
-
-
-        <label>
-
-          Mode de paiement
-
-          <select
-            required
-            name="payment"
-            id="paymentSelect"
-          >
-
-            <option value="">
-              Choisir
-            </option>
-
-            <option value="MonCash">
-              MonCash
-            </option>
-
-            <option value="NatCash">
-              NatCash
-            </option>
-
-            <option value="Paiement à la livraison">
-              Paiement à la livraison
-            </option>
-
-          </select>
-
-        </label>
-
-
-        <div
-          id="natcashPaymentInfo"
-          class="delivery-box"
-          style="display:none; margin-top:12px;"
+        <img
+          src="${product.image}"
+          alt="${product.name}"
+          onerror="this.style.display='none'"
         >
 
-          <strong>
-            💰 Paiement par NatCash
-          </strong>
+        <div class="product-info">
 
-          <p>
-            Envoyez le montant exact de votre
-            commande au numéro NatCash :
-          </p>
+          <div class="category">
+            ${product.category}
+          </div>
 
-          <h3 style="font-size:24px; margin:8px 0;">
-            📱 41551464
-          </h3>
+          <h3>${product.name}</h3>
 
-          <p>
-            Après avoir effectué le paiement,
-            prenez une capture d'écran de votre
-            reçu NatCash et ajoutez-la ci-dessous.
-          </p>
+          <p>${product.desc}</p>
 
+          <div class="price">
+            ${money(product.price)}
+          </div>
 
-          <label style="display:block; margin-top:12px;">
+          <button
+            class="add"
+            onclick="addToCart(${product.id})"
+          >
+            Ajouter au panier
+          </button>
 
-            📸 Preuve de paiement
+        </div>
 
-            <input
-              type="file"
-              id="paymentProof"
-              name="paymentProof"
-              accept="image/jpeg,image/png,image/webp"
+      </article>
+
+    `;
+
+  });
+
+}
+
+function filterCategory(category,button){
+
+  currentCategory = category;
+
+  document
+    .querySelectorAll(".categories button")
+    .forEach(btn => btn.classList.remove("active"));
+
+  button.classList.add("active");
+
+  renderProducts();
+}
+
+document
+  .getElementById("search")
+  .addEventListener("input",renderProducts);
+
+function addToCart(id){
+
+  const product = products.find(p => p.id === id);
+
+  const existing = cart.find(item => item.id === id);
+
+  if(existing){
+    existing.qty++;
+  }else{
+    cart.push({
+      ...product,
+      qty:1
+    });
+  }
+
+  renderCart();
+
+  openCart();
+
+}
+
+function removeFromCart(id){
+
+  cart = cart.filter(item => item.id !== id);
+
+  renderCart();
+
+}
+
+function changeQty(id,amount){
+
+  const item = cart.find(item => item.id === id);
+
+  if(!item) return;
+
+  item.qty += amount;
+
+  if(item.qty <= 0){
+    removeFromCart(id);
+    return;
+  }
+
+  renderCart();
+
+}
+
+function getTotal(){
+
+  return cart.reduce(
+    (sum,item) =>
+      sum + Number(item.price) * Number(item.qty),
+    0
+  );
+
+}
+
+function getQuantity(){
+
+  return cart.reduce(
+    (sum,item) =>
+      sum + Number(item.qty),
+    0
+  );
+
+}
+
+function renderCart(){
+
+  const container =
+    document.getElementById("cartItems");
+
+  document.getElementById("cartCount")
+    .textContent = getQuantity();
+
+  document.getElementById("cartTotal")
+    .textContent = money(getTotal());
+
+  document.getElementById("orderTotal")
+    .textContent = money(getTotal());
+
+  if(cart.length === 0){
+
+    container.innerHTML =
+      "<p>Votre panier est vide.</p>";
+
+    return;
+  }
+
+  container.innerHTML = "";
+
+  cart.forEach(item => {
+
+    container.innerHTML += `
+
+      <div class="cart-item">
+
+        <img
+          src="${item.image}"
+          alt="${item.name}"
+        >
+
+        <div class="cart-item-info">
+
+          <strong>${item.name}</strong>
+
+          <div>
+            ${money(item.price)}
+          </div>
+
+          <div class="qty">
+
+            <button
+              onclick="changeQty(${item.id},-1)"
             >
+              −
+            </button>
 
-          </label>
+            <span>${item.qty}</span>
 
+            <button
+              onclick="changeQty(${item.id},1)"
+            >
+              +
+            </button>
 
-          <small style="display:block; margin-top:8px;">
-            Formats acceptés : JPG, PNG, WEBP.
-          </small>
+            <button
+              onclick="removeFromCart(${item.id})"
+              style="margin-left:auto;"
+            >
+              🗑️
+            </button>
+
+          </div>
 
         </div>
 
+      </div>
 
-        <div class="delivery-box">
+    `;
 
-          <strong>
-            🚚 Livraison estimée
-          </strong>
+  });
 
-          <span>
-            En général : 1 à 2 jours selon la zone.
-          </span>
+}
 
-        </div>
+function openCart(){
 
+  document
+    .getElementById("cart")
+    .classList.add("show");
 
-        <button
-          class="primary full"
-          type="submit"
-        >
-          Confirmer la commande
-        </button>
+  document
+    .getElementById("overlay")
+    .classList.add("show");
 
+}
 
-      </form>
+function closeCart(){
 
+  document
+    .getElementById("cart")
+    .classList.remove("show");
 
-      <p class="tiny">
+  document
+    .getElementById("overlay")
+    .classList.remove("show");
 
-        Pour NatCash, votre paiement sera vérifié
-        avant la validation définitive de la commande.
-        Une fois le paiement accepté, votre reçu RC STORE
-        sera disponible.
+}
 
-      </p>
+function openOrder(){
 
-    </div>
+  if(cart.length === 0){
 
-  </div>
+    alert("Votre panier est vide.");
 
+    return;
+  }
 
-  <div
-    class="toast"
-    id="toast"
-  ></div>
+  closeCart();
 
+  document
+    .getElementById("order")
+    .classList.add("show");
 
-  <!-- Le JavaScript est dans le fichier script.js -->
-  <script src="script.js"></script>
+  document
+    .getElementById("orderTotal")
+    .textContent = money(getTotal());
+
+}
+
+function closeOrder(){
+
+  document
+    .getElementById("order")
+    .classList.remove("show");
+
+}
+
+function confirmOrder(){
+
+  const name =
+    document.getElementById("customerName").value.trim();
+
+  const code =
+    document.getElementById("countryCode").value;
+
+  const phone =
+    document.getElementById("customerPhone").value.trim();
+
+  const commune =
+    document.getElementById("commune").value;
+
+  const zone =
+    document.getElementById("zone").value;
+
+  const landmark =
+    document.getElementById("landmark").value.trim();
+
+  if(!name || !phone || !commune || !zone){
+
+    alert(
+      "Veuillez remplir le nom, téléphone, commune et zone."
+    );
+
+    return;
+  }
+
+  const fullPhone = code + phone;
+
+  let details = "";
+
+  cart.forEach(item => {
+
+    details +=
+      `${item.name} x${item.qty} = ${money(item.price * item.qty)}\n`;
+
+  });
+
+  const message =
+
+`RC STORE — NOUVELLE COMMANDE
+
+Client : ${name}
+Téléphone : ${fullPhone}
+
+Commune : ${commune}
+Zone : ${zone}
+Point de repère : ${landmark || "Non précisé"}
+
+Produits :
+${details}
+
+TOTAL : ${money(getTotal())}
+
+Paiement : NatCash
+Numéro NatCash : +509 41551564
+Nom : Cherlot René`;
+
+  alert(message);
+
+  console.log(message);
+
+  alert(
+    "Commande enregistrée pour le test. Le montant total est " +
+    money(getTotal()) + "."
+  );
+
+}
+
+renderProducts();
+renderCart();
+
+</script>
 
 </body>
-
-</html>
+            </html>
